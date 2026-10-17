@@ -14,10 +14,10 @@
 - [x] `git init` + 首次 Commit + `gh repo create dk900912/Pegged --public --push`
 
 ## Phase 2 — 技术决策建档与 UI 设计看板
-- [ ] `docs/TECHNICAL_DECISIONS.md`（6 大跨平台难点对比与决策）
-- [ ] `docs/UI_DESIGN_SPEC.md`
-- [ ] `docs/ui-design-showcase.html`（单文件可视化看板，7 大组件 + 深浅色 Token + 动画曲线）
-- [ ] git commit & push
+- [x] `docs/TECHNICAL_DECISIONS.md`（6 大跨平台难点对比与决策）
+- [x] `docs/UI_DESIGN_SPEC.md`
+- [x] `docs/ui-design-showcase.html`（单文件可视化看板，7 大组件 + 深浅色 Token + 动画曲线）
+- [x] git commit & push
 
 ## Phase 3 — 模块化开发（每模块 build 0 Error → 记录 → 勾选 → commit & push）
 - [ ] Module 1: 项目脚手架、配置持久化、多语言词条完整迁移（简中/英/西等 10 语言）、`Themes/FluentTheme.xaml`
