@@ -1,0 +1,27 @@
+# Build output
+bin/
+obj/
+publish/
+*.user
+*.suo
+
+# IDE
+.vs/
+.idea/
+*.DotSettings.user
+
+# Reference sources (never pushed)
+_reference_macos/
+
+# OS
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# NuGet
+*.nupkg
+packages/
+
+# Python tooling
+__pycache__/
+*.pyc
