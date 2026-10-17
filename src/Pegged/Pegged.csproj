@@ -23,6 +23,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Windows Forms is in scope for the tray icon, so System.Drawing and
+         System.Windows both come in as implicit usings and collide.
+         Pegged is a WPF app: the WPF spelling wins every short name. -->
+    <Using Include="System.Windows.Point" Alias="Point" />
+    <Using Include="System.Windows.Size" Alias="Size" />
+    <Using Include="System.Windows.Rect" Alias="Rect" />
+    <Using Include="System.Windows.Media.Color" Alias="Color" />
+    <Using Include="System.Windows.Media.Brush" Alias="Brush" />
+    <Using Include="System.Windows.Controls.Canvas" Alias="Canvas" />
+    <Using Include="System.Windows.Controls.Image" Alias="Image" />
+    <Using Include="System.Windows.Controls.Border" Alias="Border" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\assets\app.ico" Link="app.ico" />
     <None Include="..\..\assets\logo.png" Link="logo.png" />
     <Resource Include="..\..\assets\logo.png" Link="assets\logo.png" />

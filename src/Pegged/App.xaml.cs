@@ -15,6 +15,13 @@ public partial class App : System.Windows.Application
 {
     internal CaptureStore Store { get; private set; } = null!;
 
+    /// <summary>The line itself: raised by the controller once start-up is done.</summary>
+    internal LineController? Line { get; private set; }
+
+    internal static App Instance => (App)System.Windows.Application.Current;
+
+    internal static CaptureStore CaptureStore => Instance.Store;
+
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -29,9 +36,18 @@ public partial class App : System.Windows.Application
         Store.Restore();
         Store.Changed += (_, _) => settings.Save();
 
+        // Module 2: the line and its pills, watching every monitor's top edge.
+        Line = new LineController();
+        Line.SettingsRequested += (_, _) => SettingsRequested?.Invoke(this, EventArgs.Empty);
+        Line.Start();
+
         SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
         Exit += OnExit;
     }
+
+    /// <summary>Raised when the user asks for the settings window. Module 6
+    /// opens it; until then the request is simply dropped.</summary>
+    internal static event EventHandler? SettingsRequested;
 
     private void OnUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
     {
@@ -41,6 +57,7 @@ public partial class App : System.Windows.Application
     private void OnExit(object sender, ExitEventArgs e)
     {
         SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
+        Line?.Dispose();
         Store.Save();
         Settings.Current.Save();
     }

@@ -135,3 +135,7 @@
 | 6 | `CS0104: “Application”是“System.Windows.Forms.Application”和“System.Windows.Application”之间的不明确的引用` | 托盘图标需要 `UseWindowsForms`，两个 `Application` 同时被隐式 using 引入 | 在 `App.xaml.cs` / `ThemeManager.cs` 中写全 `System.Windows.Application` |
 | 7 | `CS0720: 不能在静态类中声明索引器` | `Loc` 索引器写在静态类里 | 去掉索引器，XAML 改用 `StrExtension` 标记扩展 |
 | 8 | 本机无 .NET SDK，`dotnet build` 不可用 | 环境预装缺失 | `dotnet-install.ps1 -Channel 8.0` 安装 8.0.426（含 WindowsDesktop 8.0.32 运行时），后续统一用绝对路径调用 |
+| 9 | Module 2 首次编译 5 个 `CS0104`：`Point` / `Canvas` 是 `System.Drawing` 与 `System.Windows` 之间的不明确引用 | `UseWindowsForms=true`（托盘图标所需）同时把 `System.Drawing` 与 `System.Windows.Forms` 加入隐式 global using，与 WPF 同名类型撞车 | 在 `Pegged.csproj` 用 `<Using Include="..." Alias="..." />` 全局声明：本项目是 WPF 应用，`Point`/`Size`/`Rect`/`Color`/`Brush`/`Canvas`/`Image`/`Border` 一律取 `System.Windows.*` 拼写，一处解决、全项目生效 |
+| 10 | `CS0165: 使用了未赋值的局部变量 bandMonitor` | `out var` 写在 `&&` 链里再在嵌套 `if` 中使用，编译器的明确赋值分析不跨该链传播 | 拆成显式 `if (MonitorService.IsInHotBand(cursor, out var hot))` + `MonitorDescription? band = null`，再用 `band is not null` 收紧作用域 |
+| 11 | `SoundService` 5 条 `CS8602/CS8604`：静态字段 `HangSamples` 等"可能为空" | `Lazy` 字段（第 24 行）写在 `Func` 字段（第 61 行）之前，Roslyn 按文本顺序做静态字段初始化流分析 | 把 5 个采样函数从 `static readonly Func<double,double>` 字段改为普通 `private static double X(double t)` 方法，方法无初始化顺序问题 |
+| 12 | 直接双击 `Pegged.exe` 报 `Failed to resolve hostfxr.dll`（错误码 0x80008083） | SDK 装在 `%USERPROFILE%\dotnet`，不在系统 PATH 里，apphost 找不到运行时 | 运行/调试前 `export DOTNET_ROOT=%USERPROFILE%\dotnet`；Phase 4 发布物附 `README` 说明与安装脚本 |
