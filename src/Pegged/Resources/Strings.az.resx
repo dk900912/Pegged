@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Tray.ShowLine" xml:space="preserve">
+    <value>Xətti göstər</value>
+  </data>
+  <data name="Tray.HideLine" xml:space="preserve">
+    <value>Xətti gizlət</value>
+  </data>
+  <data name="Tray.ClearAll" xml:space="preserve">
+    <value>Hamısını yığışdır</value>
+  </data>
+  <data name="Tray.Settings" xml:space="preserve">
+    <value>Parametrlər…</value>
+  </data>
+  <data name="Tray.OpenScreenshotsFolder" xml:space="preserve">
+    <value>Ekran görüntüsü qovluğunu aç</value>
+  </data>
+  <data name="Tray.Sounds" xml:space="preserve">
+    <value>Səslər</value>
+  </data>
+  <data name="Tray.OpenAtLogin" xml:space="preserve">
+    <value>Girişdə aç</value>
+  </data>
+  <data name="Tray.CheckForUpdates" xml:space="preserve">
+    <value>Yenilənmələri yoxla…</value>
+  </data>
+  <data name="Tray.Quit" xml:space="preserve">
+    <value>Pegged-dən çıx</value>
+  </data>
+  <data name="Menu.BringLineDown" xml:space="preserve">
+    <value>Xətti endir</value>
+  </data>
+  <data name="Menu.ConditionTopEdge" xml:space="preserve">
+    <value>Göstərici yuxarı kənarda dayandıqda</value>
+  </data>
+  <data name="Menu.ConditionNew" xml:space="preserve">
+    <value>Yeni bir şey asılanda</value>
+  </data>
+  <data name="Menu.ConditionFullScreen" xml:space="preserve">
+    <value>Tam ekran tətbiqlərin üzərində</value>
+  </data>
+  <data name="Menu.WatchClipboard" xml:space="preserve">
+    <value>Kopyalanmış şəkilləri as</value>
+  </data>
+  <data name="Menu.WatchClipboardHint" xml:space="preserve">
+    <value>Kopyaladığınız şəkillər də xəttə asılır</value>
+  </data>
+  <data name="Menu.ExtraFolders" xml:space="preserve">
+    <value>Əlavə izlənilən qovluqlar</value>
+  </data>
+  <data name="Menu.AddFolder" xml:space="preserve">
+    <value>Qovluq əlavə et…</value>
+  </data>
+  <data name="Menu.StopWatching" xml:space="preserve">
+    <value>İzləməyi dayandır</value>
+  </data>
+  <data name="Menu.KeepOnLine" xml:space="preserve">
+    <value>Xətdə saxla</value>
+  </data>
+  <data name="Menu.KeepFit" xml:space="preserve">
+    <value>Yerləşdiyi qədər</value>
+  </data>
+  <data name="Menu.KeepCount" xml:space="preserve">
+    <value>{0} çəkiliş</value>
+  </data>
+  <data name="Menu.Size" xml:space="preserve">
+    <value>Ölçü</value>
+  </data>
+  <data name="Menu.SizeSmall" xml:space="preserve">
+    <value>Kiçik</value>
+  </data>
+  <data name="Menu.SizeMedium" xml:space="preserve">
+    <value>Orta</value>
+  </data>
+  <data name="Menu.SizeLarge" xml:space="preserve">
+    <value>Böyük</value>
+  </data>
+  <data name="Menu.Shortcut" xml:space="preserve">
+    <value>Qısayol</value>
+  </data>
+  <data name="Menu.ShortcutNone" xml:space="preserve">
+    <value>Yoxdur</value>
+  </data>
+  <data name="Menu.ChangeShortcut" xml:space="preserve">
+    <value>Qısayolu dəyiş…</value>
+  </data>
+  <data name="Card.Copy" xml:space="preserve">
+    <value>Kopyala</value>
+  </data>
+  <data name="Card.Open" xml:space="preserve">
+    <value>Aç</value>
+  </data>
+  <data name="Card.Preview" xml:space="preserve">
+    <value>Önizləmə</value>
+  </data>
+  <data name="Card.Crop" xml:space="preserve">
+    <value>Kəs</value>
+  </data>
+  <data name="Card.Annotate" xml:space="preserve">
+    <value>Şərh et</value>
+  </data>
+  <data name="Card.ShowInExplorer" xml:space="preserve">
+    <value>Explorer-də göstər</value>
+  </data>
+  <data name="Card.SaveToDesktop" xml:space="preserve">
+    <value>İş masasına yadda saxla</value>
+  </data>
+  <data name="Card.Discard" xml:space="preserve">
+    <value>At</value>
+  </data>
+  <data name="Card.TakeDown" xml:space="preserve">
+    <value>Endir</value>
+  </data>
+  <data name="Card.Recycle" xml:space="preserve">
+    <value>Zibil qutusuna köçür</value>
+  </data>
+  <data name="Card.TakeDownLeft" xml:space="preserve">
+    <value>Soldakıların hamısını yığışdır</value>
+  </data>
+  <data name="Card.TakeDownRight" xml:space="preserve">
+    <value>Sağdakıların hamısını yığışdır</value>
+  </data>
+  <data name="Card.Copied" xml:space="preserve">
+    <value>Kopyalandı!</value>
+  </data>
+  <data name="Line.Empty" xml:space="preserve">
+    <value>Ekran görüntüsü alın, buraya asılacaq</value>
+  </data>
+  <data name="Line.EmptyHint" xml:space="preserve">
+    <value>Və ya bir şəkil kopyalayın, o da asılır</value>
+  </data>
+  <data name="Crop.Title" xml:space="preserve">
+    <value>Kəsmə</value>
+  </data>
+  <data name="Crop.Cancel" xml:space="preserve">
+    <value>Ləğv et</value>
+  </data>
+  <data name="Crop.Apply" xml:space="preserve">
+    <value>Kəsməni tətbiq et</value>
+  </data>
+  <data name="Crop.Size" xml:space="preserve">
+    <value>{0} × {1}</value>
+  </data>
+  <data name="Settings.Title" xml:space="preserve">
+    <value>Parametrlər</value>
+  </data>
+  <data name="Settings.General" xml:space="preserve">
+    <value>Ümumi</value>
+  </data>
+  <data name="Settings.GeneralDesc" xml:space="preserve">
+    <value>Dil, səslər və xətdə saxlanacaq miqdar</value>
+  </data>
+  <data name="Settings.Language" xml:space="preserve">
+    <value>Dil</value>
+  </data>
+  <data name="Settings.LanguageDesc" xml:space="preserve">
+    <value>Pegged on dildə danışır</value>
+  </data>
+  <data name="Settings.Sounds" xml:space="preserve">
+    <value>Səslər</value>
+  </data>
+  <data name="Settings.SoundsDesc" xml:space="preserve">
+    <value>Çəkiliş asılanda və ya endiriləndə yumşaq səs</value>
+  </data>
+  <data name="Settings.Keep" xml:space="preserve">
+    <value>Xətdə saxla</value>
+  </data>
+  <data name="Settings.KeepDesc" xml:space="preserve">
+    <value>Köhnə çəkilişlər sonundan düşür</value>
+  </data>
+  <data name="Settings.Size" xml:space="preserve">
+    <value>Kart ölçüsü</value>
+  </data>
+  <data name="Settings.SizeDesc" xml:space="preserve">
+    <value>Çəkilişlərin asılma ölçüsü</value>
+  </data>
+  <data name="Settings.Capture" xml:space="preserve">
+    <value>Çəkiliş mənbələri</value>
+  </data>
+  <data name="Settings.CaptureDesc" xml:space="preserve">
+    <value>Pegged-in yeni çəkilişləri axtardığı yer</value>
+  </data>
+  <data name="Settings.Folder" xml:space="preserve">
+    <value>Ekran görüntüsü qovluğu</value>
+  </data>
+  <data name="Settings.FolderDesc" xml:space="preserve">
+    <value>Yeni şəkillər üçün izlənilir</value>
+  </data>
+  <data name="Settings.FolderChange" xml:space="preserve">
+    <value>Dəyiş…</value>
+  </data>
+  <data name="Settings.Extra" xml:space="preserve">
+    <value>Əlavə izlənilən qovluqlar</value>
+  </data>
+  <data name="Settings.ExtraDesc" xml:space="preserve">
+    <value>Üç qovluğa qədər; oradakı yeni şəkillər də asılır</value>
+  </data>
+  <data name="Settings.Clipboard" xml:space="preserve">
+    <value>Kopyalanmış şəkilləri as</value>
+  </data>
+  <data name="Settings.ClipboardDesc" xml:space="preserve">
+    <value>İstənilən tətbiqdən kopyalanmış şəkillər xəttə asılır</value>
+  </data>
+  <data name="Settings.Appearance" xml:space="preserve">
+    <value>Görünüş və ekranlar</value>
+  </data>
+  <data name="Settings.AppearanceDesc" xml:space="preserve">
+    <value>Mövzu, vaxt və xəttin istifadə edəcəyi ekran</value>
+  </data>
+  <data name="Settings.Theme" xml:space="preserve">
+    <value>Mövzu</value>
+  </data>
+  <data name="Settings.ThemeAuto" xml:space="preserve">
+    <value>Windows-a uyğun</value>
+  </data>
+  <data name="Settings.ThemeLight" xml:space="preserve">
+    <value>Açıq</value>
+  </data>
+  <data name="Settings.ThemeDark" xml:space="preserve">
+    <value>Tünd</value>
+  </data>
+  <data name="Settings.RevealDelay" xml:space="preserve">
+    <value>Gözləmə müddəti</value>
+  </data>
+  <data name="Settings.RevealDelayDesc" xml:space="preserve">
+    <value>Xəttin enməsi üçün göstəricinin gözləmə müddəti</value>
+  </data>
+  <data name="Settings.TopEdge" xml:space="preserve">
+    <value>Yuxarı kənarda göstər</value>
+  </data>
+  <data name="Settings.TopEdgeDesc" xml:space="preserve">
+    <value>Göstəricini ekranın yuxarısında saxlamaq xətti endirir</value>
+  </data>
+  <data name="Settings.Peek" xml:space="preserve">
+    <value>Yeni çəkilişdə göstər</value>
+  </data>
+  <data name="Settings.PeekDesc" xml:space="preserve">
+    <value>Yeni çəkiliş xətti bir an göstərir</value>
+  </data>
+  <data name="Settings.OverFullScreen" xml:space="preserve">
+    <value>Tam ekran tətbiqlərin üzərində</value>
+  </data>
+  <data name="Settings.OverFullScreenDesc" xml:space="preserve">
+    <value>Tətbiq ekranı doldursa da xətt enir</value>
+  </data>
+  <data name="Settings.Shortcuts" xml:space="preserve">
+    <value>Qısayollar</value>
+  </data>
+  <data name="Settings.ShortcutsDesc" xml:space="preserve">
+    <value>Klavye təyinatları</value>
+  </data>
+  <data name="Settings.ShortcutToggle" xml:space="preserve">
+    <value>Xətti göstər və ya gizlət</value>
+  </data>
+  <data name="Settings.Record" xml:space="preserve">
+    <value>Yeni qısayolu basın</value>
+  </data>
+  <data name="Settings.RecordHint" xml:space="preserve">
+    <value>Esc ləğv edir, Delete qısayolu silir.</value>
+  </data>
+  <data name="Settings.About" xml:space="preserve">
+    <value>Haqqında</value>
+  </data>
+  <data name="Settings.AboutDesc" xml:space="preserve">
+    <value>Versiya, lisenziya və mənşə</value>
+  </data>
+  <data name="Settings.Version" xml:space="preserve">
+    <value>Versiya {0}</value>
+  </data>
+  <data name="Settings.Website" xml:space="preserve">
+    <value>Veb-sayt</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>Alejandro Bujan-ın macOS üçün tendedero tətbiqinin yerli Windows versiyası, MIT lisenziyası ilə.</value>
+  </data>
+  <data name="Dialog.WatchFolderPrompt" xml:space="preserve">
+    <value>Bu qovluğa yadda saxlanılan yeni şəkillər xəttə asılacaq.</value>
+  </data>
+  <data name="Dialog.Watch" xml:space="preserve">
+    <value>İzlə</value>
+  </data>
+  <data name="Dialog.LoginFailed" xml:space="preserve">
+    <value>Giriş parametri dəyişdirilmədi</value>
+  </data>
+  <data name="Dialog.LoginFailedBody" xml:space="preserve">
+    <value>Pegged-i yazma icazəsi olan qovluqdan işə salın.</value>
+  </data>
+  <data name="Dialog.CropFailed" xml:space="preserve">
+    <value>Bu şəkil kəsilmədi</value>
+  </data>
+  <data name="Dialog.TrashFailed" xml:space="preserve">
+    <value>Bu fayl zibil qutusuna köçürülmədi</value>
+  </data>
+  <data name="Dialog.ClipboardOffered" xml:space="preserve">
+    <value>Kopyaladığınız şəkilləri Pegged assın?</value>
+  </data>
+</root>
