@@ -35,12 +35,40 @@ public partial class LineWindow : Window
     /// <summary>Card hit rectangles in window coordinates, set by the layout.</summary>
     private readonly System.Collections.Generic.List<Rect> _hitRects = new();
 
+    /// <summary>The cards hanging from the rope. Module 5 drives the dragging
+    /// and the copying through it.</summary>
+    public CardStrip Strip { get; }
+
     public LineWindow()
     {
         InitializeComponent();
+        Strip = new CardStrip(CardLayer);
+        Strip.LayoutChanged += (_, _) =>
+        {
+            SetHitRects(Strip.HitRects());
+            UpdateHint();
+        };
+
         Loaded += OnLoaded;
         SourceInitialized += OnSourceInitialized;
         Closing += OnClosing;
+        SizeChanged += OnWindowSizeChanged;
+        PreviewMouseWheel += OnPreviewMouseWheel;
+    }
+
+    private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        Strip.Relayout();
+        LayoutRope();
+    }
+
+    /// <summary>With more on the line than fits, the wheel slides it along.</summary>
+    private void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (App.CaptureStore.LiveCount <= LayoutMetrics.CapacityFor(this.Width)) return;
+
+        Strip.Scroll(e.Delta < 0 ? -LayoutMetrics.Spacing / 2 : LayoutMetrics.Spacing / 2);
+        e.Handled = true;
     }
 
     // ---- the Win32 side --------------------------------------------------
@@ -82,6 +110,8 @@ public partial class LineWindow : Window
         MouseLeave += (_, _) => ShowToolbar(false);
         ApplyThemeBrushes();
         ThemeManager.ThemeChanged += (_, _) => ApplyThemeBrushes();
+
+        Strip.Rebuild();
     }
 
     private void OnClosing(object? sender, CancelEventArgs e)

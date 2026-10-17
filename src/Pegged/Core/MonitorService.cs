@@ -12,9 +12,14 @@ namespace Pegged.Core;
 /// </summary>
 public sealed class MonitorDescription
 {
+    /// <summary>Working area in WPF units: where a window is placed.</summary>
     public required Rect Work { get; init; }
 
+    /// <summary>Full rectangle in WPF units.</summary>
     public required Rect Bounds { get; init; }
+
+    /// <summary>Full rectangle in real pixels: what the pointer reports.</summary>
+    public required Rect Physical { get; init; }
 
     public required double Scale { get; init; }
 
@@ -22,9 +27,13 @@ public sealed class MonitorDescription
 
     public required string Name { get; init; }
 
-    /// <summary>The strip along the top of this monitor that wakes the line.</summary>
-    public Rect HotBand(double height)
-        => new(Bounds.Left, Bounds.Top, Bounds.Width, Math.Max(height, 4));
+    /// <summary>The strip along the top of this monitor that wakes the line,
+    /// in real pixels, because that is the space the pointer lives in.</summary>
+    public Rect PhysicalHotBand(double dipHeight)
+        => new(Physical.Left, Physical.Top, Physical.Width, Math.Max(dipHeight * Scale, 4));
+
+    /// <summary>Turns a pointer position on this monitor into WPF units.</summary>
+    public Point ToDip(Point physical) => new(physical.X / Scale, physical.Y / Scale);
 }
 
 public static class MonitorService
@@ -75,6 +84,7 @@ public static class MonitorService
                 Name = hMonitor.ToString(),
                 Bounds = bounds,
                 Work = work,
+                Physical = new Rect(rect.Left, rect.Top, rect.Width, rect.Height),
                 Scale = scale,
             });
             return true;
@@ -91,6 +101,7 @@ public static class MonitorService
                 Name = "fallback",
                 Bounds = fallback,
                 Work = fallback,
+                Physical = fallback,
                 Scale = 1.0,
             });
         }
@@ -100,24 +111,31 @@ public static class MonitorService
     public static MonitorDescription MonitorAtCursor(out Point cursor)
     {
         RefreshIfEmpty();
-        NativeMethods.GetCursorPos(out var p);
-        cursor = new Point(p.X, p.Y);
+        cursor = CursorPosition();
 
         foreach (var m in Monitors)
-            if (m.Bounds.Contains(cursor)) return m;
+            if (m.Physical.Contains(cursor)) return m;
 
         return Monitors[0];
     }
 
-    /// <summary>Whether the pointer is resting in the wake-up strip of a monitor.</summary>
-    public static bool IsInHotBand(Point cursor, out MonitorDescription monitor)
+    /// <summary>Where the pointer is, in real pixels.</summary>
+    public static Point CursorPosition()
+    {
+        NativeMethods.GetCursorPos(out var p);
+        return new Point(p.X, p.Y);
+    }
+
+    /// <summary>Whether the pointer is resting in the wake-up strip of a
+    /// monitor. Takes the position in real pixels.</summary>
+    public static bool IsInHotBand(Point physicalCursor, out MonitorDescription monitor)
     {
         RefreshIfEmpty();
         monitor = Monitors[0];
 
         foreach (var m in Monitors)
         {
-            if (m.HotBand(HotBandHeight).Contains(cursor))
+            if (m.PhysicalHotBand(HotBandHeight).Contains(physicalCursor))
             {
                 monitor = m;
                 return true;

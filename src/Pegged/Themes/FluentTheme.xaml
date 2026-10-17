@@ -75,6 +75,13 @@
     <sys:Double x:Key="Radius.Card">16</sys:Double>
     <sys:Double x:Key="Radius.Photo">12</sys:Double>
     <sys:Double x:Key="Radius.Control">8</sys:Double>
+
+    <!-- The same radii as CornerRadius, which is what a Border actually asks
+         for. Fluent 2 is built on continuous corners, kept in one place. -->
+    <CornerRadius x:Key="Corner.Card">16</CornerRadius>
+    <CornerRadius x:Key="Corner.Photo">12</CornerRadius>
+    <CornerRadius x:Key="Corner.Control">8</CornerRadius>
+    <CornerRadius x:Key="Corner.Pill">999</CornerRadius>
     <sys:Double x:Key="Photo.Inset">4</sys:Double>
     <sys:Double x:Key="Photo.MaxHeight">104</sys:Double>
     <sys:Double x:Key="Card.Width">150</sys:Double>
