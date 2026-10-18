@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
@@ -40,6 +41,17 @@ public partial class CardView : UserControl
     /// <summary>Asked when the little cross is pressed.</summary>
     public event EventHandler? TakeDownRequested;
 
+    /// <summary>Asked when the user double-clicks the card (open the preview).</summary>
+    public event EventHandler? PreviewRequested;
+
+    /// <summary>Asked when the user wants the in-app quick crop. Currently
+    /// surfaced through the preview window; raising on the card itself is
+    /// reserved for the right-click menu in a later module.</summary>
+    public event EventHandler? CropRequested
+    {
+        add { } remove { }
+    }
+
     public CardView(LineItem item)
     {
         Item = item;
@@ -59,6 +71,13 @@ public partial class CardView : UserControl
         SizeChanged += OnSizeChanged;
         MouseEnter += (_, _) => item.Hovering = true;
         MouseLeave += (_, _) => { item.Hovering = false; item.Pressed = false; };
+
+        // Single click: copy to clipboard. Double click: preview. Right
+        // click: take down. Press-and-drag: OLE drag-out.
+        PreviewMouseLeftButtonDown += OnMouseDown;
+        MouseLeftButtonUp += OnMouseUp;
+        MouseDoubleClick += (_, _) => PreviewRequested?.Invoke(this, EventArgs.Empty);
+        PreviewMouseRightButtonDown += OnRightClick;
 
         _effectCard = TryFindResource("Effect.Card") as Effect;
         _effectHover = TryFindResource("Effect.CardHover") as Effect;
@@ -220,6 +239,102 @@ public partial class CardView : UserControl
     }
 
     private void OnTakeDown(object sender, RoutedEventArgs e) => TakeDownRequested?.Invoke(this, EventArgs.Empty);
+
+    // ---- input -----------------------------------------------------------
+
+    private Point _pressAt;
+    private bool _armed;
+
+    private void OnMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Left) return;
+        // The take-down button keeps its own click.
+        if (e.OriginalSource is DependencyObject src && IsCloseButton(src)) return;
+
+        _pressAt = e.GetPosition(this);
+        _armed = true;
+        Item.Pressed = true;
+        CaptureMouse();
+    }
+
+    private void OnMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Left) return;
+        if (!_armed) return;
+        _armed = false;
+        Item.Pressed = false;
+        ReleaseMouseCapture();
+
+        // Was it a click (no movement) or a drag (we passed the threshold)?
+        var moved = (e.GetPosition(this) - _pressAt).Length;
+        if (moved < 4) CopyToClipboard();
+        else OnDragEnd();
+    }
+
+    private void OnDragEnd()
+    {
+        Item.Dragging = true;
+        try
+        {
+            var result = DragService.StartDrag(Window.GetWindow(this), new[] { Item.Path });
+            if (result.Effects == DragService.DragKind.Move)
+            {
+                // The receiver took the file: we drop it from the line so
+                // we are not keeping a phantom copy.
+                TakeDownRequested?.Invoke(this, EventArgs.Empty);
+            }
+        }
+        finally
+        {
+            Item.Dragging = false;
+        }
+    }
+
+    private void OnRightClick(object sender, MouseButtonEventArgs e)
+    {
+        TakeDownRequested?.Invoke(this, EventArgs.Empty);
+        e.Handled = true;
+    }
+
+    private static bool IsCloseButton(DependencyObject src)
+    {
+        while (src != null)
+        {
+            if (src is Button b && b.Name == "CloseButton") return true;
+            src = System.Windows.Media.VisualTreeHelper.GetParent(src);
+        }
+        return false;
+    }
+
+    private void CopyToClipboard()
+    {
+        try
+        {
+            if (Item.IsRecording)
+            {
+                Clipboard.SetText(Item.Path);
+            }
+            else if (Item.Path.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                     Item.Path.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                     Item.Path.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                     Item.Path.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase))
+            {
+                var list = new System.Collections.Specialized.StringCollection { Item.Path };
+                Clipboard.SetFileDropList(list);
+            }
+            else
+            {
+                Clipboard.SetText(Item.Path);
+            }
+
+            Item.Copied = true;
+            if (Settings.Current.Sounds) SoundService.Play(SoundService.Sound.Copy);
+        }
+        catch
+        {
+            // Clipboard is busy: try again or just stay quiet.
+        }
+    }
 
     /// <summary>Where the picture itself is, relative to the card's top left.</summary>
     public Rect PhotoRect => new(0, 26, Photo.Width, Photo.Height);

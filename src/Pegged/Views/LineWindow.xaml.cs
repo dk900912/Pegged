@@ -48,12 +48,45 @@ public partial class LineWindow : Window
             SetHitRects(Strip.HitRects());
             UpdateHint();
         };
+        Strip.PreviewRequested += OnPreviewRequested;
+        Strip.CropRequested += OnCropRequested;
 
         Loaded += OnLoaded;
         SourceInitialized += OnSourceInitialized;
         Closing += OnClosing;
         SizeChanged += OnWindowSizeChanged;
         PreviewMouseWheel += OnPreviewMouseWheel;
+    }
+
+    private void OnPreviewRequested(object? sender, LineItem item)
+    {
+        if (item.IsRecording || !System.IO.File.Exists(item.Path)) return;
+        ShowPreview(item.Path);
+    }
+
+    private void OnCropRequested(object? sender, LineItem item)
+    {
+        if (item.IsRecording || !System.IO.File.Exists(item.Path)) return;
+        ShowCrop(item.Path);
+    }
+
+    public void ShowPreview(string path)
+    {
+        var preview = new PreviewWindow(path);
+        preview.CropRequested += (_, p) => ShowCrop(p);
+        preview.Owner = this;
+        preview.Show();
+    }
+
+    public void ShowCrop(string path)
+    {
+        var crop = new CropWindow(path) { Owner = this };
+        if (crop.ShowDialog() == true && crop.CroppedPath is { } outPath)
+        {
+            // Add the new file to the line as its own capture.
+            App.CaptureStore.Hang(outPath);
+            if (Settings.Current.PeekAtNewCapture) App.Instance?.Line?.Peek(Settings.Current.RetractDelay * 1.5);
+        }
     }
 
     private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)

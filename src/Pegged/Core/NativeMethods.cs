@@ -90,6 +90,9 @@ internal static class NativeMethods
     public const uint CF_HDROP = 15;
     public const uint CF_LOCALE = 16;
 
+    public const string CFSTR_FILEDESCRIPTOR = "FileGroupDescriptor";
+    public const string CFSTR_FILECONTENTS = "FileContents";
+
     // ---- shell -----------------------------------------------------------
 
     public const uint SHCNE_RENAMEITEM = 0x00000001;

@@ -1,0 +1,62 @@
+<Window x:Class="Pegged.Views.CropWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Pegged.Localization"
+        Title="{loc:Str Crop.Title}"
+        Background="#CC000000"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="NoResize"
+        SizeToContent="Manual"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+    <Border CornerRadius="14" Background="{DynamicResource Brush.Window}"
+            BorderBrush="{DynamicResource Brush.CardEdge}" BorderThickness="1" Margin="14">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="44" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="44" />
+            </Grid.RowDefinitions>
+
+            <Grid x:Name="TitleBar" Grid.Row="0" Background="Transparent" MouseLeftButtonDown="OnDrag">
+                <TextBlock x:Name="TitleText" Margin="20,0" VerticalAlignment="Center"
+                           FontFamily="{DynamicResource Font.Ui}" FontSize="13"
+                           Foreground="{DynamicResource Brush.Text}" TextTrimming="CharacterEllipsis" />
+            </Grid>
+
+            <!-- The crop surface: image + dimmed overlay + 8-handle box. -->
+            <Grid Grid.Row="1" x:Name="Surface" Margin="18,0,18,12"
+                  Width="640" Height="420"
+                  HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Image x:Name="BigImage" Stretch="Uniform"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       SizeChanged="OnImageSizeChanged" />
+
+                <!-- The dimming mask: a thick black border with the crop box
+                     punched out. -->
+                <Canvas x:Name="MaskLayer" IsHitTestVisible="False" />
+                <Grid x:Name="BoxLayer" Width="640" Height="420" />
+
+                <Rectangle x:Name="Selection" Stroke="{DynamicResource Brush.Accent}"
+                           StrokeThickness="1.5" Fill="#22FFFFFF" Cursor="SizeAll"
+                           MouseLeftButtonDown="OnBoxDown" MouseMove="OnBoxMove"
+                           MouseLeftButtonUp="OnBoxUp" />
+                <TextBlock x:Name="SizeLabel" Foreground="White" FontSize="11"
+                           Background="#99000000" Padding="6,3" IsHitTestVisible="False" />
+            </Grid>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20,0,20,16">
+                <TextBlock x:Name="SizeHint" VerticalAlignment="Center" Margin="0,0,16,0"
+                           FontFamily="{DynamicResource Font.Ui}" FontSize="11"
+                           Foreground="{DynamicResource Brush.SubtleText}" />
+                <Button Style="{StaticResource GlassButton}" Padding="14,7" Margin="0,0,8,0"
+                        Click="OnCancel" Content="{loc:Str Crop.Cancel}" />
+                <Button Style="{StaticResource AccentButton}" Padding="14,7"
+                        Click="OnApply" Content="{loc:Str Crop.Apply}" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>
