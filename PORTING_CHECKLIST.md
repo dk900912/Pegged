@@ -57,3 +57,5 @@
 - [x] 剪贴板监听加固：隐私格式跳过、64MB 上限、SHA256 去重、`.part` 原子落盘
 - [x] 外部删除/移动文件后 `CaptureStore.Prune()` 已由 `FileSystemWatcher` 触发
 - [x] 重新发布 Release 构建（0 Error 0 Warning）
+- [x] 修复：`CaptureStore.OnChanged()` 与 `LineController.Peek()` 的跨线程访问（后台线程改 WPF 窗口导致静默闪退）
+- [x] 压测：连续挂 3 张 + 单张下架 + 全部清空 + 外部删除触发剪枝，`%APPDATA%\Pegged\crash.log` 保持为空

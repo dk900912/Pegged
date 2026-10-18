@@ -266,5 +266,24 @@ public sealed class CaptureStore
         OnChanged();
     }
 
-    private void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
+    /// <summary>
+    /// Tells everyone the line changed. Always on the UI thread: Drop() and
+    /// Prune() finish their work inside Task continuations, and when those
+    /// were started from a background thread they land on the thread pool.
+    /// The subscribers are WPF and WinForms controls, so an event raised from
+    /// there threw "the calling thread cannot access this object" — invisible
+    /// until the crash log started recording unobserved task exceptions.
+    /// </summary>
+    private void OnChanged()
+    {
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
+
+        if (dispatcher is not null && !dispatcher.CheckAccess())
+        {
+            dispatcher.BeginInvoke(new Action(() => Changed?.Invoke(this, EventArgs.Empty)));
+            return;
+        }
+
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
 }

@@ -7,9 +7,9 @@
   ],
   "processes": [
     {
-      "pid": 3116,
-      "exe": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\publish\\Pegged.exe",
-      "name": "Pegged.exe"
+      "name": "Pegged.exe",
+      "pid": 35208,
+      "exe": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\publish\\Pegged.exe"
     }
   ],
   "windows": [
@@ -32,18 +32,6 @@
         -15
       ],
       "texts": [
-        "pegged-test-wide.png",
-        "⎘",
-        "✂",
-        "🗑",
-        "已复制！",
-        "✕",
-        "pegged-test-tall.png",
-        "⎘",
-        "✂",
-        "🗑",
-        "已复制！",
-        "✕",
         "🗑",
         "📌",
         "⚙",

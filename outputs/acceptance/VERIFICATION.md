@@ -61,6 +61,16 @@
 10. **验收脚本自己的坐标错乱** — 探针 DPI-unaware，`GetWindowRect` 是缩放后的值而
     `SetCursorPos` 是物理像素，点击落到了穿透区。探针启动时 `SetProcessDpiAwareness(2)`。
 
+### 加完 crash.log 之后立刻抓到的两个静默闪退（本轮修复）
+
+| 缺陷 | 根因 | 修法 |
+|---|---|---|
+| 下架/清空偶发闪退，日志一片空白 | `CaptureStore.Drop` 的收尾在 `Task.Delay().ContinueWith(..., TaskScheduler.Current)` 里；`Drop` 从非 UI 线程调用时延续落到线程池，`Changed` 从后台线程触发，`LineWindow.UpdateHint()` 碰 `CardLayer.Children` 抛跨线程异常，又被当作未观察任务异常吞掉 | `CaptureStore.OnChanged()` 统一 `Dispatcher.BeginInvoke` |
+| **每来一张新截图**都触发一次跨线程异常 | `ScreenshotWatcher.TryHangAsync` 在 watcher 线程上 `Hang()` 后直接 `Peek()`，而 `Peek → Reveal → PlaceOn` 会设置窗口 `Width`/`Height` | `LineController.Peek()` 入口判断 `Dispatcher.CheckAccess()`，否则 `BeginInvoke` |
+
+压测脚本（连续挂 3 张 → 点卡片 `×` 下架 → 点工具栏清空 → 外部删除文件触发剪枝）跑完后
+`%APPDATA%\Pegged\crash.log` **保持为空**；修复前同样的操作会稳定留下两条栈。
+
 另外：未处理异常现在写 `%APPDATA%\Pegged\crash.log`（覆盖层应用崩溃后什么都不留）。
 
 ## 仍未验证（不得声称已完成）
