@@ -16,6 +16,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -31,21 +32,45 @@ def git(*args):
     return sh("git", *args).strip()
 
 
-def api(path, method="GET", payload=None):
-    token = sh("gh", "auth", "token").strip()
+def token():
+    return sh("gh", "auth", "token").strip()
+
+
+def api(path, method="GET", payload=None, attempts=12):
+    """One API call, retried.
+
+    The local proxy answers CONNECT with 502 for roughly one request in
+    four - not for a specific path or method, just intermittently. Without a
+    retry the whole push dies halfway through, and half a commit is pushed.
+    Each attempt keeps the same request, so the retry is safe: a POST that
+    never reached GitHub has no effect to duplicate.
+    """
     data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(
-        API + path, data=data, method=method,
-        headers={"Authorization": f"Bearer {token}",
-                 "Accept": "application/vnd.github+json",
-                 "X-GitHub-Api-Version": "2022-11-28",
-                 "Content-Type": "application/json"})
-    try:
-        with urllib.request.urlopen(req) as r:
-            return json.loads(r.read() or b"{}")
-    except urllib.error.HTTPError as e:
-        print("HTTP", e.code, e.read().decode()[:400], file=sys.stderr)
-        raise
+    last = None
+    for attempt in range(attempts):
+        req = urllib.request.Request(
+            API + path, data=data, method=method,
+            headers={"Authorization": f"Bearer {token()}",
+                     "Accept": "application/vnd.github+json",
+                     "X-GitHub-Api-Version": "2022-11-28",
+                     "Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return json.loads(r.read() or b"{}")
+        except urllib.error.HTTPError as e:
+            # A 4xx is the API answering: retrying cannot change it.
+            if e.code < 500 and e.code != 429:
+                print("HTTP", e.code, e.read().decode()[:400], file=sys.stderr)
+                raise
+            last = e
+        except urllib.error.URLError as e:
+            last = e
+        if attempt + 1 < attempts:
+            wait = min(0.4 * (2 ** attempt), 6.0)
+            print("[retry %d/%d] %s %s: %s" % (attempt + 1, attempts, method, path, last),
+                  file=sys.stderr, flush=True)
+            time.sleep(wait)
+    raise last if isinstance(last, Exception) else RuntimeError(last)
 
 
 def main():
