@@ -29,19 +29,22 @@ internal static class AcrylicBackdrop
     /// <summary>How far down the blur is averaged. Higher is softer.</summary>
     private const int BlurScale = 10;
 
-    /// <summary>Alpha of the tint laid over the blurred desktop, per theme.</summary>
-    private const byte TintAlpha = 199;   // 78%
-
     /// <summary>How much grain the material carries.</summary>
     private const byte NoiseAlpha = 7;
 
     /// <summary>
-    /// Grabs the desktop behind <paramref name="dipRect"/> and turns it into a
-    /// frosted brush. Returns null when the screen cannot be read (a locked
+    /// Grabs the desktop behind <paramref name="dipRect"/> and keeps the
+    /// blurred pixels. Returns null when the screen cannot be read (a locked
     /// session, some remote-desktop setups), in which case the caller keeps its
     /// plain translucent brush.
+    ///
+    /// The tint is applied later, by <see cref="AcrylicMaterial.Finish"/>: the
+    /// desktop can only be read while the dock is out of the way, but the
+    /// theme can change at any moment, including while the dock is open.
+    /// Capturing once and washing on demand means a theme switch re-frosts
+    /// instantly instead of waiting for the next time the line is tucked away.
     /// </summary>
-    public static ImageBrush? Capture(Rect dipRect, double scale, Color tint)
+    public static AcrylicMaterial? Capture(Rect dipRect, double scale)
     {
         if (dipRect.Width < 4 || dipRect.Height < 4) return null;
 
@@ -61,20 +64,7 @@ internal static class AcrylicBackdrop
                     System.Drawing.CopyPixelOperation.SourceCopy);
             }
 
-            using var frosted = Frost(shot, tint);
-
-            // A way to look at the material on its own, for the acceptance run.
-            if (Environment.GetEnvironmentVariable("PEGGED_ACRYLIC_DUMP") is { Length: > 0 } dump)
-            {
-                try { frosted.Save(dump, DImaging.ImageFormat.Png); }
-                catch (Exception) { }
-            }
-
-            return new ImageBrush(ToSource(frosted))
-            {
-                Stretch = Stretch.Fill,
-                TileMode = TileMode.None,
-            };
+            return new AcrylicMaterial(Blur(shot));
         }
         catch (Exception)
         {
@@ -83,8 +73,8 @@ internal static class AcrylicBackdrop
         }
     }
 
-    /// <summary>Blur, tint, grain: the three ingredients of the material.</summary>
-    private static DBitmap Frost(DBitmap source, Color tint)
+    /// <summary>The desktop, blurred, before any tint.</summary>
+    private static DBitmap Blur(DBitmap source)
     {
         var smallWidth = Math.Max(4, source.Width / BlurScale);
         var smallHeight = Math.Max(3, source.Height / BlurScale);
@@ -108,15 +98,25 @@ internal static class AcrylicBackdrop
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
             g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
             g.DrawImage(small, new System.Drawing.Rectangle(0, 0, source.Width, source.Height));
-
-            // Tint: Bg.Acrylic at 78% in light, 72% in dark. The surface is
-            // opaque, so the brush's alpha blends instead of being ignored.
-            using var wash = new System.Drawing.SolidBrush(DColor.FromArgb(TintAlpha, tint.R, tint.G, tint.B));
-            g.FillRectangle(wash, 0, 0, source.Width, source.Height);
         }
 
-        Grain(result);
         return result;
+    }
+
+    /// <summary>The tint wash and the grain, on top of an already blurred copy.</summary>
+    internal static void Wash(DBitmap bitmap, Color tint)
+    {
+        using (var g = DGraphics.FromImage(bitmap))
+        {
+            // Tint: Bg.Acrylic at 78% in light, 72% in dark - the alpha comes
+            // from the palette, so the two themes are actually different
+            // materials and not the same one with a different hue. The surface
+            // is opaque, so the brush's alpha blends instead of being ignored.
+            using var wash = new System.Drawing.SolidBrush(DColor.FromArgb(tint.A, tint.R, tint.G, tint.B));
+            g.FillRectangle(wash, 0, 0, bitmap.Width, bitmap.Height);
+        }
+
+        Grain(bitmap);
     }
 
     /// <summary>
@@ -218,7 +218,7 @@ internal static class AcrylicBackdrop
         }
     }
 
-    private static BitmapSource ToSource(DBitmap bitmap)
+    internal static BitmapSource ToSource(DBitmap bitmap)
     {
         // Not GetHbitmap(): GDI drops the alpha channel of a 32bpp bitmap on
         // the way to an HBITMAP, and CreateBitmapSourceFromHBitmap then hands
@@ -241,5 +241,45 @@ internal static class AcrylicBackdrop
         {
             bitmap.UnlockBits(data);
         }
+    }
+}
+
+/// <summary>
+/// One capture of the desktop behind the dock, blurred and ready to be tinted.
+/// Held by the line so a theme switch can re-wash it without reading the
+/// screen again - which it cannot do while the dock is covering that screen.
+/// </summary>
+internal sealed class AcrylicMaterial : IDisposable
+{
+    private DBitmap? _blurred;
+
+    internal AcrylicMaterial(DBitmap blurred) => _blurred = blurred;
+
+    /// <summary>Tint, grain and brush: the material as it is painted.</summary>
+    public ImageBrush? Finish(Color tint)
+    {
+        if (_blurred is null) return null;
+
+        using var frosted = (DBitmap)_blurred.Clone();
+        AcrylicBackdrop.Wash(frosted, tint);
+
+        // A way to look at the material on its own, for the acceptance run.
+        if (Environment.GetEnvironmentVariable("PEGGED_ACRYLIC_DUMP") is { Length: > 0 } dump)
+        {
+            try { frosted.Save(dump, DImaging.ImageFormat.Png); }
+            catch (Exception) { }
+        }
+
+        return new ImageBrush(AcrylicBackdrop.ToSource(frosted))
+        {
+            Stretch = Stretch.Fill,
+            TileMode = TileMode.None,
+        };
+    }
+
+    public void Dispose()
+    {
+        _blurred?.Dispose();
+        _blurred = null;
     }
 }

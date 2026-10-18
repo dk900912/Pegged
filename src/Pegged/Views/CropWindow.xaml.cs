@@ -63,7 +63,14 @@ public partial class CropWindow : Window
         }
 
         BuildOverlay();
-        Loaded += (_, _) => UpdateSizeLabel();
+        Loaded += (_, _) =>
+        {
+            UpdateSizeLabel();
+            // A fullscreen overlay without the keyboard looks like a frozen
+            // app: Esc and Enter would go to the window that was in front.
+            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input,
+                new Action(() => WindowFocus.Take(this)));
+        };
         KeyDown += OnKeyDown;
     }
 
@@ -149,6 +156,12 @@ public partial class CropWindow : Window
         _label.CornerRadius = new CornerRadius(4);
         _label.IsHitTestVisible = false;
         Overlay.Children.Add(_label);
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        WindowFocus.Release();
+        base.OnClosed(e);
     }
 
     private void OnKeyDown(object sender, KeyEventArgs e)

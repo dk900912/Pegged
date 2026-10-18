@@ -1,0 +1,60 @@
+{
+  "results": [
+    {
+      "id": "dock.empty_hint",
+      "area": "dock",
+      "expected": "空挂绳显示引导文案",
+      "actual": "hint text present",
+      "ok": true
+    },
+    {
+      "id": "dock.clear_all",
+      "area": "dock",
+      "expected": "一键清空取下全部卡片并恢复引导",
+      "actual": "cards after clear=0, hint back=True",
+      "ok": true
+    },
+    {
+      "id": "dock.toolbar_auto_hide",
+      "area": "dock",
+      "expected": "指针离开后工具栏收起并让出点击",
+      "actual": "toolbar hittest=-1 after leaving (expect not HTCLIENT)",
+      "ok": true
+    },
+    {
+      "id": "dock.pin_holds_open",
+      "area": "dock",
+      "expected": "固定后指针离开仍展开",
+      "actual": "top=0 after pointer left (pinned should stay 0)",
+      "ok": true
+    },
+    {
+      "id": "dock.unpin_retracts",
+      "area": "dock",
+      "expected": "取消固定后自动收起",
+      "actual": "top=-307 after unpin (expect tucked above screen)",
+      "ok": true
+    },
+    {
+      "id": "dock.hotkey_toggle",
+      "area": "dock",
+      "expected": "Ctrl+Alt+P 展开/收起",
+      "actual": "top before=-307 after hotkey=0 after again=-307",
+      "ok": true
+    },
+    {
+      "id": "dock.reveal_settles",
+      "area": "dock",
+      "expected": "展开动画 1 秒内落定不抖动",
+      "actual": "top at 1.0s=0, at 1.3s=0 (both must be 0)",
+      "ok": true
+    },
+    {
+      "id": "dock.peek_keeps_pointer",
+      "area": "dock",
+      "expected": "peek 到期时指针在舱体上则不收起",
+      "actual": "top=0 2.6s after a peek started under the pointer",
+      "ok": true
+    }
+  ]
+}

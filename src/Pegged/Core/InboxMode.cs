@@ -26,6 +26,44 @@ public static class InboxMode
     /// <summary>Where Windows is told to put captures while the mode is on.</summary>
     public static string Folder => AppPaths.ScreenshotsFolder;
 
+    /// <summary>
+    /// Why the redirect is not available on this system, or null when it is.
+    ///
+    /// FOLDERID_Screenshots is not a fixed path: the shell only resolves it
+    /// once it knows about the folder, and a profile that has never saved a
+    /// capture there answers ERROR_FILE_NOT_FOUND (0x80070002). Measured on
+    /// this machine: writing the User Shell Folders value by hand,
+    /// KF_FLAG_DONT_VERIFY and a SHChangeNotify broadcast all leave it
+    /// unresolved, so there is genuinely nothing to redirect and the mode has
+    /// to say so up front instead of failing after the switch is flipped.
+    /// </summary>
+    public static string? Unavailable => _probe.Value;
+
+    /// <summary>The HRESULT of the last failed redirect, for the settings row.</summary>
+    public static string? LastError { get; private set; }
+
+    private static readonly Lazy<string?> _probe = new(ProbeSupport);
+
+    private static string? ProbeSupport()
+    {
+        IntPtr pointer = IntPtr.Zero;
+        try
+        {
+            var id = ScreenshotsFolderId;
+            var hr = SHGetKnownFolderPath(ref id, 0, IntPtr.Zero, out pointer);
+            if (hr == 0) return null;
+            return "0x" + ((uint)hr).ToString("X8");
+        }
+        catch (Exception)
+        {
+            return "unavailable";
+        }
+        finally
+        {
+            if (pointer != IntPtr.Zero) Marshal.FreeCoTaskMem(pointer);
+        }
+    }
+
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     private static extern int SHGetKnownFolderPath(ref Guid rfid, uint flags, IntPtr token, out IntPtr path);
 
@@ -84,10 +122,12 @@ public static class InboxMode
 
             var id = ScreenshotsFolderId;
             var hr = SHSetKnownFolderPath(ref id, 0, IntPtr.Zero, Folder);
+            LastError = hr == 0 ? null : "0x" + ((uint)hr).ToString("X8");
             return hr == 0;
         }
         catch (Exception)
         {
+            LastError = "unavailable";
             return false;
         }
     }
@@ -118,6 +158,14 @@ public static class InboxMode
     /// <summary>Switches the mode on or off, and reports whether it stuck.</summary>
     public static bool SetEnabled(bool enabled)
     {
+        // Turning it on where the shell has no such folder to give would only
+        // flip the switch back a moment later. Refuse before touching either.
+        if (enabled && Unavailable is { } why)
+        {
+            LastError = why;
+            return false;
+        }
+
         Settings.Current.InboxEnabled = enabled;
 
         if (enabled)

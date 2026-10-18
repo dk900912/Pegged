@@ -7,9 +7,9 @@
   ],
   "processes": [
     {
-      "name": "Pegged.exe",
-      "pid": 35208,
-      "exe": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\publish\\Pegged.exe"
+      "pid": 37000,
+      "exe": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\publish\\Pegged.exe",
+      "name": "Pegged.exe"
     }
   ],
   "windows": [

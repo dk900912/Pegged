@@ -59,3 +59,17 @@
 - [x] 重新发布 Release 构建（0 Error 0 Warning）
 - [x] 修复：`CaptureStore.OnChanged()` 与 `LineController.Peek()` 的跨线程访问（后台线程改 WPF 窗口导致静默闪退）
 - [x] 压测：连续挂 3 张 + 单张下架 + 全部清空 + 外部删除触发剪枝，`%APPDATA%\Pegged\crash.log` 保持为空
+
+## Phase 6 — 全量交互走查（第四轮，真跑真点）
+- [x] 新增 `scripts/e2e/audit_walkthrough.py`：四区 33 项真实交互断言（dock 8 / card 11 / crop 4 / settings 9 / 无崩溃 1）
+- [x] 修复：主题切换后舱体玻璃不变色（`AcrylicMaterial` 缓存 + 主题变化就地重上色 + alpha 取调色板）
+- [x] 修复：卡片尺寸改变后舱体高度不变（`LineController` 订阅 `Settings.Saved` 重排）
+- [x] 修复：`ToggleSwitch` 双 automation id（外层取消 automation peer）
+- [x] 修复：Inbox 模式在无 `FOLDERID_Screenshots` 的系统上弹模态框并吞掉下一次点击 → 探测 + 置灰 + 行内说明
+- [x] 修复：预览窗口标题显示 `Preview.Title`（补 en/zh 资源键）
+- [x] 修复：裁剪浮层「取消 / 应用裁剪」补 `AutomationId`，手柄拖拽首次被真实验证（`608×384 → 549×337`）
+- [x] 修复：验收脚本三处自欺（按句柄判定窗口、探针收尾关窗、按内容而非标题找设置窗）
+- [x] 清理：移除全部 `InputTrace` 追踪与 `PEGGED_TRACE`，删除 12 个一次性 `diag_*.py`
+- [x] 交付：`docs/REVIEW-CHECKLIST.md`（审查清单：缺陷、证据、覆盖矩阵、未验证项）
+- [x] 回归：`launch_probe` 9/9、`interaction_probe` 5/5、`audit_walkthrough` 33/33，`crash.log` 为空
+- [x] 重新发布 Release 构建（0 Error 0 Warning）

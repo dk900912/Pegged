@@ -106,19 +106,36 @@ public sealed class CardStrip
         LayoutChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    /// <summary>Slides the line sideways when there is more on it than fits.</summary>
+    /// <summary>
+    /// True when the line is longer than the screen and the user asked for the
+    /// spacing to be kept. Without "keep on line" the cards close ranks to fit
+    /// instead, so there is nothing to scroll - and consuming the wheel then
+    /// would be a dead gesture.
+    /// </summary>
+    public bool CanScroll =>
+        Settings.Current.KeepOnLine is not null
+        && App.CaptureStore.LiveCount > LayoutMetrics.CapacityFor(_canvas.ActualWidth);
+
+    /// <summary>Slides the line sideways when there is more on it than fits.
+    /// Zero is the newest end, positive moves towards the older ones, and the
+    /// line stops at both ends: sliding past them only hides every card.</summary>
     public void Scroll(double amount)
     {
         var live = App.CaptureStore.Live();
         var visible = LayoutMetrics.CapacityFor(_canvas.ActualWidth);
         var span = Math.Max(0, live.Count - visible) * LayoutMetrics.Spacing;
 
-        _scroll = Math.Clamp(_scroll + amount, -span, span);
+        _scroll = Math.Clamp(_scroll + amount, 0, span);
         Relayout();
     }
 
     /// <summary>Where the pictures are, in window coordinates. Everything else
-    /// on the line lets clicks through.</summary>
+    /// on the line lets clicks through.
+    ///
+    /// The rect goes through the card's own transforms, because a hanging card
+    /// is tilted and swaying: the picture on screen is not where the canvas
+    /// left it, and a hit area that ignored the swing missed clicks along the
+    /// edge of a card that had just been nudged.</summary>
     public IEnumerable<Rect> HitRects()
     {
         foreach (var view in _views.Values)
@@ -127,7 +144,7 @@ public sealed class CardStrip
             var top = Canvas.GetTop(view);
             if (double.IsNaN(left) || double.IsNaN(top)) continue;
 
-            var photo = view.PhotoRect;
+            var photo = view.PhotoWithTilt();
             yield return new Rect(left + photo.Left, top + photo.Top, photo.Width, photo.Height);
         }
     }
@@ -154,7 +171,7 @@ public sealed class CardStrip
             var top = Canvas.GetTop(view);
             if (double.IsNaN(left) || double.IsNaN(top)) continue;
 
-            var photo = view.PhotoRect;
+            var photo = view.PhotoWithTilt();
             var r = new Rect(left + photo.Left, top + photo.Top, photo.Width, photo.Height);
             r.Inflate(6, 6);
             if (r.Contains(point)) return view;

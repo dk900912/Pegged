@@ -27,6 +27,22 @@ public static class ClipboardWatcher
     /// <summary>Above this size the clipboard is not a screenshot any more.</summary>
     private const long MaxPngBytes = 64L * 1024 * 1024;
 
+    /// <summary>
+    /// Copies that carry a picture but are not one. A file copied in Explorer
+    /// brings its icon, a range of cells from a spreadsheet renders itself as
+    /// an image, and a photo copied from the line brings its file as well -
+    /// hanging any of those would put the same picture back on the line every
+    /// time it is copied. The macOS original ignores exactly this set
+    /// (fileURL and string); without it, copying a card duplicates it.
+    /// </summary>
+    private static readonly string[] NotAPicture =
+    {
+        DataFormats.FileDrop,
+        DataFormats.Text,
+        DataFormats.UnicodeText,
+        DataFormats.StringFormat,
+    };
+
     private static string? _lastHash;
 
     public static void OnClipboardChanged()
@@ -54,6 +70,13 @@ public static class ClipboardWatcher
         // into our own folder.
         if (data.GetDataPresent(ExcludeFromMonitor) || data.GetDataPresent(ClipboardViewerIgnore))
             return;
+
+        // A picture that also carries a file or text is a copy of something
+        // else: our own cards, a file from Explorer, a cell range.
+        foreach (var format in NotAPicture)
+        {
+            if (data.GetDataPresent(format)) return;
+        }
 
         if (!data.GetDataPresent(PngFormat) && !data.GetDataPresent(DataFormats.Bitmap))
             return;
@@ -109,13 +132,17 @@ public static class ClipboardWatcher
         if (bitmap is null) return;
         if (rawPng is not null && rawPng.LongLength > MaxPngBytes) return;
 
+        // One shape for the bytes: a picture that arrives as a DIB has no PNG
+        // of its own, so it is encoded once and those bytes are used both for
+        // the comparison and for the file. Without this every clipboard update
+        // - and Windows sends more than one per copy - hung a duplicate.
+        var png = rawPng ?? Encode(bitmap);
+        if (png is null) return;
+
         // Same picture twice in a row: do not hang a duplicate.
-        if (rawPng is not null)
-        {
-            var hash = Convert.ToHexString(SHA256.HashData(rawPng));
-            if (hash == _lastHash) return;
-            _lastHash = hash;
-        }
+        var hash = Convert.ToHexString(SHA256.HashData(png));
+        if (hash == _lastHash) return;
+        _lastHash = hash;
 
         AppPaths.EnsureCreated();
         var name = DateTime.Now.ToString("yyyyMMdd-HHmmss-ffff") + ".png";
@@ -126,18 +153,7 @@ public static class ClipboardWatcher
         var temp = path + ".part";
         try
         {
-            if (rawPng is not null)
-            {
-                File.WriteAllBytes(temp, rawPng);
-            }
-            else
-            {
-                var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(bitmap));
-                using var stream = File.Create(temp);
-                encoder.Save(stream);
-            }
-
+            File.WriteAllBytes(temp, png);
             File.Move(temp, path, overwrite: true);
         }
         catch (Exception)
@@ -148,6 +164,22 @@ public static class ClipboardWatcher
 
         App.CaptureStore.Hang(path, flying: true);
         App.Instance?.Line?.Peek();
+    }
+
+    private static byte[]? Encode(BitmapSource bitmap)
+    {
+        try
+        {
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bitmap));
+            using var ms = new MemoryStream();
+            encoder.Save(ms);
+            return ms.ToArray();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     private static BitmapSource? PngToBitmap(byte[] png)
