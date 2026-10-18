@@ -14,20 +14,31 @@ namespace Pegged.Views;
 /// <summary>
 /// A fullscreen crop overlay. The user drags the box (or one of the 8 handles)
 /// around on the image; the dimmed mask tracks it; the live "WxH" label
-/// floats outside the box. Apply produces a new PNG next to the source.
+/// floats outside the box. Apply writes a new file next to the source.
 /// </summary>
 public partial class CropWindow : Window
 {
     public string FilePath { get; }
     public string? CroppedPath { get; private set; }
 
+    /// <summary>Handle slots. -1 moves the whole box.</summary>
+    private const int HandleMove = -1;
+
     private Rect _box;
     private Point _dragStart;
     private Rect _boxStart;
     private bool _dragging;
-    private int _handle; // -1 = move whole box, 0..7 = handle index
+    private int _handle = HandleMove;
 
     private double _imgW, _imgH;
+
+    // Overlay children, kept as fields so layout never has to guess indexes.
+    private readonly System.Windows.Shapes.Path _mask = new();
+    private readonly Rectangle _selection = new();
+    private readonly Rectangle[] _handles = new Rectangle[8];
+    private readonly Line[] _gridV = new Line[2];
+    private readonly Line[] _gridH = new Line[2];
+    private readonly Border _label = new();
 
     public CropWindow(string path)
     {
@@ -47,13 +58,97 @@ public partial class CropWindow : Window
         }
         catch
         {
-            // Even if the picture can't be read, Apply still tries to write
-            // the (unchanged) bytes back: the user gets a clean error and
-            // the original is left alone.
+            // Even if the picture can't be read, Apply still tries; the user
+            // gets a clean error and the original is left alone.
         }
 
-        Loaded += (_, _) => { BuildHandles(); UpdateSizeLabel(); };
+        BuildOverlay();
+        Loaded += (_, _) => UpdateSizeLabel();
         KeyDown += OnKeyDown;
+    }
+
+    private void BuildOverlay()
+    {
+        // 1. the dim, with a hole where the box is
+        _mask.Fill = new SolidColorBrush(Color.FromArgb(0x8C, 0, 0, 0));
+        _mask.IsHitTestVisible = false;
+        Overlay.Children.Add(_mask);
+
+        // 2. rule-of-thirds grid, 4px white, inside the box
+        for (var i = 0; i < 2; i++)
+        {
+            _gridV[i] = new Line
+            {
+                Stroke = Brushes.White,
+                StrokeThickness = 4,
+                Opacity = 0.55,
+                IsHitTestVisible = false,
+                Visibility = Visibility.Collapsed,
+            };
+            _gridH[i] = new Line
+            {
+                Stroke = Brushes.White,
+                StrokeThickness = 4,
+                Opacity = 0.55,
+                IsHitTestVisible = false,
+                Visibility = Visibility.Collapsed,
+            };
+            Overlay.Children.Add(_gridV[i]);
+            Overlay.Children.Add(_gridH[i]);
+        }
+
+        // 3. the selection itself: draggable, and obviously the box
+        _selection.Stroke = Brushes.White;
+        _selection.StrokeThickness = 1.5;
+        _selection.Fill = Brushes.Transparent;
+        _selection.Cursor = Cursors.SizeAll;
+        _selection.MouseLeftButtonDown += OnBoxDown;
+        _selection.MouseMove += OnBoxMove;
+        _selection.MouseLeftButtonUp += OnBoxUp;
+        Overlay.Children.Add(_selection);
+
+        // 4. eight handles, white with a black outline (spec 3.5)
+        var positions = new[]
+        {
+            new Point(0, 0),   new Point(0.5, 0),   new Point(1, 0),
+            new Point(0, 0.5),                    new Point(1, 0.5),
+            new Point(0, 1),   new Point(0.5, 1),   new Point(1, 1),
+        };
+        for (var i = 0; i < _handles.Length; i++)
+        {
+            var isCorner = i is 0 or 2 or 5 or 7;
+            var sz = isCorner ? 12 : 8;
+            var h = new Rectangle
+            {
+                Width = sz,
+                Height = sz,
+                Fill = Brushes.White,
+                Stroke = Brushes.Black,
+                StrokeThickness = 1,
+                Opacity = 0.95,
+                Cursor = i switch
+                {
+                    0 or 7 => Cursors.SizeNWSE,
+                    2 or 5 => Cursors.SizeNESW,
+                    1 or 6 => Cursors.SizeNS,
+                    3 or 4 => Cursors.SizeWE,
+                    _ => Cursors.SizeAll,
+                },
+                Tag = i,
+            };
+            h.MouseLeftButtonDown += OnHandleDown;
+            h.MouseMove += OnHandleMove;
+            h.MouseLeftButtonUp += OnHandleUp;
+            _handles[i] = h;
+            Overlay.Children.Add(h);
+        }
+
+        // 5. the live pixel size, sitting just outside the box
+        _label.Background = new SolidColorBrush(Color.FromArgb(0xCC, 0, 0, 0));
+        _label.Padding = new Thickness(6, 3, 6, 3);
+        _label.CornerRadius = new CornerRadius(4);
+        _label.IsHitTestVisible = false;
+        Overlay.Children.Add(_label);
     }
 
     private void OnKeyDown(object sender, KeyEventArgs e)
@@ -79,44 +174,36 @@ public partial class CropWindow : Window
         PlaceBox();
     }
 
-    // ---- box & handles ---------------------------------------------------
+    // ---- box, grid, handles ---------------------------------------------
 
-    private void BuildHandles()
+    private void PlaceBox()
     {
-        Overlay.Children.Clear();
-        var positions = new[]
-        {
-            new Point(0, 0),   new Point(0.5, 0),   new Point(1, 0),
-            new Point(0, 0.5),                    new Point(1, 0.5),
-            new Point(0, 1),   new Point(0.5, 1),   new Point(1, 1),
-        };
-        for (var i = 0; i < positions.Length; i++)
-        {
-            var isCorner = i is 0 or 2 or 5 or 7;
-            var sz = isCorner ? 12 : 8;
-            var h = new Rectangle
-            {
-                Width = sz,
-                Height = sz,
-                Fill = Brushes.White,
-                Stroke = Application.Current.TryFindResource("Brush.Accent") as Brush ?? Brushes.DodgerBlue,
-                StrokeThickness = 1.5,
-                Cursor = i switch
-                {
-                    0 or 7 => Cursors.SizeNWSE,
-                    2 or 5 => Cursors.SizeNESW,
-                    1 or 6 => Cursors.SizeNS,
-                    3 or 4 => Cursors.SizeWE,
-                    _ => Cursors.SizeAll,
-                },
-                Tag = i,
-            };
-            h.MouseLeftButtonDown += OnHandleDown;
-            h.MouseMove += OnHandleMove;
-            h.MouseLeftButtonUp += OnHandleUp;
-            Overlay.Children.Add(h);
-        }
+        if (_imgW <= 0 || _imgH <= 0) return;
+
+        _selection.Width = _box.Width;
+        _selection.Height = _box.Height;
+        Canvas.SetLeft(_selection, _box.X);
+        Canvas.SetTop(_selection, _box.Y);
+
+        LayoutGrid();
         LayoutHandles();
+        BuildMask();
+        UpdateSizeLabel();
+    }
+
+    private void LayoutGrid()
+    {
+        for (var i = 0; i < 2; i++)
+        {
+            var x = _box.X + _box.Width * (i + 1) / 3.0;
+            var y = _box.Y + _box.Height * (i + 1) / 3.0;
+            _gridV[i].X1 = x; _gridV[i].Y1 = _box.Y;
+            _gridV[i].X2 = x; _gridV[i].Y2 = _box.Bottom;
+            _gridH[i].X1 = _box.X;      _gridH[i].Y1 = y;
+            _gridH[i].X2 = _box.Right;  _gridH[i].Y2 = y;
+            _gridV[i].Visibility = Visibility.Visible;
+            _gridH[i].Visibility = Visibility.Visible;
+        }
     }
 
     private void LayoutHandles()
@@ -127,88 +214,84 @@ public partial class CropWindow : Window
             new Point(0, 0.5),                    new Point(1, 0.5),
             new Point(0, 1),   new Point(0.5, 1),   new Point(1, 1),
         };
-        for (var i = 0; i < 8; i++)
+        for (var i = 0; i < _handles.Length; i++)
         {
-            var h = (Rectangle)Overlay.Children[i + 1]; // +1 because mask is at index 0
+            var h = _handles[i];
             var p = positions[i];
             var sz = h.Width;
             Canvas.SetLeft(h, _box.X + _box.Width * p.X - sz / 2);
             Canvas.SetTop(h, _box.Y + _box.Height * p.Y - sz / 2);
+            System.Windows.Controls.Panel.SetZIndex(h, 10);
         }
-    }
-
-    private void PlaceBox()
-    {
-        Selection.Margin = new Thickness(_box.X, _box.Y, 0, 0);
-        Selection.Width = _box.Width;
-        Selection.Height = _box.Height;
-        LayoutHandles();
-        BuildMask();
-        UpdateSizeLabel();
     }
 
     private void BuildMask()
     {
-        if (Overlay.Children.Count == 0) return;
-        // Replace the mask (index 0) with a fresh one.
-        if (Overlay.Children[0] is System.Windows.Shapes.Path) Overlay.Children.RemoveAt(0);
+        if (_imgW <= 0 || _imgH <= 0) return;
 
         var bgRect = new RectangleGeometry(new Rect(0, 0, _imgW, _imgH));
         var holeRect = new RectangleGeometry(_box);
-        var geom = new CombinedGeometry(GeometryCombineMode.Exclude, bgRect, holeRect);
-
-        var visual = new System.Windows.Shapes.Path
-        {
-            Fill = new SolidColorBrush(Color.FromArgb(170, 0, 0, 0)),
-            Data = geom,
-        };
-        Overlay.Children.Insert(0, visual);
+        _mask.Data = new CombinedGeometry(GeometryCombineMode.Exclude, bgRect, holeRect);
     }
 
     private void UpdateSizeLabel()
     {
+        var pw = 0;
+        var ph = 0;
         if (BigImage.Source is BitmapImage bi)
         {
             var sx = bi.PixelWidth / _imgW;
             var sy = bi.PixelHeight / _imgH;
-            var pw = (int)Math.Round(_box.Width * sx);
-            var ph = (int)Math.Round(_box.Height * sy);
-            SizeLabel.Text = $"  {pw} × {ph}  ";
+            pw = (int)Math.Round(_box.Width * sx);
+            ph = (int)Math.Round(_box.Height * sy);
             SizeHint.Text = $"{pw} × {ph} px";
         }
         else
         {
-            SizeLabel.Text = $"  {(int)_box.Width} × {(int)_box.Height}  ";
+            pw = (int)_box.Width;
+            ph = (int)_box.Height;
+            SizeHint.Text = $"{pw} × {ph}";
         }
-        // Position the label just above the box, centered horizontally.
-        SizeLabel.Margin = new Thickness(0, 0, 0, 0);
-        // Use a translation to place it above the selection.
-        var trans = new TranslateTransform(0, -24);
-        SizeLabel.RenderTransform = trans;
-        // We'll update the translation in a follow-up if needed; for now the
-        // label stays centered and we just nudge it up with the transform.
+
+        _label.Child = new TextBlock
+        {
+            Text = $"  {pw} × {ph}  ",
+            FontSize = 11,
+            Foreground = Brushes.White,
+        };
+
+        // Just above the box, centred, clamped to the surface.
+        _label.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        var size = _label.DesiredSize;
+        var x = Math.Clamp(_box.X + _box.Width / 2 - size.Width / 2, 0, Math.Max(0, _imgW - size.Width));
+        var y = _box.Y - size.Height - 6;
+        if (y < 0) y = _box.Bottom + 6;                      // no room above: go below
+        Canvas.SetLeft(_label, x);
+        Canvas.SetTop(_label, Math.Min(y, Math.Max(0, _imgH - size.Height)));
+        System.Windows.Controls.Panel.SetZIndex(_label, 20);
     }
 
-    // ---- input handling --------------------------------------------------
+    // ---- input -----------------------------------------------------------
 
     private void OnBoxDown(object sender, MouseButtonEventArgs e)
     {
-        _handle = -1;
+        _handle = HandleMove;
         _dragStart = e.GetPosition(Overlay);
         _boxStart = _box;
         _dragging = true;
         ((UIElement)sender).CaptureMouse();
+        e.Handled = true;
     }
 
     private void OnBoxMove(object sender, MouseEventArgs e)
     {
-        if (!_dragging || _handle != -1) return;
+        if (!_dragging || _handle != HandleMove) return;
         var p = e.GetPosition(Overlay);
         var dx = p.X - _dragStart.X;
         var dy = p.Y - _dragStart.Y;
         _box = new Rect(
-            Math.Clamp(_boxStart.X + dx, 0, _imgW - _boxStart.Width),
-            Math.Clamp(_boxStart.Y + dy, 0, _imgH - _boxStart.Height),
+            Math.Clamp(_boxStart.X + dx, 0, Math.Max(0, _imgW - _boxStart.Width)),
+            Math.Clamp(_boxStart.Y + dy, 0, Math.Max(0, _imgH - _boxStart.Height)),
             _boxStart.Width, _boxStart.Height);
         PlaceBox();
     }
@@ -240,7 +323,7 @@ public partial class CropWindow : Window
         var y = _boxStart.Y;
         var w = _boxStart.Width;
         var h = _boxStart.Height;
-        var minSize = 24.0;
+        const double minSize = 24.0;
 
         if (_handle is 0 or 3 or 5) { x = Math.Min(_boxStart.X + dx, x + w - minSize); w = _boxStart.Right - x; }
         if (_handle is 2 or 4 or 7) { w = Math.Max(minSize, _boxStart.Width + dx); }
@@ -295,20 +378,32 @@ public partial class CropWindow : Window
 
             var dir = System.IO.Path.GetDirectoryName(FilePath)!;
             var stem = System.IO.Path.GetFileNameWithoutExtension(FilePath);
-            var ext = System.IO.Path.GetExtension(FilePath);
-            var outPath = System.IO.Path.Combine(dir, $"{stem}-cropped{ext}");
+            var ext = System.IO.Path.GetExtension(FilePath).ToLowerInvariant();
+
+            // Only write an extension whose bytes actually match: a .webp
+            // written with PNG data is a broken file.
+            var outExt = ext switch
+            {
+                ".png" => ".png",
+                ".jpg" or ".jpeg" => ext,
+                ".bmp" => ".bmp",
+                _ => ".png",
+            };
+
+            var outPath = System.IO.Path.Combine(dir, $"{stem}-cropped{outExt}");
             var n = 1;
             while (File.Exists(outPath))
             {
-                outPath = System.IO.Path.Combine(dir, $"{stem}-cropped-{n}{ext}");
+                outPath = System.IO.Path.Combine(dir, $"{stem}-cropped-{n}{outExt}");
                 n++;
             }
 
             using (var fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
             {
-                var encoder = System.IO.Path.GetExtension(outPath).ToLowerInvariant() switch
+                BitmapEncoder encoder = outExt switch
                 {
-                    ".jpg" or ".jpeg" => (BitmapEncoder)new JpegBitmapEncoder { QualityLevel = 92 },
+                    ".jpg" or ".jpeg" => new JpegBitmapEncoder { QualityLevel = 92 },
+                    ".bmp" => new BmpBitmapEncoder(),
                     _ => new PngBitmapEncoder(),
                 };
                 encoder.Frames.Add(BitmapFrame.Create(crop));

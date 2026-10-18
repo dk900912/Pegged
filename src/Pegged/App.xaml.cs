@@ -1,5 +1,7 @@
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using Microsoft.Win32;
 using Pegged.Core;
@@ -15,6 +17,15 @@ namespace Pegged;
 // scope and "Application" has to be spelled out here.
 public partial class App : System.Windows.Application
 {
+    /// <summary>Per-monitor-v2, the only mode where a window placed at
+    /// monitor.Work actually lands there on a 125%/150% screen.</summary>
+    private const int DpiAwarenessContextPerMonitorAwareV2 = -4;
+
+    [DllImport("user32.dll")]
+    private static extern bool SetProcessDpiAwarenessContext(IntPtr context);
+
+    private static Mutex? _singleInstance;
+
     internal CaptureStore Store { get; private set; } = null!;
 
     /// <summary>The line itself: raised by the controller once start-up is done.</summary>
@@ -24,7 +35,11 @@ public partial class App : System.Windows.Application
     internal WatchService? Watch { get; private set; }
 
     /// <summary>The system-tray icon. Disposing it lets the app exit.</summary>
-    internal TrayService? Tray { get; private set; }
+    internal TrayService? Tray { get; private set; } = null!;
+
+    /// <summary>The app-wide global hotkey. Owned by the app, not by the
+    /// settings window, so the shortcut keeps working after it closes.</summary>
+    internal HotKeyService? HotKey { get; private set; }
 
     internal static App Instance => (App)System.Windows.Application.Current;
 
@@ -32,6 +47,11 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        // The very first thing: without per-monitor-v2 the whole app runs
+        // DPI-virtualised and every placement lands in the wrong place (this
+        // was measured: the line showed up at (96,96) instead of the top edge).
+        SetProcessDpiAwarenessContext((IntPtr)DpiAwarenessContextPerMonitorAwareV2);
+
         base.OnStartup(e);
 
         // A tiny development hook: put a picture on the clipboard and exit.
@@ -44,6 +64,17 @@ public partial class App : System.Windows.Application
                 System.Windows.Forms.Clipboard.SetImage(bmp);
             }
             catch (Exception) { }
+            Shutdown(0);
+            return;
+        }
+
+        // One Pegged per session: a second double-click on the exe used to
+        // spawn a whole second set of windows.
+        _singleInstance = new Mutex(true, @"Local\Pegged.SingleInstance", out var isNew);
+        if (!isNew)
+        {
+            // A second launch just puts the already-running Pegged back on
+            // top and exits; it used to build a whole second set of windows.
             Shutdown(0);
             return;
         }
@@ -66,6 +97,10 @@ public partial class App : System.Windows.Application
         // Module 4: watch the screenshot folder (and the three extras) for
         // fresh captures, and listen to the clipboard.
         Watch = new WatchService();
+
+        // Module 6: the shortcut lives with the app, not with the settings UI.
+        HotKey = new HotKeyService(Line.Line);
+        HotKey.Apply(Settings.Current.Shortcut);
 
         // Module 6: tray + settings + (sync) launch-at-login state.
         Settings.Current.LaunchAtLogin = StartupService.IsEnabled();
@@ -100,9 +135,12 @@ public partial class App : System.Windows.Application
         SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
         SettingsRequested -= OnSettingsRequested;
         Tray?.Dispose();
+        HotKey?.Dispose();
         Watch?.Dispose();
         Line?.Dispose();
         Store.Save();
         Settings.Current.Save();
+        _singleInstance?.Dispose();
+        _singleInstance = null;
     }
 }

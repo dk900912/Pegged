@@ -11,6 +11,13 @@
     <Color x:Key="Palette.Border">#FF333944</Color>
     <Color x:Key="Palette.Text">#FFFFFFFF</Color>
     <Color x:Key="Palette.TextSecondary">#FFC9CDD4</Color>
+    <Color x:Key="Palette.SubtleText">#FFC9CDD4</Color>
+    <Color x:Key="Palette.Window">#FF16181D</Color>
+    <Color x:Key="Palette.Sidebar">#FF20242B</Color>
+    <Color x:Key="Palette.OnAccent">#FF1A1B1F</Color>
+    <Color x:Key="Palette.SwitchTrack">#FF3A414D</Color>
+    <Color x:Key="Palette.CardEdgeTop">#29FFFFFF</Color>
+    <Color x:Key="Palette.CardEdgeBottom">#0FFFFFFF</Color>
     <Color x:Key="Palette.Accent">#FF4CC2FF</Color>
     <Color x:Key="Palette.AccentAlt">#FF9B7BFF</Color>
     <Color x:Key="Palette.Rope">#FFB9BEC9</Color>
@@ -23,4 +30,8 @@
     <Color x:Key="Palette.Success">#FF6CCB5F</Color>
     <Color x:Key="Palette.Mask">#9E000000</Color>
     <Color x:Key="Palette.Shadow">#59000000</Color>
+
+    <SolidColorBrush x:Key="Brush.Window" Color="{DynamicResource Palette.Window}" />
+    <SolidColorBrush x:Key="Brush.Sidebar" Color="{DynamicResource Palette.Sidebar}" />
+    <SolidColorBrush x:Key="Brush.SubtleText" Color="{DynamicResource Palette.SubtleText}" />
 </ResourceDictionary>

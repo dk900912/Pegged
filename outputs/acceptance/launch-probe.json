@@ -1,0 +1,61 @@
+{
+  "method": "Explorer ListItem.double_click_input, twice (physical mouse double click)",
+  "exe": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\publish\\Pegged.exe",
+  "screen": [
+    1920,
+    1200
+  ],
+  "processes": [
+    {
+      "exe": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\publish\\Pegged.exe",
+      "pid": 3708,
+      "name": "Pegged.exe"
+    }
+  ],
+  "windows": [
+    {
+      "title": "Pegged edge",
+      "rect": [
+        860,
+        -1,
+        1060,
+        14
+      ],
+      "texts": []
+    },
+    {
+      "title": "Pegged",
+      "rect": [
+        0,
+        -308,
+        1920,
+        -15
+      ],
+      "texts": [
+        "🗑",
+        "📌",
+        "⚙",
+        "截一张图，它会挂到这里",
+        "或者复制一张图片，它也会挂上来"
+      ]
+    }
+  ],
+  "revealed_rect": [
+    0,
+    0,
+    1920,
+    293
+  ],
+  "checks": {
+    "single_instance": true,
+    "line_window_exists": true,
+    "line_full_width": true,
+    "line_rests_above_screen": true,
+    "revealed_at_top_edge": true,
+    "revealed_height": true,
+    "pill_exists": true,
+    "pill_top_centred": true,
+    "no_runtime_error_dialog": true
+  },
+  "passed": true
+}

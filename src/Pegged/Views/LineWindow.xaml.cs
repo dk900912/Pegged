@@ -29,6 +29,7 @@ public partial class LineWindow : Window
     private bool _pinned;
     private bool _transparent = true;
     private double _breezePhase;
+    private double _scale = 1.0;
 
     /// <summary>Where the line hangs when it is down, in WPF units.</summary>
     private Rect _target = new(0, 0, 800, 210);
@@ -121,6 +122,12 @@ public partial class LineWindow : Window
 
         // Module 4: the line window is also where the clipboard talks to.
         NativeMethods.AddClipboardFormatListener(_handle);
+
+        // PlaceOn() before the window is shown cannot move anything: there is
+        // no HWND yet and MoveTo() bails out. Now that the handle exists, do
+        // the placement that was asked for. Without this the window sits at
+        // Windows' default spot (measured at 96,96) instead of the top edge.
+        if (_target.Width > 0) MoveTo(_target.Left, _target.Top - _slide.Value);
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -172,10 +179,14 @@ public partial class LineWindow : Window
     {
         Monitor = monitor;
         var scale = monitor.Scale <= 0 ? 1.0 : monitor.Scale;
-        var left = monitor.Work.Left;
-        var top = monitor.Work.Top;
-        var width = monitor.Work.Width;
-        var height = LayoutMetrics.PanelHeight / 1.0;
+        var left = monitor.Bounds.Left;
+        var top = monitor.Bounds.Top;
+        var width = monitor.Bounds.Width;
+        var height = LayoutMetrics.PanelHeight;
+
+        // Remember the monitor's own scale: MoveTo() multiplies by it, and the
+        // window's "current" DPI is stale while it is still on another screen.
+        _scale = scale;
 
         _target = new Rect(left, top, width, height);
 
@@ -186,18 +197,34 @@ public partial class LineWindow : Window
         LayoutRope();
     }
 
-    /// <summary>Moves the window without activating it, in physical pixels.</summary>
+    /// <summary>Moves the window without activating it, in physical pixels.
+    /// Uses the scale of the monitor the window belongs to, not the one it is
+    /// leaving, so a 150% screen is not shifted by the old screen's 125%.</summary>
     private void MoveTo(double dipLeft, double dipTop)
     {
         if (_handle == IntPtr.Zero) return;
 
-        var dpi = GetDpiForWindow(_handle);
-        var scale = dpi / 96.0;
+        var scale = _scale > 0 ? _scale : GetDpiScale(_handle);
 
         NativeMethods.SetWindowPos(_handle, NativeMethods.HWND_TOPMOST,
             (int)Math.Round(dipLeft * scale), (int)Math.Round(dipTop * scale),
             0, 0,
             NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOACTIVATE | NativeMethods.SWP_NOOWNERZORDER);
+    }
+
+    private double GetDpiScale(IntPtr hwnd)
+    {
+        try
+        {
+            var dpi = GetDpiForWindow(hwnd);
+            if (dpi > 0) return dpi / 96.0;
+        }
+        catch (Exception)
+        {
+            // Windows 10 1607 and earlier do not have it: 1:1 is fine.
+        }
+
+        return 1.0;
     }
 
     [DllImport("user32.dll")]
@@ -311,12 +338,14 @@ public partial class LineWindow : Window
 
     private void OnFrame(double dt)
     {
-        if (_slide.AtRest) return;
+        if (!_slide.AtRest)
+        {
+            _slide.Step(dt);
+            MoveTo(_target.Left, _target.Top - _slide.Value);
+        }
 
-        _slide.Step(dt);
-        MoveTo(_target.Left, _target.Top - _slide.Value);
-
-        // Breeze phase: one full cycle every ~10 seconds.
+        // Breeze: runs even when the slide is at rest (it always is, most of
+        // the time), or the rope would be frozen for the whole session.
         _breezePhase += dt * 0.628;
         if (CardLayer.Children.Count == 0) LayoutRope();
     }

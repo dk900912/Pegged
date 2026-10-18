@@ -16,50 +16,15 @@
     <Grid>
         <!-- The crop surface: everything is positioned relative to the displayed image. -->
         <Grid x:Name="Surface" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <!-- The image -->
             <Image x:Name="BigImage" Stretch="Uniform"
                    RenderOptions.BitmapScalingMode="HighQuality"
                    SizeChanged="OnImageSizeChanged" />
 
-            <!-- 33% grid lines -->
-            <Grid x:Name="GridLayer" IsHitTestVisible="False">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" /><RowDefinition Height="*" /><RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Border Grid.Row="0" Grid.Column="0" BorderBrush="#66FFFFFF" BorderThickness="0,0,1,1" />
-                <Border Grid.Row="0" Grid.Column="1" BorderBrush="#66FFFFFF" BorderThickness="1,0,1,1" />
-                <Border Grid.Row="0" Grid.Column="2" BorderBrush="#66FFFFFF" BorderThickness="1,0,0,1" />
-                <Border Grid.Row="1" Grid.Column="0" BorderBrush="#66FFFFFF" BorderThickness="0,1,1,1" />
-                <Border Grid.Row="1" Grid.Column="1" BorderBrush="#66FFFFFF" BorderThickness="1,1,1,1" />
-                <Border Grid.Row="1" Grid.Column="2" BorderBrush="#66FFFFFF" BorderThickness="1,1,0,1" />
-                <Border Grid.Row="2" Grid.Column="0" BorderBrush="#66FFFFFF" BorderThickness="0,1,1,0" />
-                <Border Grid.Row="2" Grid.Column="1" BorderBrush="#66FFFFFF" BorderThickness="1,1,1,0" />
-                <Border Grid.Row="2" Grid.Column="2" BorderBrush="#66FFFFFF" BorderThickness="1,1,0,0" />
-            </Grid>
-
-            <!-- Dim mask + selection + handles + label -->
-            <Canvas x:Name="Overlay" IsHitTestVisible="False" />
-
-            <!-- The draggable selection box -->
-            <Rectangle x:Name="Selection" Stroke="White" StrokeThickness="2" Fill="#12FFFFFF"
-                       Cursor="SizeAll" HorizontalAlignment="Left" VerticalAlignment="Top"
-                       MouseLeftButtonDown="OnBoxDown" MouseMove="OnBoxMove" MouseLeftButtonUp="OnBoxUp" />
+            <!-- Mask, selection, grid, handles and label all live on this canvas.
+                 It MUST be hit-testable, or the eight drag handles never see
+                 the mouse at all. -->
+            <Canvas x:Name="Overlay" IsHitTestVisible="True" />
         </Grid>
-
-        <!-- Size label floats above the box -->
-        <TextBlock x:Name="SizeLabel" Foreground="White" FontSize="11"
-                   Background="#CC000000" Padding="6,3" IsHitTestVisible="False"
-                   HorizontalAlignment="Center" VerticalAlignment="Center" />
 
         <!-- Floating glass action bar at bottom center -->
         <Border HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,40"

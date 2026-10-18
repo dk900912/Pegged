@@ -170,3 +170,15 @@
 | 41 | 设置窗口尺寸与导航不符合规范 | 规范 3.6 要求 720×560 / 左栏 240px / 图标+副标题导航 | 改窗口尺寸，左栏 208→240，导航项改用 `StackPanel` 内嵌图标 Unicode + 标题 + 副标题，页头 20→28px |
 | 42 | 空状态绳子无微风动画 | 规范 3.4 要求 ±1.6°~3.4° 微风轻摆 | `LineWindow` 增 `_breezePhase`，`OnFrame` 中每帧累加，`LayoutRope()` 的贝塞尔控制点 Y 加 `Math.Sin(_breezePhase) * 2.5`；有卡片时 breeze=0 |
 | 43 | 边缘胶囊无流光效果 | 规范 3.1 要求"水平流光" | `EdgePillWindow` 构造函数创建本地 `LinearGradientBrush`（透明→Accent 蓝→Accent 紫→透明），`OnFrame` 中按 `_phase` 滑动 `GradientStop.Offset` |
+| 44 | 双击启动后挂绳窗口出现在 (96,96)、感应条出现在 (32,32)，都不在屏幕顶部 | `LineController.Start()` 先 `PlaceOn()` 后 `Show()`，而 `MoveTo()` 在 `_handle == Zero` 时直接 return（无 HWND 可移）；窗口随后落到 Windows 默认位置。实测：`GetWindowRect = (96,96,2016,389)` | ①进程启动时显式 `SetProcessDpiAwarenessContext(PerMonitorV2)`；②`LineWindow.OnSourceInitialized` 与 `EdgePillWindow.OnSourceInitialized` 在句柄就绪后补做排一次定位；③`MoveTo` 改用目标显示器的 `monitor.Scale`（而非当前窗口 DPI，跨屏移动时旧屏 DPI 会偏移坐标） |
+| 45 | 连按两次 exe 会打开两套挂绳/感应条窗口，互相干扰 | 没有单实例保护；资源管理器双击/开始菜单都会另起进程 | `App.OnStartup` 用命名 `Mutex(Local\Pegged.SingleInstance)`，第二个实例直接 `Shutdown(0)` 退出。实测：双击两次 `processes == 1` |
+| 46 | 默认设置（"不在全屏应用上显示"=关）下挂绳**永远不展开** | `IsFullScreen()` 枚举所有可见窗口并与显示器矩形比较，而 Windows 长期常驻两个铺满全屏的窗口（桌面 Program Manager、IME 宿主"Windows 输入体验"），于是永远判定"有全屏应用"；且早期用 DIP 矩形与 `GetWindowRect` 的物理像素比较，缩放屏上任何最大化窗口都会被误判 | 只判断**前台窗口**：跳过 shell 窗口、`WS_EX_TOOLWINDOW`/`NOACTIVATE`、`DWMWA_CLOAKED`  cloaked 窗口，并改用 `Physical` 矩形比较。实测：光标置于顶边 `IsInHotBand=true → revealed=true`，窗口停在 top=0 |
+| 47 | `LineWindow.PlaceOn` 用 `monitor.Work`（工作区）取 left/top/width | 规范 3.2 要求贴**物理顶部全屏宽**；任务栏置顶或垂直停靠时位置/宽度会偏 | 改用 `monitor.Bounds`，与 `EdgePillWindow` 保持一致 |
+| 48 | 裁剪窗口 8 个手柄完全点不动 | `CropWindow.xaml` 的 `Overlay` Canvas 设了 `IsHitTestVisible="False"`，挂在它上面的 8 个 Rectangle 收不到鼠标；且 `LayoutHandles` 取 `Children[i+1]`（mask 在 0 位），`BuildHandles` 清空后只有 8 个子元素，i=7 时取第 9 个 → `ArgumentOutOfRangeException` | 重写 `CropWindow`：手柄写成字段数组不再依赖索引；mask/网格/选框/手柄/标签分层用 `Panel.ZIndex` 控制命中；Canvas 恢复可命中 |
+| 49 | 拖拽时按 Esc / 拖到无效目标，卡片被当成 Move 直接移除 | `DragService` 把 `DoDragDrag` 的 `None`（取消）结果映射回 `initial`，而自有目录默认 `initial = Move` | 取消即 `DragKind.None`，只有明确的 `DragDropEffects.Move` 才算移动 |
+| 50 | 全局快捷键只在设置窗口打开期间有效，一关就失效 | `HotKeyService` 由 `SettingsWindow` 创建/销毁，注册失败后 `_id=0` 但 hook 仍在 `_source` 上，`Unregister` 因条件不满足不再清理（泄漏） | 热键收归 `App` 常驻（绑定生命周期同 LineWindow），`Register` 返回 bool、失败即回滚 hook，快捷键录制失败时提示并保留原绑定 |
+| 51 | 空挂绳微风动画实际不动 | `LineWindow.OnFrame` 开头 `if (_slide.AtRest) return;`，而展开动画结束后弹簧长期处于 AtRest，微风相位永不累加 | 把 breeze 更新移到 AtRest 早退判断之外 |
+| 52 | 感应条参数不符合规范 | 呼吸周期 4s、透明度 0.55–0.90 | 改为规范 3.1 的 2.4s 周期、35%–75% 透明度 |
+| 53 | 截图飞入动画不触发 | `CaptureStore` 挂入时 `LineItem.Flying=true`，但 `CardView` 构造完成后才订阅 `PropertyChanged`，初始值变化丢失 | 该动画仍未修复（见"未完成项"） |
+| 54 | 首启强制展开 4s | 规范 3.4 要求 5s | 改 `Peek(5.0)` |
+| 55 | 裁剪输出把 webp 等扩展名写成 PNG 内容 | encoder 一律按"非 jpg 即 png"，`.webp`/`.gif` 会得到内容与扩展不符的文件 | 输出扩展名归一到 png/jpg/bmp，其它一律 `.png`；尺寸标签改为跟随选框、越界时翻转到选框下方 |

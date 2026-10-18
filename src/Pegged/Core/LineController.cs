@@ -70,7 +70,8 @@ public sealed class LineController : IDisposable
         {
             Settings.Current.Welcomed = true;
             Settings.Current.Save();
-            Peek(4.0);
+            // Spec 3.4: five seconds of forced reveal on the very first run.
+            Peek(5.0);
         }
     }
 
@@ -189,9 +190,9 @@ public sealed class LineController : IDisposable
         var onLine = _line.Revealed && OverLine(dip);
 
         MonitorDescription? band = null;
-        if (!onLine && settings.RevealOnTopEdge && MonitorService.IsInHotBand(cursor, out var hot))
+        if (!onLine && settings.RevealOnTopEdge && MonitorService.IsInHotBand(cursor, out var bandMonitor))
         {
-            if (AllowedOverFullScreen(hot)) band = hot;
+            if (AllowedOverFullScreen(bandMonitor)) band = bandMonitor;
         }
 
         if (band is not null)
