@@ -39,6 +39,13 @@ public sealed class WatchService : IDisposable
         foreach (var extra in Settings.Current.ExtraFolders) AddUnique(seen, extra);
     }
 
+    /// <summary>Re-create the watchers. Used by the settings window when the
+    /// user picks a new folder: change the setting, then call this.</summary>
+    public void Restart()
+    {
+        Rebuild();
+    }
+
     private void AddUnique(HashSet<string> seen, string? folder)
     {
         if (string.IsNullOrWhiteSpace(folder)) return;

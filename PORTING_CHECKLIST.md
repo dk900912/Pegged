@@ -25,7 +25,7 @@
 - [x] Module 3: 挂绳、夹子、图片/视频卡片渲染、钟摆摇晃物理引擎
 - [x] Module 4: 截图目录监控器（文件锁指数退避重试）+ 剪贴板图像监听器（隐私过滤与防回环）
 - [x] Module 5: OLE 拖拽引擎（Copy/Move 语义区分）、单击复制反馈、双击预览、快速裁剪窗口
-- [ ] Module 6: Fluent 设置中心窗口、系统托盘菜单、`RegisterHotKey` 全局热键、开机自启
+- [x] Module 6: Fluent 设置中心窗口、系统托盘菜单、`RegisterHotKey` 全局热键、开机自启
 
 ## Phase 4 — 打包发布、文档脱敏与复盘
 - [ ] `dotnet publish -c Release -r win-x64 --self-contained false -o ./publish`

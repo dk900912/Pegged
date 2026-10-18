@@ -1,0 +1,282 @@
+<Window x:Class="Pegged.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Pegged.Localization"
+        xmlns:views="clr-namespace:Pegged.Views"
+        Title="{loc:Str Settings.Title}"
+        Background="{DynamicResource Brush.Window}"
+        WindowStartupLocation="CenterOwner"
+        Width="820" Height="600"
+        MinWidth="640" MinHeight="460"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+    <!-- Settings window: a side nav, a content card. Two regions stay
+         separate; the nav scrolls on its own when the height is small. -->
+    <Grid Margin="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="208" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Side nav -->
+        <Border Grid.Column="0" Background="{DynamicResource Brush.Sidebar}"
+                BorderBrush="{DynamicResource Brush.CardEdge}" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Margin="20,18,20,10">
+                    <TextBlock Text="Pegged" FontFamily="{DynamicResource Font.Ui}"
+                               FontWeight="SemiBold" FontSize="18"
+                               Foreground="{DynamicResource Brush.Text}" />
+                    <TextBlock Text="A clothesline for your screenshots"
+                               FontFamily="{DynamicResource Font.Ui}" FontSize="11"
+                               Foreground="{DynamicResource Brush.SubtleText}"
+                               TextWrapping="Wrap" Margin="0,2,0,0" />
+                </StackPanel>
+
+                <ListBox x:Name="NavList" Grid.Row="1" Margin="8,8,8,8"
+                         Background="Transparent" BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         SelectionChanged="OnNavChanged">
+                    <ListBox.Resources>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource NavItem}" />
+                    </ListBox.Resources>
+                    <ListBoxItem x:Name="NavGeneral"    Content="{loc:Str Settings.General}"    Tag="general" />
+                    <ListBoxItem x:Name="NavCapture"    Content="{loc:Str Settings.Capture}"    Tag="capture" />
+                    <ListBoxItem x:Name="NavAppearance" Content="{loc:Str Settings.Appearance}" Tag="appearance" />
+                    <ListBoxItem x:Name="NavShortcuts"  Content="{loc:Str Settings.Shortcuts}"  Tag="shortcuts" />
+                    <ListBoxItem x:Name="NavAbout"      Content="{loc:Str Settings.About}"      Tag="about" />
+                </ListBox>
+
+                <StackPanel Grid.Row="2" Margin="20,0,20,16" Orientation="Horizontal">
+                    <Button Style="{StaticResource GlassButton}" Padding="12,6"
+                            Click="OnClose" Content="{loc:Str Preview.Close}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="28,16,28,28">
+            <Grid>
+                <!-- General -->
+                <StackPanel x:Name="GeneralPane" Visibility="Visible">
+                    <TextBlock Text="{loc:Str Settings.General}" FontFamily="{DynamicResource Font.Ui}"
+                               FontWeight="SemiBold" FontSize="20"
+                               Foreground="{DynamicResource Brush.Text}" Margin="0,0,0,4" />
+                    <TextBlock Text="{loc:Str Settings.GeneralDesc}" FontFamily="{DynamicResource Font.Ui}"
+                               FontSize="11" Foreground="{DynamicResource Brush.SubtleText}"
+                               TextWrapping="Wrap" Margin="0,0,0,18" />
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Language}" />
+                                <TextBlock Text="{loc:Str Settings.LanguageDesc}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <ComboBox x:Name="LanguageCombo" HorizontalAlignment="Right" MinWidth="180" SelectionChanged="OnLanguage" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Sounds}" />
+                                <TextBlock Text="{loc:Str Settings.SoundsDesc}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <views:ToggleSwitch x:Name="SoundsSwitch" HorizontalAlignment="Right" Changed="OnSounds" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Keep}" />
+                                <TextBlock Text="{loc:Str Settings.KeepDesc}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <ComboBox x:Name="KeepCombo" HorizontalAlignment="Right" MinWidth="120" SelectionChanged="OnKeep" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Size}" />
+                                <TextBlock Text="{loc:Str Settings.SizeDesc}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <ComboBox x:Name="SizeCombo" HorizontalAlignment="Right" MinWidth="160" SelectionChanged="OnSize" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- Capture -->
+                <StackPanel x:Name="CapturePane" Visibility="Collapsed">
+                    <TextBlock Text="{loc:Str Settings.Capture}" FontFamily="{DynamicResource Font.Ui}"
+                               FontWeight="SemiBold" FontSize="20"
+                               Foreground="{DynamicResource Brush.Text}" Margin="0,0,0,4" />
+                    <TextBlock Text="{loc:Str Settings.CaptureDesc}" FontFamily="{DynamicResource Font.Ui}"
+                               FontSize="11" Foreground="{DynamicResource Brush.SubtleText}"
+                               TextWrapping="Wrap" Margin="0,0,0,18" />
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Folder}" />
+                                <TextBlock x:Name="FolderPath" Style="{StaticResource SubtleHint}" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                            <Button Style="{StaticResource AccentButton}" HorizontalAlignment="Right"
+                                    Click="OnChangeFolder" Content="{loc:Str Settings.FolderChange}" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Clipboard}" />
+                                <TextBlock Text="{loc:Str Settings.ClipboardDesc}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <views:ToggleSwitch x:Name="ClipboardSwitch" HorizontalAlignment="Right" Changed="OnClipboard" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.OverFullScreen}" />
+                                <TextBlock Text="{loc:Str Settings.OverFullScreenDesc}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <views:ToggleSwitch x:Name="FullScreenSwitch" HorizontalAlignment="Right" Changed="OnFullScreen" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- Appearance -->
+                <StackPanel x:Name="AppearancePane" Visibility="Collapsed">
+                    <TextBlock Text="{loc:Str Settings.Appearance}" FontFamily="{DynamicResource Font.Ui}"
+                               FontWeight="SemiBold" FontSize="20"
+                               Foreground="{DynamicResource Brush.Text}" Margin="0,0,0,4" />
+                    <TextBlock Text="{loc:Str Settings.AppearanceDesc}" FontFamily="{DynamicResource Font.Ui}"
+                               FontSize="11" Foreground="{DynamicResource Brush.SubtleText}"
+                               TextWrapping="Wrap" Margin="0,0,0,18" />
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Theme}" />
+                                <TextBlock Text="{loc:Str Settings.ThemeLight}" Style="{StaticResource SubtleHint}" x:Name="ThemeHint" />
+                            </StackPanel>
+                            <ComboBox x:Name="ThemeCombo" HorizontalAlignment="Right" MinWidth="160" SelectionChanged="OnTheme" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.RevealDelay}" />
+                                <TextBlock Text="{loc:Str Settings.RevealDelayDesc}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <Slider x:Name="RevealSlider" Width="180" HorizontalAlignment="Right"
+                                    Minimum="0" Maximum="1" TickFrequency="0.05"
+                                    ValueChanged="OnRevealDelay" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.TopEdge}" />
+                                <TextBlock Text="{loc:Str Settings.TopEdgeDesc}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <views:ToggleSwitch x:Name="TopEdgeSwitch" HorizontalAlignment="Right" Changed="OnTopEdge" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Peek}" />
+                                <TextBlock Text="{loc:Str Settings.PeekDesc}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <views:ToggleSwitch x:Name="PeekSwitch" HorizontalAlignment="Right" Changed="OnPeek" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- Shortcuts -->
+                <StackPanel x:Name="ShortcutsPane" Visibility="Collapsed">
+                    <TextBlock Text="{loc:Str Settings.Shortcuts}" FontFamily="{DynamicResource Font.Ui}"
+                               FontWeight="SemiBold" FontSize="20"
+                               Foreground="{DynamicResource Brush.Text}" Margin="0,0,0,4" />
+                    <TextBlock Text="{loc:Str Settings.ShortcutsDesc}" FontFamily="{DynamicResource Font.Ui}"
+                               FontSize="11" Foreground="{DynamicResource Brush.SubtleText}"
+                               TextWrapping="Wrap" Margin="0,0,0,18" />
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.ShortcutToggle}" />
+                                <TextBlock Text="{loc:Str Settings.RecordHint}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <TextBox x:Name="HotkeyBox" Width="200" HorizontalAlignment="Right"
+                                     HorizontalContentAlignment="Center"
+                                     PreviewKeyDown="OnHotkeyDown" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Tray.OpenAtLogin}" />
+                                <TextBlock Text="{loc:Str Settings.RecordHint}" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <views:ToggleSwitch x:Name="LoginSwitch" HorizontalAlignment="Right" Changed="OnLogin" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- About -->
+                <StackPanel x:Name="AboutPane" Visibility="Collapsed">
+                    <TextBlock Text="{loc:Str Settings.About}" FontFamily="{DynamicResource Font.Ui}"
+                               FontWeight="SemiBold" FontSize="20"
+                               Foreground="{DynamicResource Brush.Text}" Margin="0,0,0,4" />
+                    <TextBlock Text="{loc:Str Settings.AboutDesc}" FontFamily="{DynamicResource Font.Ui}"
+                               FontSize="11" Foreground="{DynamicResource Brush.SubtleText}"
+                               TextWrapping="Wrap" Margin="0,0,0,18" />
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Version}" />
+                                <TextBlock Text="Pegged 1.0.0" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Website}" />
+                                <TextBlock Text="github.com/dk900912/Pegged" Style="{StaticResource SubtleHint}" />
+                            </StackPanel>
+                            <Button Style="{StaticResource AccentButton}" HorizontalAlignment="Right"
+                                    Click="OnWebsite" Content="{loc:Str Preview.Open}" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingsRow}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Str Settings.Credits}" />
+                                <TextBlock Text="A native Windows 11 port of tendedero (MIT) by alejandrobujan."
+                                           Style="{StaticResource SubtleHint}" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>
