@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using Microsoft.Win32;
 using Pegged.Core;
@@ -18,6 +19,9 @@ public partial class App : System.Windows.Application
     /// <summary>The line itself: raised by the controller once start-up is done.</summary>
     internal LineController? Line { get; private set; }
 
+    /// <summary>The folder watchers, kept alive while the app is running.</summary>
+    internal WatchService? Watch { get; private set; }
+
     internal static App Instance => (App)System.Windows.Application.Current;
 
     internal static CaptureStore CaptureStore => Instance.Store;
@@ -25,6 +29,20 @@ public partial class App : System.Windows.Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // A tiny development hook: put a picture on the clipboard and exit.
+        // Used by the automated smoke test for Module 4.
+        if (e.Args.Length >= 2 && e.Args[0] == "--put-clip" && File.Exists(e.Args[1]))
+        {
+            try
+            {
+                using var bmp = new System.Drawing.Bitmap(e.Args[1]);
+                System.Windows.Forms.Clipboard.SetImage(bmp);
+            }
+            catch (Exception) { }
+            Shutdown(0);
+            return;
+        }
 
         AppPaths.EnsureCreated();
 
@@ -40,6 +58,10 @@ public partial class App : System.Windows.Application
         Line = new LineController();
         Line.SettingsRequested += (_, _) => SettingsRequested?.Invoke(this, EventArgs.Empty);
         Line.Start();
+
+        // Module 4: watch the screenshot folder (and the three extras) for
+        // fresh captures, and listen to the clipboard.
+        Watch = new WatchService();
 
         SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
         Exit += OnExit;
@@ -57,6 +79,7 @@ public partial class App : System.Windows.Application
     private void OnExit(object sender, ExitEventArgs e)
     {
         SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
+        Watch?.Dispose();
         Line?.Dispose();
         Store.Save();
         Settings.Current.Save();

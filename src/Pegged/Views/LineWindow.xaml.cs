@@ -85,6 +85,9 @@ public partial class LineWindow : Window
         style |= NativeMethods.WS_EX_TOOLWINDOW | NativeMethods.WS_EX_NOACTIVATE | NativeMethods.WS_EX_TRANSPARENT;
         NativeMethods.SetWindowLong(_handle, NativeMethods.GWL_EXSTYLE, style);
         _transparent = true;
+
+        // Module 4: the line window is also where the clipboard talks to.
+        NativeMethods.AddClipboardFormatListener(_handle);
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -96,7 +99,8 @@ public partial class LineWindow : Window
                 handled = true;
                 return (IntPtr)NativeMethods.MA_NOACTIVATE;
 
-            case 0x031D: // WM_CLIPBOARDUPDATE is handled by the clipboard watcher
+            case NativeMethods.WM_CLIPBOARDUPDATE:
+                ClipboardWatcher.OnClipboardChanged();
                 break;
         }
 
@@ -116,6 +120,7 @@ public partial class LineWindow : Window
 
     private void OnClosing(object? sender, CancelEventArgs e)
     {
+        if (_handle != IntPtr.Zero) NativeMethods.RemoveClipboardFormatListener(_handle);
         FrameLoop.Unsubscribe(OnFrame);
         _source?.RemoveHook(WndProc);
     }
