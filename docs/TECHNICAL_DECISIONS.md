@@ -163,3 +163,10 @@
 | 34 | `HotkeyParser.Render` 引用了不存在的 `HotkeyModifiers` 枚举 | Settings 里 `HotkeyBinding.Modifiers` 是 `uint` 而不是枚举 | 把 `HotkeyParser` 改成直接操作 `NativeMethods.MOD_*` 位掩码；保持与 Win32 一致 |
 | 35 | `ToggleSwitch.xaml.cs` 报 `CS0246: 找不到 Shape` | WPF `Shape` 派生类在 `System.Windows.Shapes` 命名空间，需要 `using` | 加 `using System.Windows.Shapes;` |
 | 36 | SettingsWindow.xaml `ToggleSwitch` 报 `MC3074: 标记不存在` | 控件在 `Pegged.Views` 命名空间，XAML 里要加 xmlns | 加 `xmlns:views="clr-namespace:Pegged.Views"`，所有 ToggleSwitch 加 `views:` 前缀 |
+| 37 | 双击卡片无法打开预览窗口 | `PreviewMouseLeftButtonDown` 中 `CaptureMouse()` 破坏了 WPF `MouseDoubleClick` 的内部检测（Roslyn 不认为捕获会干扰，但 WPF 的路由事件确实受影响） | 移除 `MouseDoubleClick` 事件处理器；在 `OnMouseUp` 中自己跟踪 `_lastClick` 时间戳，400ms 内第二次点击直接触发 `PreviewRequested` |
+| 38 | `PreviewWindow` / `CropWindow` 有时不显示 | `CenterOwner` 以 `LineWindow` 为中心，而 `LineWindow` 是顶部透明小窗口，子窗口可能被定位到屏幕外或 Z 序被压 | 改为 `CenterScreen` + `Topmost="True"`，并移除 `Owner = this` 绑定 |
+| 39 | 卡片悬停时底部操作按钮不可见 | 玻璃按钮（`RoundGlassButton`）在彩色图片上完全融入背景 | 给 `ActionRow` 加 `#66000000` 半透明暗色底 + `CornerRadius="10"` 包裹，按钮放其中；同时上移到底边 26px 避免与 `NameBar` 重叠 |
+| 40 | 裁剪窗口不是全屏遮罩 | 规范 3.5 要求"冻结桌面背景 + 全屏 Overlay"，但实现是居中对话框 | 重写为 `WindowState="Maximized"` + `Background="#E6000000"`，图片 `Uniform` 居中，加 33% 九宫格白线，`Canvas` 统一承载遮罩/选框/手柄 |
+| 41 | 设置窗口尺寸与导航不符合规范 | 规范 3.6 要求 720×560 / 左栏 240px / 图标+副标题导航 | 改窗口尺寸，左栏 208→240，导航项改用 `StackPanel` 内嵌图标 Unicode + 标题 + 副标题，页头 20→28px |
+| 42 | 空状态绳子无微风动画 | 规范 3.4 要求 ±1.6°~3.4° 微风轻摆 | `LineWindow` 增 `_breezePhase`，`OnFrame` 中每帧累加，`LayoutRope()` 的贝塞尔控制点 Y 加 `Math.Sin(_breezePhase) * 2.5`；有卡片时 breeze=0 |
+| 43 | 边缘胶囊无流光效果 | 规范 3.1 要求"水平流光" | `EdgePillWindow` 构造函数创建本地 `LinearGradientBrush`（透明→Accent 蓝→Accent 紫→透明），`OnFrame` 中按 `_phase` 滑动 `GradientStop.Offset` |

@@ -26,6 +26,8 @@ public partial class CardView : UserControl
     private readonly Pendulum _swing = new();
     private readonly Spring _hover = new(0, 0, stiffness: 180, damping: 18);
     private readonly Spring _lift = new(0, 0, stiffness: 220, damping: 22);
+    private readonly Spring _pegOpen = new(0, 0, stiffness: 260, damping: 24);
+    private readonly Spring _pressScale = new(1, 1, stiffness: 300, damping: 28);
 
     private readonly Effect? _effectCard;
     private readonly Effect? _effectHover;
@@ -44,13 +46,8 @@ public partial class CardView : UserControl
     /// <summary>Asked when the user double-clicks the card (open the preview).</summary>
     public event EventHandler? PreviewRequested;
 
-    /// <summary>Asked when the user wants the in-app quick crop. Currently
-    /// surfaced through the preview window; raising on the card itself is
-    /// reserved for the right-click menu in a later module.</summary>
-    public event EventHandler? CropRequested
-    {
-        add { } remove { }
-    }
+    /// <summary>Asked when the user wants the in-app quick crop.</summary>
+    public event EventHandler? CropRequested;
 
     public CardView(LineItem item)
     {
@@ -76,7 +73,6 @@ public partial class CardView : UserControl
         // click: take down. Press-and-drag: OLE drag-out.
         PreviewMouseLeftButtonDown += OnMouseDown;
         MouseLeftButtonUp += OnMouseUp;
-        MouseDoubleClick += (_, _) => PreviewRequested?.Invoke(this, EventArgs.Empty);
         PreviewMouseRightButtonDown += OnRightClick;
 
         _effectCard = TryFindResource("Effect.Card") as Effect;
@@ -164,12 +160,27 @@ public partial class CardView : UserControl
         _lift.Target = liftTarget;
         if (!_lift.AtRest) _lift.Step(dt);
 
-        var pop = 1 + 0.035 * _hover.Value - (Item.Pressed && !Item.Dragging ? 0.02 : 0);
+        // Peg opens on hover: spring band drops, slats spread.
+        _pegOpen.Target = Item.Hovering ? 1 : 0;
+        if (!_pegOpen.AtRest) _pegOpen.Step(dt);
+        var peg = _pegOpen.Value;
+        PinBand.Margin = new Thickness(0, 11 + 2 * peg, 0, 0);
+        PinSlatTop.Margin = new Thickness(0, -1 * peg, 0, 0);
+        PinSlatBottom.Margin = new Thickness(0, 21 + 1 * peg, 0, 0);
+
+        // Press scale: card squeezes to 0.95 when pressed.
+        _pressScale.Target = Item.Pressed && !Item.Dragging ? 0.95 : 1.0;
+        if (!_pressScale.AtRest) _pressScale.Step(dt);
+        Press.ScaleX = _pressScale.Value;
+        Press.ScaleY = _pressScale.Value;
+
+        var pop = 1 + 0.035 * _hover.Value;
         Pop.ScaleX = pop;
         Pop.ScaleY = pop;
 
         NameBar.Opacity = Math.Clamp(_hover.Value * 1.2, 0, 1);
         CloseButton.Opacity = Math.Clamp(_hover.Value * 1.2, 0, 1);
+        ActionRowBg.Opacity = Math.Clamp(_hover.Value * 1.2, 0, 1);
 
         // The shadow only swaps when it has to: re-assigning an effect every
         // frame would redo the layout work behind it.
@@ -240,10 +251,24 @@ public partial class CardView : UserControl
 
     private void OnTakeDown(object sender, RoutedEventArgs e) => TakeDownRequested?.Invoke(this, EventArgs.Empty);
 
+    private void OnCopy(object sender, RoutedEventArgs e)
+    {
+        CopyToClipboard();
+        e.Handled = true;
+    }
+
+    private void OnCrop(object sender, RoutedEventArgs e)
+    {
+        CropRequested?.Invoke(this, EventArgs.Empty);
+        e.Handled = true;
+    }
+
     // ---- input -----------------------------------------------------------
 
     private Point _pressAt;
     private bool _armed;
+    private DateTime _lastClick;
+    private const double DoubleClickMs = 400;
 
     private void OnMouseDown(object sender, MouseButtonEventArgs e)
     {
@@ -267,8 +292,19 @@ public partial class CardView : UserControl
 
         // Was it a click (no movement) or a drag (we passed the threshold)?
         var moved = (e.GetPosition(this) - _pressAt).Length;
-        if (moved < 4) CopyToClipboard();
-        else OnDragEnd();
+        if (moved >= 4) { OnDragEnd(); return; }
+
+        // Double-click detection: two quick clicks open the preview.
+        var now = DateTime.UtcNow;
+        var elapsed = (now - _lastClick).TotalMilliseconds;
+        _lastClick = now;
+        if (elapsed > 0 && elapsed < DoubleClickMs)
+        {
+            PreviewRequested?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
+        CopyToClipboard();
     }
 
     private void OnDragEnd()
@@ -300,7 +336,7 @@ public partial class CardView : UserControl
     {
         while (src != null)
         {
-            if (src is Button b && b.Name == "CloseButton") return true;
+            if (src is Button b && (b.Name == "CloseButton" || b.Name == "CopyButton" || b.Name == "CropButton" || b.Name == "DeleteButton")) return true;
             src = System.Windows.Media.VisualTreeHelper.GetParent(src);
         }
         return false;

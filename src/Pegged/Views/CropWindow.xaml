@@ -3,60 +3,78 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:Pegged.Localization"
         Title="{loc:Str Crop.Title}"
-        Background="#CC000000"
-        WindowStartupLocation="CenterOwner"
+        Background="#E6000000"
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        Topmost="True"
         WindowStyle="None"
         AllowsTransparency="True"
         ResizeMode="NoResize"
-        SizeToContent="Manual"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True">
 
-    <Border CornerRadius="14" Background="{DynamicResource Brush.Window}"
-            BorderBrush="{DynamicResource Brush.CardEdge}" BorderThickness="1" Margin="14">
-        <Grid>
+    <Grid>
+        <!-- The crop surface: everything is positioned relative to the displayed image. -->
+        <Grid x:Name="Surface" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid.RowDefinitions>
-                <RowDefinition Height="44" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="44" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-            <Grid x:Name="TitleBar" Grid.Row="0" Background="Transparent" MouseLeftButtonDown="OnDrag">
-                <TextBlock x:Name="TitleText" Margin="20,0" VerticalAlignment="Center"
-                           FontFamily="{DynamicResource Font.Ui}" FontSize="13"
-                           Foreground="{DynamicResource Brush.Text}" TextTrimming="CharacterEllipsis" />
+            <!-- The image -->
+            <Image x:Name="BigImage" Stretch="Uniform"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   SizeChanged="OnImageSizeChanged" />
+
+            <!-- 33% grid lines -->
+            <Grid x:Name="GridLayer" IsHitTestVisible="False">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" /><RowDefinition Height="*" /><RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Row="0" Grid.Column="0" BorderBrush="#66FFFFFF" BorderThickness="0,0,1,1" />
+                <Border Grid.Row="0" Grid.Column="1" BorderBrush="#66FFFFFF" BorderThickness="1,0,1,1" />
+                <Border Grid.Row="0" Grid.Column="2" BorderBrush="#66FFFFFF" BorderThickness="1,0,0,1" />
+                <Border Grid.Row="1" Grid.Column="0" BorderBrush="#66FFFFFF" BorderThickness="0,1,1,1" />
+                <Border Grid.Row="1" Grid.Column="1" BorderBrush="#66FFFFFF" BorderThickness="1,1,1,1" />
+                <Border Grid.Row="1" Grid.Column="2" BorderBrush="#66FFFFFF" BorderThickness="1,1,0,1" />
+                <Border Grid.Row="2" Grid.Column="0" BorderBrush="#66FFFFFF" BorderThickness="0,1,1,0" />
+                <Border Grid.Row="2" Grid.Column="1" BorderBrush="#66FFFFFF" BorderThickness="1,1,1,0" />
+                <Border Grid.Row="2" Grid.Column="2" BorderBrush="#66FFFFFF" BorderThickness="1,1,0,0" />
             </Grid>
 
-            <!-- The crop surface: image + dimmed overlay + 8-handle box. -->
-            <Grid Grid.Row="1" x:Name="Surface" Margin="18,0,18,12"
-                  Width="640" Height="420"
-                  HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Image x:Name="BigImage" Stretch="Uniform"
-                       RenderOptions.BitmapScalingMode="HighQuality"
-                       SizeChanged="OnImageSizeChanged" />
+            <!-- Dim mask + selection + handles + label -->
+            <Canvas x:Name="Overlay" IsHitTestVisible="False" />
 
-                <!-- The dimming mask: a thick black border with the crop box
-                     punched out. -->
-                <Canvas x:Name="MaskLayer" IsHitTestVisible="False" />
-                <Grid x:Name="BoxLayer" Width="640" Height="420" />
+            <!-- The draggable selection box -->
+            <Rectangle x:Name="Selection" Stroke="White" StrokeThickness="2" Fill="#12FFFFFF"
+                       Cursor="SizeAll" HorizontalAlignment="Left" VerticalAlignment="Top"
+                       MouseLeftButtonDown="OnBoxDown" MouseMove="OnBoxMove" MouseLeftButtonUp="OnBoxUp" />
+        </Grid>
 
-                <Rectangle x:Name="Selection" Stroke="{DynamicResource Brush.Accent}"
-                           StrokeThickness="1.5" Fill="#22FFFFFF" Cursor="SizeAll"
-                           MouseLeftButtonDown="OnBoxDown" MouseMove="OnBoxMove"
-                           MouseLeftButtonUp="OnBoxUp" />
-                <TextBlock x:Name="SizeLabel" Foreground="White" FontSize="11"
-                           Background="#99000000" Padding="6,3" IsHitTestVisible="False" />
-            </Grid>
+        <!-- Size label floats above the box -->
+        <TextBlock x:Name="SizeLabel" Foreground="White" FontSize="11"
+                   Background="#CC000000" Padding="6,3" IsHitTestVisible="False"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" />
 
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20,0,20,16">
-                <TextBlock x:Name="SizeHint" VerticalAlignment="Center" Margin="0,0,16,0"
+        <!-- Floating glass action bar at bottom center -->
+        <Border HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,40"
+                Padding="10,6" CornerRadius="20"
+                Background="{DynamicResource Brush.Acrylic}"
+                BorderBrush="#59FFFFFF" BorderThickness="1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="SizeHint" VerticalAlignment="Center" Margin="0,0,14,0"
                            FontFamily="{DynamicResource Font.Ui}" FontSize="11"
-                           Foreground="{DynamicResource Brush.SubtleText}" />
+                           Foreground="{DynamicResource Brush.Text}" />
                 <Button Style="{StaticResource GlassButton}" Padding="14,7" Margin="0,0,8,0"
                         Click="OnCancel" Content="{loc:Str Crop.Cancel}" />
                 <Button Style="{StaticResource AccentButton}" Padding="14,7"
                         Click="OnApply" Content="{loc:Str Crop.Apply}" />
             </StackPanel>
-        </Grid>
-    </Border>
+        </Border>
+    </Grid>
 </Window>

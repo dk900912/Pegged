@@ -6,8 +6,8 @@
         Title="{loc:Str Settings.Title}"
         Background="{DynamicResource Brush.Window}"
         WindowStartupLocation="CenterOwner"
-        Width="820" Height="600"
-        MinWidth="640" MinHeight="460"
+        Width="720" Height="560"
+        MinWidth="560" MinHeight="420"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True">
 
@@ -15,7 +15,7 @@
          separate; the nav scrolls on its own when the height is small. -->
     <Grid Margin="0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="208" />
+            <ColumnDefinition Width="240" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -45,11 +45,51 @@
                     <ListBox.Resources>
                         <Style TargetType="ListBoxItem" BasedOn="{StaticResource NavItem}" />
                     </ListBox.Resources>
-                    <ListBoxItem x:Name="NavGeneral"    Content="{loc:Str Settings.General}"    Tag="general" />
-                    <ListBoxItem x:Name="NavCapture"    Content="{loc:Str Settings.Capture}"    Tag="capture" />
-                    <ListBoxItem x:Name="NavAppearance" Content="{loc:Str Settings.Appearance}" Tag="appearance" />
-                    <ListBoxItem x:Name="NavShortcuts"  Content="{loc:Str Settings.Shortcuts}"  Tag="shortcuts" />
-                    <ListBoxItem x:Name="NavAbout"      Content="{loc:Str Settings.About}"      Tag="about" />
+                <ListBoxItem x:Name="NavGeneral" Tag="general">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#x2699;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <StackPanel>
+                            <TextBlock Text="{loc:Str Settings.General}" FontSize="13" />
+                            <TextBlock Text="{loc:Str Settings.GeneralDesc}" FontSize="10" Foreground="{DynamicResource Brush.SubtleText}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem x:Name="NavCapture" Tag="capture">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#x1F4F7;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <StackPanel>
+                            <TextBlock Text="{loc:Str Settings.Capture}" FontSize="13" />
+                            <TextBlock Text="{loc:Str Settings.CaptureDesc}" FontSize="10" Foreground="{DynamicResource Brush.SubtleText}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem x:Name="NavAppearance" Tag="appearance">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#x1F3A8;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <StackPanel>
+                            <TextBlock Text="{loc:Str Settings.Appearance}" FontSize="13" />
+                            <TextBlock Text="{loc:Str Settings.AppearanceDesc}" FontSize="10" Foreground="{DynamicResource Brush.SubtleText}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem x:Name="NavShortcuts" Tag="shortcuts">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#x2328;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <StackPanel>
+                            <TextBlock Text="{loc:Str Settings.Shortcuts}" FontSize="13" />
+                            <TextBlock Text="{loc:Str Settings.ShortcutsDesc}" FontSize="10" Foreground="{DynamicResource Brush.SubtleText}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem x:Name="NavAbout" Tag="about">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#x2139;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <StackPanel>
+                            <TextBlock Text="{loc:Str Settings.About}" FontSize="13" />
+                            <TextBlock Text="{loc:Str Settings.AboutDesc}" FontSize="10" Foreground="{DynamicResource Brush.SubtleText}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ListBoxItem>
                 </ListBox>
 
                 <StackPanel Grid.Row="2" Margin="20,0,20,16" Orientation="Horizontal">
@@ -65,7 +105,7 @@
                 <!-- General -->
                 <StackPanel x:Name="GeneralPane" Visibility="Visible">
                     <TextBlock Text="{loc:Str Settings.General}" FontFamily="{DynamicResource Font.Ui}"
-                               FontWeight="SemiBold" FontSize="20"
+                               FontWeight="SemiBold" FontSize="28"
                                Foreground="{DynamicResource Brush.Text}" Margin="0,0,0,4" />
                     <TextBlock Text="{loc:Str Settings.GeneralDesc}" FontFamily="{DynamicResource Font.Ui}"
                                FontSize="11" Foreground="{DynamicResource Brush.SubtleText}"
@@ -115,7 +155,7 @@
                 <!-- Capture -->
                 <StackPanel x:Name="CapturePane" Visibility="Collapsed">
                     <TextBlock Text="{loc:Str Settings.Capture}" FontFamily="{DynamicResource Font.Ui}"
-                               FontWeight="SemiBold" FontSize="20"
+                               FontWeight="SemiBold" FontSize="28"
                                Foreground="{DynamicResource Brush.Text}" Margin="0,0,0,4" />
                     <TextBlock Text="{loc:Str Settings.CaptureDesc}" FontFamily="{DynamicResource Font.Ui}"
                                FontSize="11" Foreground="{DynamicResource Brush.SubtleText}"
@@ -156,7 +196,7 @@
                 <!-- Appearance -->
                 <StackPanel x:Name="AppearancePane" Visibility="Collapsed">
                     <TextBlock Text="{loc:Str Settings.Appearance}" FontFamily="{DynamicResource Font.Ui}"
-                               FontWeight="SemiBold" FontSize="20"
+                               FontWeight="SemiBold" FontSize="28"
                                Foreground="{DynamicResource Brush.Text}" Margin="0,0,0,4" />
                     <TextBlock Text="{loc:Str Settings.AppearanceDesc}" FontFamily="{DynamicResource Font.Ui}"
                                FontSize="11" Foreground="{DynamicResource Brush.SubtleText}"
@@ -208,7 +248,7 @@
                 <!-- Shortcuts -->
                 <StackPanel x:Name="ShortcutsPane" Visibility="Collapsed">
                     <TextBlock Text="{loc:Str Settings.Shortcuts}" FontFamily="{DynamicResource Font.Ui}"
-                               FontWeight="SemiBold" FontSize="20"
+                               FontWeight="SemiBold" FontSize="28"
                                Foreground="{DynamicResource Brush.Text}" Margin="0,0,0,4" />
                     <TextBlock Text="{loc:Str Settings.ShortcutsDesc}" FontFamily="{DynamicResource Font.Ui}"
                                FontSize="11" Foreground="{DynamicResource Brush.SubtleText}"
@@ -240,7 +280,7 @@
                 <!-- About -->
                 <StackPanel x:Name="AboutPane" Visibility="Collapsed">
                     <TextBlock Text="{loc:Str Settings.About}" FontFamily="{DynamicResource Font.Ui}"
-                               FontWeight="SemiBold" FontSize="20"
+                               FontWeight="SemiBold" FontSize="28"
                                Foreground="{DynamicResource Brush.Text}" Margin="0,0,0,4" />
                     <TextBlock Text="{loc:Str Settings.AboutDesc}" FontFamily="{DynamicResource Font.Ui}"
                                FontSize="11" Foreground="{DynamicResource Brush.SubtleText}"
