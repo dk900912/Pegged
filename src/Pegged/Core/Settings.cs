@@ -53,6 +53,15 @@ public sealed class Settings
     /// <summary>Extra folders watched for new images, three at most.</summary>
     public List<string> ExtraFolders { get; set; } = new();
 
+    /// <summary>Windows saves captures into Pegged's own folder while this is on.</summary>
+    public bool InboxEnabled { get; set; }
+
+    /// <summary>Where Windows saved screenshots before the mode was switched on.</summary>
+    public string? InboxPreviousPath { get; set; }
+
+    /// <summary>The inbox mode was offered once already.</summary>
+    public bool InboxOffered { get; set; }
+
     /// <summary>Auto / Light / Dark.</summary>
     public ThemeKind Theme { get; set; } = ThemeKind.Auto;
 

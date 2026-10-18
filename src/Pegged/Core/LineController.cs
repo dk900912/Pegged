@@ -163,8 +163,9 @@ public sealed class LineController : IDisposable
         var cursor = MonitorService.CursorPosition();
         var dip = _line.Monitor?.ToDip(cursor) ?? cursor;
 
-        // Keep the window's click-through in step with where the pointer is.
-        _line.UpdateClickThrough(dip);
+        // Keep the dock's hover state in step with where the pointer is: the
+        // line is click-through, so WPF never sees the mouse enter it.
+        _line.UpdatePointer(dip);
 
         // A peek from a new capture or the welcome wins over everything.
         if (_peekUntil is { } until)

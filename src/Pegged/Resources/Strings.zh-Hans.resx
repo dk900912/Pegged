@@ -76,6 +76,12 @@
   <data name="Tray.Sounds" xml:space="preserve">
     <value>声音</value>
   </data>
+  <data name="Tray.Empty" xml:space="preserve">
+    <value>Pegged — 挂绳是空的</value>
+  </data>
+  <data name="Tray.OnLine" xml:space="preserve">
+    <value>Pegged — 挂了 {0} 张</value>
+  </data>
   <data name="Tray.OpenAtLogin" xml:space="preserve">
     <value>开机时启动</value>
   </data>
@@ -282,6 +288,42 @@
   </data>
   <data name="Settings.RevealDelayDesc" xml:space="preserve">
     <value>指针需停留多久挂绳才落下</value>
+  </data>
+  <data name="Settings.ExtraFolders" xml:space="preserve">
+    <value>额外监控文件夹</value>
+  </data>
+  <data name="Settings.ExtraFoldersDesc" xml:space="preserve">
+    <value>最多再监视 3 个文件夹里的新截图</value>
+  </data>
+  <data name="Settings.ExtraFoldersNone" xml:space="preserve">
+    <value>无</value>
+  </data>
+  <data name="Settings.ExtraFoldersFull" xml:space="preserve">
+    <value>最多只能添加 3 个额外文件夹，请先移除一个。</value>
+  </data>
+  <data name="Settings.FolderAdd" xml:space="preserve">
+    <value>添加文件夹</value>
+  </data>
+  <data name="Settings.FolderClear" xml:space="preserve">
+    <value>清空</value>
+  </data>
+  <data name="Settings.Inbox" xml:space="preserve">
+    <value>Inbox 模式</value>
+  </data>
+  <data name="Settings.InboxDesc" xml:space="preserve">
+    <value>Windows 的截图直接存进 Pegged 自己的文件夹</value>
+  </data>
+  <data name="Settings.InboxRestore" xml:space="preserve">
+    <value>还原位置</value>
+  </data>
+  <data name="Settings.InboxPath" xml:space="preserve">
+    <value>Windows 当前保存截图的位置：{0}</value>
+  </data>
+  <data name="Settings.InboxFailed" xml:space="preserve">
+    <value>Windows 不允许修改截图文件夹，Inbox 模式已关闭。</value>
+  </data>
+  <data name="Settings.License" xml:space="preserve">
+    <value>移植自 tendedero（MIT），Pegged 以 MIT 协议开源。</value>
   </data>
   <data name="Settings.TopEdge" xml:space="preserve">
     <value>在屏幕顶边唤出</value>

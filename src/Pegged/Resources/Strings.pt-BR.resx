@@ -76,6 +76,12 @@
   <data name="Tray.Sounds" xml:space="preserve">
     <value>Sons</value>
   </data>
+  <data name="Tray.Empty" xml:space="preserve">
+    <value>Pegged — a corda está vazia</value>
+  </data>
+  <data name="Tray.OnLine" xml:space="preserve">
+    <value>Pegged — {0} na corda</value>
+  </data>
   <data name="Tray.OpenAtLogin" xml:space="preserve">
     <value>Abrir ao entrar</value>
   </data>
@@ -282,6 +288,42 @@
   </data>
   <data name="Settings.RevealDelayDesc" xml:space="preserve">
     <value>Quanto tempo o ponteiro para antes da corda descer</value>
+  </data>
+  <data name="Settings.ExtraFolders" xml:space="preserve">
+    <value>Pastas adicionais</value>
+  </data>
+  <data name="Settings.ExtraFoldersDesc" xml:space="preserve">
+    <value>Até três pastas adicionais são monitoradas</value>
+  </data>
+  <data name="Settings.ExtraFoldersNone" xml:space="preserve">
+    <value>Nenhuma</value>
+  </data>
+  <data name="Settings.ExtraFoldersFull" xml:space="preserve">
+    <value>Três pastas adicionais é o máximo. Remova uma antes.</value>
+  </data>
+  <data name="Settings.FolderAdd" xml:space="preserve">
+    <value>Adicionar pasta</value>
+  </data>
+  <data name="Settings.FolderClear" xml:space="preserve">
+    <value>Limpar</value>
+  </data>
+  <data name="Settings.Inbox" xml:space="preserve">
+    <value>Modo caixa de entrada</value>
+  </data>
+  <data name="Settings.InboxDesc" xml:space="preserve">
+    <value>O Windows guarda as capturas na pasta do Pegged</value>
+  </data>
+  <data name="Settings.InboxRestore" xml:space="preserve">
+    <value>Restaurar local</value>
+  </data>
+  <data name="Settings.InboxPath" xml:space="preserve">
+    <value>O Windows guarda as capturas em: {0}</value>
+  </data>
+  <data name="Settings.InboxFailed" xml:space="preserve">
+    <value>O Windows não permitiu mudar a pasta; o modo caixa de entrada está desligado.</value>
+  </data>
+  <data name="Settings.License" xml:space="preserve">
+    <value>Portado do tendedero (MIT). Pegged tem licença MIT.</value>
   </data>
   <data name="Settings.TopEdge" xml:space="preserve">
     <value>Mostrar na borda superior</value>

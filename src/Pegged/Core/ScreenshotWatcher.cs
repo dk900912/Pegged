@@ -32,10 +32,34 @@ public sealed class ScreenshotWatcher : IDisposable
             NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size,
         };
         _fs.Created += (_, e) => _pending.Enqueue(e.FullPath);
-        _fs.Renamed += (_, e) => _pending.Enqueue(e.FullPath);
+        _fs.Renamed += (_, e) =>
+        {
+            _pending.Enqueue(e.FullPath);
+            PruneLine();
+        };
+        // Files deleted or moved away by another app must fall off the line;
+        // Prune() existed but nothing ever called it.
+        _fs.Deleted += (_, _) => PruneLine();
         _fs.EnableRaisingEvents = true;
 
         _ = Task.Run(() => PumpAsync(_cts.Token));
+    }
+
+    /// <summary>Drops cards whose file is gone. Runs on the UI thread because
+    /// the store owns an ObservableCollection bound to the line.</summary>
+    private static void PruneLine()
+    {
+        var app = App.Instance;
+        if (app is null) return;
+
+        try
+        {
+            app.Dispatcher.BeginInvoke(() => App.CaptureStore.Prune());
+        }
+        catch (Exception)
+        {
+            // The app is shutting down.
+        }
     }
 
     public string Folder => _folder;

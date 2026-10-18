@@ -235,9 +235,59 @@
                             <views:ToggleSwitch x:Name="FullScreenSwitch" AutomationProperties.AutomationId="FullScreenSwitch" AutomationProperties.Name="{loc:Str Settings.OverFullScreen}" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Changed="OnFullScreen" />
                         </Grid>
                     </Border>
-                </StackPanel>
 
-                <!-- Appearance -->
+                    <!-- Up to three extra folders, watched exactly like the
+                         main screenshot folder. -->
+                    <Border Style="{StaticResource SettingsRow}" Height="Auto" Padding="10,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                <TextBlock Text="{loc:Str Settings.ExtraFolders}" />
+                                <TextBlock Text="{loc:Str Settings.ExtraFoldersDesc}" Style="{StaticResource SubtleHint}" />
+                                <TextBlock x:Name="ExtraFoldersText" Style="{StaticResource SubtleHint}"
+                                           TextWrapping="Wrap" Margin="0,4,0,0" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Style="{StaticResource GlassButton}" Padding="10,5" Margin="0,0,6,0"
+                                        AutomationProperties.AutomationId="AddExtraFolder"
+                                        Click="OnAddExtraFolder" Content="{loc:Str Settings.FolderAdd}" />
+                                <Button Style="{StaticResource GlassButton}" Padding="10,5"
+                                        AutomationProperties.AutomationId="ClearExtraFolders"
+                                        Click="OnClearExtraFolders" Content="{loc:Str Settings.FolderClear}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Inbox mode: Windows' own screenshot folder is pointed at
+                         Pegged's store while the mode is on, and put back when
+                         it is switched off or the app quits. -->
+                    <Border Style="{StaticResource SettingsRow}" Height="Auto" Padding="10,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                <TextBlock Text="{loc:Str Settings.Inbox}" />
+                                <TextBlock Text="{loc:Str Settings.InboxDesc}" Style="{StaticResource SubtleHint}" />
+                                <TextBlock x:Name="InboxText" Style="{StaticResource SubtleHint}"
+                                           TextWrapping="Wrap" Margin="0,4,0,0" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Style="{StaticResource GlassButton}" Padding="10,5" Margin="0,0,6,0"
+                                        AutomationProperties.AutomationId="RestoreInbox"
+                                        Click="OnRestoreInbox" Content="{loc:Str Settings.InboxRestore}" />
+                                <views:ToggleSwitch x:Name="InboxSwitch"
+                                                    AutomationProperties.AutomationId="InboxSwitch"
+                                                    AutomationProperties.Name="{loc:Str Settings.Inbox}"
+                                                    VerticalAlignment="Center" Changed="OnInbox" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
                 <StackPanel x:Name="AppearancePane" Visibility="Collapsed">
                     <TextBlock Text="{loc:Str Settings.Appearance}" FontFamily="{DynamicResource Font.Ui}"
                                FontWeight="SemiBold" FontSize="28"
@@ -341,6 +391,23 @@
                                 <TextBlock Text="{loc:Str Settings.RecordHint}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
                             <views:ToggleSwitch x:Name="LoginSwitch" AutomationProperties.AutomationId="LoginSwitch" AutomationProperties.Name="{loc:Str Tray.OpenAtLogin}" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Changed="OnLogin" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Brand + licence: the About page used to be text only. -->
+                    <Border Style="{StaticResource SettingsRow}" Height="Auto" Padding="10,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="/assets/logo.png" Width="48" Height="48"
+                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                            <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Pegged 1.0.0" FontWeight="SemiBold" />
+                                <TextBlock Style="{StaticResource SubtleHint}" TextWrapping="Wrap"
+                                           Text="{loc:Str Settings.License}" />
+                            </StackPanel>
                         </Grid>
                     </Border>
                 </StackPanel>

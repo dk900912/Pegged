@@ -1,0 +1,48 @@
+{
+  "checks": {
+    "line_window": true,
+    "click_through_empty": true,
+    "toolbar_clickable": true,
+    "settings_opened": true,
+    "language_refresh": true
+  },
+  "detail": {
+    "samples": [
+      [
+        0,
+        0,
+        1920,
+        293
+      ],
+      [
+        0,
+        0,
+        1920,
+        293
+      ]
+    ],
+    "window_rect": [
+      0,
+      0,
+      1920,
+      293
+    ],
+    "hittest_empty": -1,
+    "toolbar_span": [
+      889,
+      1030
+    ],
+    "clicked_at": 1008,
+    "settings_rect": [
+      160,
+      160,
+      1060,
+      860
+    ],
+    "settings_title": "\u8bbe\u7f6e",
+    "settings_class": "HwndWrapper[Pegged;;10ba6036-3e97-49b1-a041-5fdef3822bfc]",
+    "nav_before": "\ue722 \u6355\u83b7\u6e90 Pegged \u4ece\u54ea\u91cc\u53d1\u73b0\u65b0\u622a\u56fe",
+    "nav_after": "\ue722 Capture sources Where Pegged looks for new captures"
+  },
+  "passed": true
+}

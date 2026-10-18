@@ -36,6 +36,11 @@ public sealed class WatchService : IDisposable
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         AddUnique(seen, Settings.Current.ScreenshotFolder);
         AddUnique(seen, AppPaths.WatchFolder());
+
+        // Inbox mode sends the system captures into Pegged's own folder, so
+        // that folder has to be watched even though it is not the user's.
+        if (Settings.Current.InboxEnabled) AddUnique(seen, AppPaths.ScreenshotsFolder);
+
         foreach (var extra in Settings.Current.ExtraFolders) AddUnique(seen, extra);
     }
 

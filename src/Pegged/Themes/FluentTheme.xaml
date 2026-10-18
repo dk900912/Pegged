@@ -31,6 +31,7 @@
     <Color x:Key="Palette.BandLight">#FFE2E8F0</Color>
     <Color x:Key="Palette.BandDark">#FF949EAC</Color>
     <Color x:Key="Palette.Success">#FF0F7B0F</Color>
+    <Color x:Key="Palette.OnSuccess">#FFFFFFFF</Color>
     <Color x:Key="Palette.Mask">#8C000000</Color>
     <Color x:Key="Palette.Shadow">#2E000000</Color>
     <Color x:Key="Palette.Window">#FFF6F7FB</Color>
@@ -55,6 +56,7 @@
     <SolidColorBrush x:Key="Brush.Rope" Color="{DynamicResource Palette.Rope}" />
     <SolidColorBrush x:Key="Brush.RopeHighlight" Color="{DynamicResource Palette.RopeHighlight}" />
     <SolidColorBrush x:Key="Brush.Success" Color="{DynamicResource Palette.Success}" />
+    <SolidColorBrush x:Key="Brush.OnSuccess" Color="{DynamicResource Palette.OnSuccess}" />
     <SolidColorBrush x:Key="Brush.Mask" Color="{DynamicResource Palette.Mask}" />
     <SolidColorBrush x:Key="Brush.Window" Color="{DynamicResource Palette.Window}" />
     <SolidColorBrush x:Key="Brush.Sidebar" Color="{DynamicResource Palette.Sidebar}" />

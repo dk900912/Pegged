@@ -25,32 +25,37 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- The peg: two wooden slats and the little metal spring between them -->
-        <Grid x:Name="Pin" Grid.Row="0" Width="16" HorizontalAlignment="Center"
-              VerticalAlignment="Top" IsHitTestVisible="False">
-            <!-- Top slat -->
-            <Rectangle x:Name="PinSlatTop" Width="9" Height="16" RadiusX="3" RadiusY="3"
-                       VerticalAlignment="Top" Margin="0,0,0,0"
+        <!-- The peg (spec 3.3): a 9x26 wooden capsule split into two slats, a
+             5x1.4 rope slot at the top and a 13x13 metal spring band clamping
+             the middle. On hover the band slides down 2px and the slats part. -->
+        <Grid x:Name="Pin" Grid.Row="0" Width="13" Height="30"
+              HorizontalAlignment="Center" VerticalAlignment="Top"
+              IsHitTestVisible="False">
+            <Rectangle x:Name="PinSlatTop" Width="9" Height="12" RadiusX="3" RadiusY="3"
+                       HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,0"
                        Fill="{DynamicResource Brush.Wood}" Effect="{DynamicResource Effect.Pin}" />
-            <!-- Metal spring band -->
-            <Rectangle x:Name="PinBand" Width="7" Height="7" RadiusX="2" RadiusY="2"
-                       VerticalAlignment="Top" Margin="0,11,0,0" Fill="{DynamicResource Brush.Band}" />
-            <!-- Bottom slat -->
-            <Rectangle x:Name="PinSlatBottom" Width="13" Height="8" RadiusX="2.2" RadiusY="2.2"
-                       VerticalAlignment="Top" Margin="0,21,0,0" Fill="{DynamicResource Brush.Wood}" />
-            <!-- Highlight slot -->
-            <Rectangle Width="5" Height="2" RadiusX="1" RadiusY="1"
-                       VerticalAlignment="Top" Margin="0,12.5,0,0" Fill="#59FFFFFF" />
+            <Rectangle x:Name="PinSlatBottom" Width="9" Height="12" RadiusX="3" RadiusY="3"
+                       HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,14,0,0"
+                       Fill="{DynamicResource Brush.Wood}" Effect="{DynamicResource Effect.Pin}" />
+            <!-- Rope slot: 5 x 1.4, a dark capsule sunk into the top slat -->
+            <Rectangle Width="5" Height="1.4" RadiusX="0.7" RadiusY="0.7"
+                       HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,3.2,0,0"
+                       Fill="#8C3A2312" />
+            <!-- Spring band: 13 x 13, metal gradient, wider than the wood -->
+            <Rectangle x:Name="PinBand" Width="13" Height="13" RadiusX="4.5" RadiusY="4.5"
+                       HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,6,0,0"
+                       Fill="{DynamicResource Brush.Band}" Effect="{DynamicResource Effect.Pin}" />
         </Grid>
 
-        <!-- The picture -->
-        <Border x:Name="Photo" Grid.Row="1" Margin="0,-4,0,6"
+        <!-- The picture: a polaroid frame. 4px of white card all round, outer
+             corner 16 and inner corner 12 so the two radii stay concentric. -->
+        <Border x:Name="Photo" Grid.Row="1" Margin="0,-4,0,6" Padding="4"
                 Background="{DynamicResource Brush.Card}"
-                BorderBrush="{DynamicResource Brush.CardEdge}" BorderThickness="1"
-                CornerRadius="{DynamicResource Corner.Photo}"
+                BorderBrush="{DynamicResource Brush.CardEdge}" BorderThickness="0.5"
+                CornerRadius="{DynamicResource Corner.Card}"
                 Effect="{DynamicResource Effect.Card}">
             <Grid x:Name="PhotoClip">
-                <Image x:Name="ThumbImage" Stretch="UniformToFill"
+                <Image x:Name="ThumbImage" Stretch="Uniform"
                        RenderOptions.BitmapScalingMode="HighQuality" />
 
                 <!-- Recordings are marked: there is no frame to show for them -->
@@ -94,7 +99,7 @@
                         <ScaleTransform x:Name="CopiedScale" ScaleX="0.6" ScaleY="0.6" />
                     </Border.RenderTransform>
                     <TextBlock Text="{loc:Str Card.Copied}" FontFamily="{DynamicResource Font.Ui}"
-                               FontSize="11" FontWeight="SemiBold" Foreground="White" />
+                               FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Brush.OnSuccess}" />
                 </Border>
 
                 <!-- Take it down (top-right) -->

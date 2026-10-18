@@ -76,6 +76,12 @@
   <data name="Tray.Sounds" xml:space="preserve">
     <value>Sonidos</value>
   </data>
+  <data name="Tray.Empty" xml:space="preserve">
+    <value>Pegged — la cuerda está vacía</value>
+  </data>
+  <data name="Tray.OnLine" xml:space="preserve">
+    <value>Pegged — {0} en la cuerda</value>
+  </data>
   <data name="Tray.OpenAtLogin" xml:space="preserve">
     <value>Abrir al iniciar sesión</value>
   </data>
@@ -282,6 +288,42 @@
   </data>
   <data name="Settings.RevealDelayDesc" xml:space="preserve">
     <value>Cuánto debe detenerse el puntero para que baje la cuerda</value>
+  </data>
+  <data name="Settings.ExtraFolders" xml:space="preserve">
+    <value>Carpetas adicionales</value>
+  </data>
+  <data name="Settings.ExtraFoldersDesc" xml:space="preserve">
+    <value>Se vigilan hasta tres carpetas más en busca de capturas</value>
+  </data>
+  <data name="Settings.ExtraFoldersNone" xml:space="preserve">
+    <value>Ninguna</value>
+  </data>
+  <data name="Settings.ExtraFoldersFull" xml:space="preserve">
+    <value>Tres carpetas adicionales es el máximo. Quita una primero.</value>
+  </data>
+  <data name="Settings.FolderAdd" xml:space="preserve">
+    <value>Añadir carpeta</value>
+  </data>
+  <data name="Settings.FolderClear" xml:space="preserve">
+    <value>Vaciar</value>
+  </data>
+  <data name="Settings.Inbox" xml:space="preserve">
+    <value>Modo bandeja</value>
+  </data>
+  <data name="Settings.InboxDesc" xml:space="preserve">
+    <value>Windows guarda las capturas en la carpeta de Pegged</value>
+  </data>
+  <data name="Settings.InboxRestore" xml:space="preserve">
+    <value>Restaurar ubicación</value>
+  </data>
+  <data name="Settings.InboxPath" xml:space="preserve">
+    <value>Windows guarda las capturas en: {0}</value>
+  </data>
+  <data name="Settings.InboxFailed" xml:space="preserve">
+    <value>Windows no permitió cambiar la carpeta de capturas; el modo bandeja está desactivado.</value>
+  </data>
+  <data name="Settings.License" xml:space="preserve">
+    <value>Portado de tendedero (MIT). Pegged tiene licencia MIT.</value>
   </data>
   <data name="Settings.TopEdge" xml:space="preserve">
     <value>Mostrar en el borde superior</value>

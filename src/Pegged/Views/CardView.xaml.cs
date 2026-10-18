@@ -62,6 +62,16 @@ public partial class CardView : UserControl
         _swing.Rest = item.Tilt;
         _swing.Nudge(-13);   // it swings in, then settles
 
+        // A capture that arrived while this card was being built already has
+        // Flying = true, and the PropertyChanged subscription below is too
+        // late to see it. Apply the start of the fly-in here or the card just
+        // pops into place.
+        if (item.Flying)
+        {
+            _lift.SnapTo(-190);
+            item.Flying = false;
+        }
+
         item.PropertyChanged += OnItemChanged;
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
@@ -86,21 +96,28 @@ public partial class CardView : UserControl
 
     private void ApplyMetrics()
     {
-        var width = LayoutMetrics.CardWidth;
-        var max = LayoutMetrics.PhotoMaxHeight;
+        var inset = LayoutMetrics.PhotoInset;
+        var width = LayoutMetrics.CardWidth;      // outer frame, inset included
+        var innerWidth = width - 2 * inset;
+        var maxInner = LayoutMetrics.PhotoMaxHeight;
 
+        // The picture fits inside 150x104 (spec 3.3); the frame is 4px wider
+        // and taller on every side, so the outer box is 158 x (photo + 8).
         var aspect = Math.Clamp(Item.Aspect, 0.45, 3.2);
-        var height = Math.Clamp(width / aspect, 56, max);
+        var innerHeight = Math.Clamp(innerWidth / aspect, 52, maxInner);
+        var height = innerHeight + 2 * inset;
 
         this.Width = width;
         Photo.Width = width;
         Photo.Height = height;
-        PhotoClip.Width = width;
-        PhotoClip.Height = height;
+        PhotoClip.Width = innerWidth;
+        PhotoClip.Height = innerHeight;
 
-        // Rounded corners: a Border does not clip its content by itself.
+        // Rounded corners: a Border does not clip its content by itself, and
+        // the inner radius has to be the outer one minus the inset or the two
+        // corners are not concentric.
         var radius = LayoutMetrics.PhotoRadius;
-        PhotoClip.Clip = new RectangleGeometry(new Rect(0, 0, width - 2, height - 2), radius, radius);
+        PhotoClip.Clip = new RectangleGeometry(new Rect(0, 0, innerWidth, innerHeight), radius, radius);
 
         VideoBadge.Visibility = Item.IsRecording ? Visibility.Visible : Visibility.Collapsed;
     }
@@ -160,13 +177,14 @@ public partial class CardView : UserControl
         _lift.Target = liftTarget;
         if (!_lift.AtRest) _lift.Step(dt);
 
-        // Peg opens on hover: spring band drops, slats spread.
+        // Peg opens on hover (spec 3.3): the band slides down 2px and the two
+        // slats part by 2px between them.
         _pegOpen.Target = Item.Hovering ? 1 : 0;
         if (!_pegOpen.AtRest) _pegOpen.Step(dt);
         var peg = _pegOpen.Value;
-        PinBand.Margin = new Thickness(0, 11 + 2 * peg, 0, 0);
+        PinBand.Margin = new Thickness(0, 6 + 2 * peg, 0, 0);
         PinSlatTop.Margin = new Thickness(0, -1 * peg, 0, 0);
-        PinSlatBottom.Margin = new Thickness(0, 21 + 1 * peg, 0, 0);
+        PinSlatBottom.Margin = new Thickness(0, 14 + 1 * peg, 0, 0);
 
         // Press scale: card squeezes to 0.95 when pressed.
         _pressScale.Target = Item.Pressed && !Item.Dragging ? 0.95 : 1.0;
@@ -346,24 +364,39 @@ public partial class CardView : UserControl
     {
         try
         {
-            if (Item.IsRecording)
+            // A screenshot is a picture: put the pixels on the clipboard so it
+            // can be pasted straight into a chat or an editor, and offer the
+            // file as well for receivers that want a path.
+            var data = new DataObject();
+
+            if (!Item.IsRecording)
             {
-                Clipboard.SetText(Item.Path);
-            }
-            else if (Item.Path.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-                     Item.Path.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                     Item.Path.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-                     Item.Path.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase))
-            {
-                var list = new System.Collections.Specialized.StringCollection { Item.Path };
-                Clipboard.SetFileDropList(list);
+                try
+                {
+                    using var fs = new System.IO.FileStream(Item.Path, System.IO.FileMode.Open,
+                        System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
+                    var frame = BitmapFrame.Create(fs, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                    frame.Freeze();
+                    data.SetImage(frame);
+                }
+                catch (Exception)
+                {
+                    // Not decodable as an image (a video, say): fall through and
+                    // still offer the file itself.
+                }
+
+                data.SetData(DataFormats.FileDrop, new[] { Item.Path });
             }
             else
             {
-                Clipboard.SetText(Item.Path);
+                data.SetText(Item.Path);
             }
 
+            Clipboard.SetDataObject(data, true);
+
             Item.Copied = true;
+            // Spec 3.3: a light 3 degree shove so the card acknowledges it.
+            _swing.Impulse(26);
             if (Settings.Current.Sounds) SoundService.Play(SoundService.Sound.Copy);
         }
         catch
@@ -372,8 +405,17 @@ public partial class CardView : UserControl
         }
     }
 
-    /// <summary>Where the picture itself is, relative to the card's top left.</summary>
-    public Rect PhotoRect => new(0, 26, Photo.Width, Photo.Height);
+    /// <summary>Where the picture itself is, relative to the card's top left.
+    /// The frame's 4px white border is not part of it.</summary>
+    public Rect PhotoRect
+    {
+        get
+        {
+            var inset = LayoutMetrics.PhotoInset;
+            return new Rect(inset, 26 + inset,
+                Photo.Width - 2 * inset, Photo.Height - 2 * inset);
+        }
+    }
 
     /// <summary>How tall the whole card is, peg included.</summary>
     public double CardHeight => Photo.Height + 32;
