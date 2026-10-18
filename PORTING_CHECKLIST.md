@@ -73,3 +73,11 @@
 - [x] 交付：`docs/REVIEW-CHECKLIST.md`（审查清单：缺陷、证据、覆盖矩阵、未验证项）
 - [x] 回归：`launch_probe` 9/9、`interaction_probe` 5/5、`audit_walkthrough` 33/33，`crash.log` 为空
 - [x] 重新发布 Release 构建（0 Error 0 Warning）
+
+## Phase 6 — 用户报障修复（挂 2 张以上时第一张很难点选复制）
+- [x] 复现：新增 `scripts/e2e/repro_first_card_click.py`（逐点真点 + 剪贴板断言，2 张 / 3 张×网格）
+- [x] 定位：`UpdateHint()` 只置 `Opacity=0`，而 WPF 中透明元素**依然吃点击**；居中提示正好压在第一张卡上
+- [x] 修复：`Hint` 改 `Visibility` 显隐 + `IsHitTestVisible=False`；`NameBar`/`ActionRowBg` 同源收紧
+- [x] 回归：新增 `card.first_card_clickable`；audit 34/34、launch 9/9、interaction 5/5，crash.log 为空
+- [x] 清理：删除 `diag_line_tree.py` / `diag_point_owner.py` 一次性脚本
+- [x] 交付：`docs/REVIEW-CHECKLIST.md` 增补 1.1 节；`TECHNICAL_DECISIONS.md` 第 88 条

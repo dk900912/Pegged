@@ -464,7 +464,13 @@ public partial class LineWindow : Window
     private void UpdateHint()
     {
         var show = _revealed && CardLayer.Children.Count == 0;
-        Hint.Opacity = show ? 1 : 0;
+
+        // Opacity alone is not enough. An element at Opacity 0 is still
+        // hit-testable, so the empty-state pill used to sit invisible over
+        // the middle of the dock and swallow every click meant for the first
+        // card's picture. Hidden takes it out of hit testing entirely.
+        Hint.Visibility = show ? Visibility.Visible : Visibility.Hidden;
+        Hint.IsHitTestVisible = show;
     }
 
     internal void OnCardsChanged() => UpdateHint();

@@ -654,6 +654,46 @@ def main():
 
         check("card.click_copies_image", "card", "单击卡片复制，且不把自己的图片再挂一张", card_click_copies)
 
+        def card_first_card_clickable():
+            """With two cards up, the first one hung must still copy on a click.
+
+            Regression: the empty-state hint was hidden with Opacity, and in
+            WPF an element at Opacity 0 still takes clicks. The hint is
+            centred, so it sat invisible over the middle of the dock - exactly
+            where the first card hangs - and every click meant for the first
+            card's picture was swallowed by the hint instead of copying it.
+            """
+            clear_cards()
+            write_test_images(2, "audit-first-%d" % int(time.time()))
+            if not wait_cards(2):
+                return False, "two cards did not hang"
+            reveal()
+            settle()
+            win32clipboard.OpenClipboard()
+            win32clipboard.EmptyClipboard()
+            win32clipboard.CloseClipboard()
+
+            pictures = [e.rectangle() for e in uia().descendants(control_type="Image")
+                        if e.element_info.automation_id == "ThumbImage"]
+            if len(pictures) < 2:
+                return False, "only %d pictures found" % len(pictures)
+
+            # The first one hung is the leftmost card on the line.
+            first = min(pictures, key=lambda r: r.left)
+            x = (first.left + first.right) // 2
+            y = first.top + int((first.bottom - first.top) * 0.4)
+            click(x, y)
+            time.sleep(1.6)
+            ok = clipboard_has_image()
+
+            # The checks that follow expect one card hanging.
+            clear_cards()
+            write_test_images(1, "audit-one-%d" % int(time.time()))
+            wait_cards(1)
+            return ok, "clicked the first card's picture at (%d,%d): clipboard image=%s" % (x, y, ok)
+
+        check("card.first_card_clickable", "card", "挂 2 张以上时第一张仍可单击复制", card_first_card_clickable)
+
         def card_double_click_preview():
             before = {h for h, _, _ in windows_of_app(300)}
             x, y = card_point()

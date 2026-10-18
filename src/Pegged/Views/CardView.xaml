@@ -65,17 +65,23 @@
                     <TextBlock Text="&#x25B6;" FontSize="13" Foreground="White" />
                 </Border>
 
-                <!-- The file name, only while the pointer is on the card -->
+                <!-- The file name, only while the pointer is on the card.
+                     Decoration: it fades with Opacity, and an element that is
+                     merely transparent still takes clicks, so the strip would
+                     quietly eat part of the picture at the bottom. -->
                 <Border x:Name="NameBar" VerticalAlignment="Bottom" Padding="6,4"
-                        Background="{DynamicResource Brush.Mask}" Opacity="0">
+                        Background="{DynamicResource Brush.Mask}" Opacity="0"
+                        IsHitTestVisible="False">
                     <TextBlock x:Name="NameText" FontFamily="{DynamicResource Font.Ui}" FontSize="10"
                                Foreground="White" TextTrimming="CharacterEllipsis" />
                 </Border>
 
-                <!-- Bottom hover action row: copy / crop / delete -->
+                <!-- Bottom hover action row: copy / crop / delete. The glass
+                     behind the buttons is decoration; only the buttons take
+                     clicks, so the pill itself is not hit testable. -->
                 <Border x:Name="ActionRowBg" VerticalAlignment="Bottom" Margin="4,0,4,26"
                         CornerRadius="10" Background="#66000000" Padding="4,3"
-                        Opacity="0">
+                        Opacity="0" IsHitTestVisible="False">
                     <StackPanel x:Name="ActionRow" Orientation="Horizontal"
                                 HorizontalAlignment="Center">
                         <Button x:Name="CopyButton" Style="{StaticResource RoundGlassButton}" Tag="14"
