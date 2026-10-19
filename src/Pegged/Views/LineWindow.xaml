@@ -1,0 +1,72 @@
+<Window x:Class="Pegged.Views.LineWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Pegged.Localization"
+        Title="Pegged"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        Focusable="False"
+        IsTabStop="False"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+    <Window.Resources>
+        <Storyboard x:Key="HintFade">
+            <DoubleAnimation Storyboard.TargetName="Hint" Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:0.3" />
+        </Storyboard>
+    </Window.Resources>
+
+    <!-- The dock: an acrylic strip along the top of one screen. Its height is
+         set from code, from the card size the user chose. -->
+    <Grid x:Name="Root">
+        <!-- Acrylic dock background -->
+        <Border x:Name="Dock" CornerRadius="0,0,14,14" Background="{DynamicResource Brush.Acrylic}"
+                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" />
+
+        <!-- The rope, drawn edge to edge, sagging towards the middle -->
+        <Canvas x:Name="RopeLayer" IsHitTestVisible="False">
+            <Path x:Name="RopeShadow" Stroke="#38000000" StrokeThickness="2.4" />
+            <Path x:Name="RopeCore" Stroke="{DynamicResource Brush.Rope}" StrokeThickness="1.6" />
+            <Path x:Name="RopeHighlight" Stroke="{DynamicResource Brush.RopeHighlight}" StrokeThickness="0.8" />
+        </Canvas>
+
+        <!-- Cards hang here. Module 3 fills it. -->
+        <Canvas x:Name="CardLayer" />
+
+        <!-- Top quick actions: clear, pin, settings -->
+        <Border x:Name="Toolbar" HorizontalAlignment="Center" VerticalAlignment="Top"
+                Margin="0,10,0,0" Padding="6,4" CornerRadius="18"
+                Background="{DynamicResource Brush.Acrylic}"
+                BorderBrush="#59FFFFFF" BorderThickness="1" Opacity="0"
+                Effect="{DynamicResource Effect.Flyout}">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="ClearButton" Style="{StaticResource RoundGlassButton}"
+                        Tag="15" ToolTip="{loc:Str Tray.ClearAll}" Click="OnClear" Content="&#x1F5D1;" />
+                <Button x:Name="PinButton" Style="{StaticResource RoundGlassButton}"
+                        Tag="15" ToolTip="{loc:Str Tray.HideLine}" Click="OnPin" Content="&#x1F4CC;" />
+                <Button x:Name="SettingsButton" Style="{StaticResource RoundGlassButton}"
+                        Tag="15" ToolTip="{loc:Str Tray.Settings}" Click="OnSettings" Content="&#x2699;" />
+            </StackPanel>
+        </Border>
+
+        <!-- Empty state -->
+        <Border x:Name="Hint" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Padding="14,7" CornerRadius="16" Background="{DynamicResource Brush.Acrylic}"
+                BorderBrush="#59FFFFFF" BorderThickness="1" Opacity="0">
+            <StackPanel>
+                <TextBlock x:Name="HintText" Text="{loc:Str Line.Empty}"
+                           FontFamily="{DynamicResource Font.Ui}" FontSize="12" FontWeight="Medium"
+                           Foreground="{DynamicResource Brush.Text}" HorizontalAlignment="Center" />
+                <TextBlock x:Name="HintSub" Text="{loc:Str Line.EmptyHint}"
+                           FontFamily="{DynamicResource Font.Ui}" FontSize="11"
+                           Foreground="{DynamicResource Brush.TextSecondary}" HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

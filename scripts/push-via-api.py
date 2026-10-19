@@ -69,10 +69,13 @@ def main():
         return
     print(f"{len(pending)} commit(s) to push onto {head[:8]}")
 
-    parent = head
+    # Two bases move together: the remote sha (parent of the commits we create)
+    # and the local commit the diff is taken against.
+    parent_remote = head
+    prev_local = base_ref
     for c in pending:
         message = git("log", "-1", "--format=%B", c)
-        files = git("diff-tree", "-r", "--no-commit-id", "--name-status", parent, c).splitlines()
+        files = git("diff-tree", "-r", "--no-commit-id", "--name-status", prev_local, c).splitlines()
         entries = []
         for line in files:
             status, path = line.split("\t", 1)
@@ -88,19 +91,20 @@ def main():
                       {"content": base64.b64encode(blob).decode(), "encoding": "base64"})["sha"]
             entries.append({"path": path, "mode": "100644", "type": "blob", "sha": sha})
         tree = api(f"{base}/git/trees", "POST",
-                   {"base_tree": api(f"{base}/commits/{parent}")["commit"]["tree"]["sha"],
+                   {"base_tree": api(f"{base}/commits/{parent_remote}")["commit"]["tree"]["sha"],
                     "tree": entries})["sha"]
         new = api(f"{base}/git/commits", "POST",
-                  {"message": message, "tree": tree, "parents": [parent]})["sha"]
+                  {"message": message, "tree": tree, "parents": [parent_remote]})["sha"]
         print(f"  {c[:8]} -> {new[:8]}  ({len(entries)} file(s))")
-        parent = new
+        prev_local = c
+        parent_remote = new
 
     if DRY:
         print("dry run: ref not moved")
         return
-    api(f"{base}/git/refs/heads/{branch}", "PATCH", {"sha": parent})
+    api(f"{base}/git/refs/heads/{branch}", "PATCH", {"sha": parent_remote})
     subprocess.run(["git", "tag", "-f", "pushed", pending[-1]], check=True, capture_output=True)
-    print("pushed:", parent, "(local base tag ->", pending[-1][:8], ")")
+    print("pushed:", parent_remote, "(local base tag ->", pending[-1][:8], ")")
 
 
 if __name__ == "__main__":
