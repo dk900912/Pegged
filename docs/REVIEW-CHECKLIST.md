@@ -10,10 +10,13 @@
 | --- | --- | --- |
 | `launch_probe.py`（资源管理器双击启动） | 单实例 / 贴顶 / 全宽 / 收起 / 展开高度 / 感应条 | **9 / 9 PASS** |
 | `interaction_probe.py`（穿透与语言） | `WM_NCHITTEST` 逐点穿透 / 工具栏可点 / 设置窗 / 语言实时刷新 | **5 / 5 PASS** |
-| `audit_walkthrough.py`（四区交互） | dock 8 + card 11 + crop 4 + settings 9 + 无崩溃 1 | **33 / 33 PASS** |
-| 合计 | | **47 / 47 PASS** |
+| `audit_walkthrough.py`（四区交互） | dock 8 + card 12 + crop 4 + settings 9 + 无崩溃 1 | **34 / 34 PASS** |
+| `repro_first_card_click.py`（定向复现，见 §5） | 2 / 3 张卡片时每张图的可点区域 | **全绿** |
+| 合计 | | **48 / 48 PASS** |
 
-清理临时追踪代码（`InputTrace` / `PEGGED_TRACE`）后重跑，三套件仍为 9/9、5/5、33/33，`crash.log` 为空。
+清理临时代码后重跑，各套件保持原结果，`crash.log` 为空。
+
+本轮（用户报障：挂 2 张以上时第一张很难点选复制）新定位 **1 个应用缺陷**（A-9），已修复并新增回归项 `card.first_card_clickable`；前序 8 个缺陷全部回归通过。
 
 本轮共定位 **8 个应用缺陷**（其中 2 个是「功能在这台机器上根本不可用却假装能用」的严重项）与 **4 个验收脚本自身缺陷**；另把 3 项此前「声明为未验证」的交互（裁剪手柄拖拽、剪贴板自动上线、一键清空）变成可复现的绿项。
 
@@ -31,6 +34,12 @@
 | A-6 | 裁剪浮层的 8 个手柄「拖不动」——一直没有被真正验证过 | 不是代码缺陷，是**从未验证**：手柄没有 automation peer，探针此前只能验证「浮层能开、Esc 能关」 | 给「取消 / 应用裁剪」补 `AutomationId`（`CropCancel` / `CropApply`），并新增真拖拽检查：按初始 80% 选框反推右下角手柄位置，`mouse down → 14 步移动 → up` | `crop.resize_and_apply`：`size '608 × 384 px' -> '549 × 337 px', cards 1 -> 2, overlay closed=True` |
 | A-7 | 卡片被复制后，**同一张图会在挂绳上再挂一张** | 剪贴板监听不区分「图」和「图 + 文本/文件」；而 macOS 原版把 `.string` / `.fileURL` 列入 `ignoredTypes`（带文本的复制不算截图） | `ClipboardWatcher` 增加 `NotAPicture` 格式过滤（FileDrop / Text / UnicodeText / StringFormat），并对编码后的 PNG 做 SHA256 去重 | `card.click_copies_image`：`clipboard image=True, cards 1 -> 1` |
 | A-8 | 图片文件被预览窗打开过之后，**复制和右键回收都失败**，卡片赖着不走 | 预览用 `new BitmapImage(new Uri(path))` 一直持有文件句柄；`SHFileOperation` 又会在**成功**时置 `fAnyOperationsAborted`，应用据此判定失败 | ①`BeginInit/CacheOption=OnLoad/IgnoreImageCache/EndInit/Freeze`；②回收成功与否改看 `!File.Exists(path)`，不看返回码 | `card.right_click_drops`：`cards 1 -> 0`（此前间歇性失败，需连查 6 个原因） |
+
+### 1.1 用户报障轮次（「挂 2 张以上时第一张很难点选到复制」）
+
+| # | 现象（用户视角） | 根因 | 修复 | 证据（修复后） |
+| --- | --- | --- | --- | --- |
+| A-9 | 挂上第 2 张图以后，**第一张图很难点**：图上没有任何遮挡，但点它十有八九没反应（既不复制，也不弹裁剪），像有一块看不见的玻璃压在它身上 | **空态提示胶囊是不可见的，但它仍然吃点击**。`UpdateHint()` 只把 `Hint.Opacity` 置 0，而 WPF 中 `Opacity=0` 的元素**依然参与命中测试**，一样会截留 `MouseLeftButtonDown`。提示是 `HorizontalAlignment=Center`，正好压在舱体中央——也就是第一张卡（最左那张）的右半部分上；第二张卡的中心恰好落在它右边一点点，所以第一张最明显、第二张偶发。UIA `ElementFromPoint` 逐点归属图直接拍到：卡片中部这些点的所有者是 `Text:HintText` / `Text:HintSub`，而不是图 | ①`Hint` 改由 `Visibility` 显隐（`Visibility.Hidden` 才真正退出命中测试），并保留 `IsHitTestVisible="False"` 双保险；②顺带给同一处两处疑似同源隐患上了保险：卡内的 `NameBar`（文件名条）与 `ActionRowBg`（悬停操作栏底板）同样以 `Opacity` 显隐，改为一律 `IsHitTestVisible="False"`——它们只是底板，点击应落到按钮或图上 | 修复前后逐点对比（3 张卡 × 3×3 网格）：修复前第一、二张的中下部 7 个点 `copied=False`；修复后 `GREEN: every click on a picture copied that picture`，第三张亦全绿。回归项 `card.first_card_clickable`：`clipboard image=True` |
 
 ## 2. 本轮新发现的验收脚本缺陷（自己骗自己也是 BUG）
 
@@ -72,7 +81,7 @@
 | `dock.reveal_settles` | 1.0s 内到位且不抖 | `0 / 0` |
 | `dock.peek_keeps_pointer` | peek 到期不把挂绳从指针下抽走 | `top=0` |
 
-### 4.2 card（卡片）11/11
+### 4.2 card（卡片）12/12
 
 | 检查 | 断言 | 实测 |
 | --- | --- | --- |
@@ -80,6 +89,7 @@
 | `card.hang_from_file` | 新文件自动挂上 | `cards=1` |
 | `card.hover_chrome` | 悬停出 复制/裁剪/删除/关闭 | 全部存在 |
 | `card.click_copies_image` | 复制进剪贴板且**不重复挂** | `cards 1 -> 1` |
+| `card.first_card_clickable` | **挂 2 张以上时第一张仍可单击复制** | `clicked at (868,108): clipboard image=True` |
 | `card.double_click_preview` | 双击开预览 | `new windows=['预览']` |
 | `card.preview_takes_keyboard` | 预览打开即拿焦点 | `foreground=预览` |
 | `card.preview_close` | Esc 关掉预览 | `closed=True` |
@@ -138,8 +148,12 @@ python scripts/e2e/launch_probe.py          # 9 项
 python scripts/e2e/interaction_probe.py     # 5 项
 
 # 3) 四区交互走查（会自己停掉/恢复设置与卡片）
-python scripts/e2e/audit_walkthrough.py             # 33 项
+python scripts/e2e/audit_walkthrough.py             # 34 项
 python scripts/e2e/audit_walkthrough.py --only crop # 只跑一区
+
+# 4) 定向复现：多张卡片时每张图的可点区域（原文报障的复现脚本）
+python scripts/e2e/repro_first_card_click.py                 # 2 张
+python scripts/e2e/repro_first_card_click.py --cards 3 --grid # 3 张 + 逐点网格
 ```
 
 结果落在 `outputs/acceptance/audit.json`（全量）与 `outputs/acceptance/audit-<area>.json`（分区），截图在 `outputs/acceptance/shots/audit/`。

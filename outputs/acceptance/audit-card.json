@@ -29,6 +29,13 @@
       "ok": true
     },
     {
+      "id": "card.first_card_clickable",
+      "area": "card",
+      "expected": "挂 2 张以上时第一张仍可单击复制",
+      "actual": "clicked the first card's picture at (863,110): clipboard image=True",
+      "ok": true
+    },
+    {
       "id": "card.double_click_preview",
       "area": "card",
       "expected": "双击打开预览窗口",
@@ -39,14 +46,14 @@
       "id": "card.preview_takes_keyboard",
       "area": "card",
       "expected": "预览窗口打开即获得焦点（Esc 可关）",
-      "actual": "foreground=预览 preview=0x480ae2",
+      "actual": "foreground=预览 preview=0x150e44",
       "ok": true
     },
     {
       "id": "card.preview_close",
       "area": "card",
       "expected": "Esc 关闭预览窗口",
-      "actual": "preview 0x480ae2 closed=True",
+      "actual": "preview 0x150e44 closed=True",
       "ok": true
     },
     {
@@ -74,7 +81,7 @@
       "id": "card.wheel_scroll",
       "area": "card",
       "expected": "卡片超出一屏时滚轮向旧照片滚动",
-      "actual": "first card x -1809 -> -1126 after six notches up",
+      "actual": "first card x -1814 -> -1132 after six notches up",
       "ok": true
     }
   ]

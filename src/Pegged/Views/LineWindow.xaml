@@ -15,13 +15,6 @@
         UseLayoutRounding="True"
         SnapsToDevicePixels="True">
 
-    <Window.Resources>
-        <Storyboard x:Key="HintFade">
-            <DoubleAnimation Storyboard.TargetName="Hint" Storyboard.TargetProperty="Opacity"
-                             From="0" To="1" Duration="0:0:0.3" />
-        </Storyboard>
-    </Window.Resources>
-
     <!-- The dock: an acrylic strip along the top of one screen. Its height is
          set from code, from the card size the user chose. -->
     <Grid x:Name="Root">
@@ -60,10 +53,18 @@
             </StackPanel>
         </Grid>
 
-        <!-- Empty state -->
+        <!-- Empty state. It is centred, so while it is up it straddles the
+             middle of the screen - exactly where the first card hangs. In WPF
+             an element only stops taking clicks when it is Hidden, not when it
+             is transparent: an invisible Border at Opacity 0 still owned the
+             rectangle over the pictures, so every click aimed at the first
+             card's photo was swallowed by the hint instead of copying.
+             Visibility is driven from UpdateHint(); IsHitTestVisible stays
+             false so no part of the pill can ever trap a click. -->
         <Border x:Name="Hint" HorizontalAlignment="Center" VerticalAlignment="Center"
                 Padding="14,7" CornerRadius="16" Background="{DynamicResource Brush.Acrylic}"
-                BorderBrush="#59FFFFFF" BorderThickness="1" Opacity="0">
+                BorderBrush="#59FFFFFF" BorderThickness="1"
+                Visibility="Hidden" IsHitTestVisible="False">
             <StackPanel>
                 <TextBlock x:Name="HintText" Text="{loc:Str Line.Empty}"
                            FontFamily="{DynamicResource Font.Ui}" FontSize="12" FontWeight="Medium"
