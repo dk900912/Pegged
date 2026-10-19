@@ -36,6 +36,9 @@
     <Using Include="System.Windows.Controls.Border" Alias="Border" />
     <Using Include="System.Windows.Controls.Control" Alias="Control" />
     <Using Include="System.Windows.Controls.UserControl" Alias="UserControl" />
+    <Using Include="System.Windows.IDataObject" Alias="IDataObject" />
+    <Using Include="System.Windows.Clipboard" Alias="Clipboard" />
+    <Using Include="System.Windows.DataFormats" Alias="DataFormats" />
   </ItemGroup>
 
   <ItemGroup>
