@@ -5,14 +5,29 @@
         xmlns:views="clr-namespace:Pegged.Views"
         Title="{loc:Str Settings.Title}"
         Background="{DynamicResource Brush.Window}"
+        Foreground="{DynamicResource Brush.Text}"
+        FontFamily="{DynamicResource Font.Ui}"
+        AutomationProperties.AutomationId="SettingsWindow"
         WindowStartupLocation="CenterOwner"
         Width="720" Height="560"
         MinWidth="560" MinHeight="420"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True">
 
-    <!-- Settings window: a side nav, a content card. Two regions stay
-         separate; the nav scrolls on its own when the height is small. -->
+    <Window.Resources>
+        <Style TargetType="ComboBox" BasedOn="{StaticResource FluentComboBox}" />
+        <Style TargetType="TextBox" BasedOn="{StaticResource FluentTextBox}" />
+        <Style TargetType="Slider" BasedOn="{StaticResource FluentSlider}" />
+        <Style x:Key="NavIcon" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </Window.Resources>
+
+    <!-- 侧栏与内容独立布局，保留 720×560 窗口和 240px 导航。 -->
     <Grid Margin="0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240" />
@@ -38,52 +53,52 @@
                                TextWrapping="Wrap" Margin="0,2,0,0" />
                 </StackPanel>
 
-                <ListBox x:Name="NavList" Grid.Row="1" Margin="8,8,8,8"
+                <ListBox x:Name="NavList" AutomationProperties.AutomationId="NavList" Grid.Row="1" Margin="8,8,8,8"
                          Background="Transparent" BorderThickness="0"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          SelectionChanged="OnNavChanged">
                     <ListBox.Resources>
                         <Style TargetType="ListBoxItem" BasedOn="{StaticResource NavItem}" />
                     </ListBox.Resources>
-                <ListBoxItem x:Name="NavGeneral" Tag="general">
+                <ListBoxItem x:Name="NavGeneral" AutomationProperties.AutomationId="NavGeneral" Tag="general">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#x2699;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <TextBlock Text="&#xE713;" Style="{StaticResource NavIcon}" />
                         <StackPanel>
                             <TextBlock Text="{loc:Str Settings.General}" FontSize="13" />
                             <TextBlock Text="{loc:Str Settings.GeneralDesc}" FontSize="10" Foreground="{DynamicResource Brush.SubtleText}" />
                         </StackPanel>
                     </StackPanel>
                 </ListBoxItem>
-                <ListBoxItem x:Name="NavCapture" Tag="capture">
+                <ListBoxItem x:Name="NavCapture" AutomationProperties.AutomationId="NavCapture" Tag="capture">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#x1F4F7;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <TextBlock Text="&#xE722;" Style="{StaticResource NavIcon}" />
                         <StackPanel>
                             <TextBlock Text="{loc:Str Settings.Capture}" FontSize="13" />
                             <TextBlock Text="{loc:Str Settings.CaptureDesc}" FontSize="10" Foreground="{DynamicResource Brush.SubtleText}" />
                         </StackPanel>
                     </StackPanel>
                 </ListBoxItem>
-                <ListBoxItem x:Name="NavAppearance" Tag="appearance">
+                <ListBoxItem x:Name="NavAppearance" AutomationProperties.AutomationId="NavAppearance" Tag="appearance">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#x1F3A8;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <TextBlock Text="&#xE790;" Style="{StaticResource NavIcon}" />
                         <StackPanel>
                             <TextBlock Text="{loc:Str Settings.Appearance}" FontSize="13" />
                             <TextBlock Text="{loc:Str Settings.AppearanceDesc}" FontSize="10" Foreground="{DynamicResource Brush.SubtleText}" />
                         </StackPanel>
                     </StackPanel>
                 </ListBoxItem>
-                <ListBoxItem x:Name="NavShortcuts" Tag="shortcuts">
+                <ListBoxItem x:Name="NavShortcuts" AutomationProperties.AutomationId="NavShortcuts" Tag="shortcuts">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#x2328;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <TextBlock Text="&#xE765;" Style="{StaticResource NavIcon}" />
                         <StackPanel>
                             <TextBlock Text="{loc:Str Settings.Shortcuts}" FontSize="13" />
                             <TextBlock Text="{loc:Str Settings.ShortcutsDesc}" FontSize="10" Foreground="{DynamicResource Brush.SubtleText}" />
                         </StackPanel>
                     </StackPanel>
                 </ListBoxItem>
-                <ListBoxItem x:Name="NavAbout" Tag="about">
+                <ListBoxItem x:Name="NavAbout" AutomationProperties.AutomationId="NavAbout" Tag="about">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#x2139;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <TextBlock Text="&#xE946;" Style="{StaticResource NavIcon}" />
                         <StackPanel>
                             <TextBlock Text="{loc:Str Settings.About}" FontSize="13" />
                             <TextBlock Text="{loc:Str Settings.AboutDesc}" FontSize="10" Foreground="{DynamicResource Brush.SubtleText}" />
@@ -93,7 +108,7 @@
                 </ListBox>
 
                 <StackPanel Grid.Row="2" Margin="20,0,20,16" Orientation="Horizontal">
-                    <Button Style="{StaticResource GlassButton}" Padding="12,6"
+                    <Button x:Name="CloseButton" AutomationProperties.AutomationId="CloseButton" Style="{StaticResource GlassButton}" Padding="12,6"
                             Click="OnClose" Content="{loc:Str Preview.Close}" />
                 </StackPanel>
             </Grid>
@@ -113,41 +128,57 @@
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Language}" />
                                 <TextBlock Text="{loc:Str Settings.LanguageDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <ComboBox x:Name="LanguageCombo" HorizontalAlignment="Right" MinWidth="180" SelectionChanged="OnLanguage" />
+                            <ComboBox x:Name="LanguageCombo" AutomationProperties.AutomationId="LanguageCombo" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="180" SelectionChanged="OnLanguage" />
                         </Grid>
                     </Border>
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Sounds}" />
                                 <TextBlock Text="{loc:Str Settings.SoundsDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <views:ToggleSwitch x:Name="SoundsSwitch" HorizontalAlignment="Right" Changed="OnSounds" />
+                            <views:ToggleSwitch x:Name="SoundsSwitch" AutomationProperties.AutomationId="SoundsSwitch" AutomationProperties.Name="{loc:Str Settings.Sounds}" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Changed="OnSounds" />
                         </Grid>
                     </Border>
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Keep}" />
                                 <TextBlock Text="{loc:Str Settings.KeepDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <ComboBox x:Name="KeepCombo" HorizontalAlignment="Right" MinWidth="120" SelectionChanged="OnKeep" />
+                            <ComboBox x:Name="KeepCombo" AutomationProperties.AutomationId="KeepCombo" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="120" SelectionChanged="OnKeep" />
                         </Grid>
                     </Border>
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Size}" />
                                 <TextBlock Text="{loc:Str Settings.SizeDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <ComboBox x:Name="SizeCombo" HorizontalAlignment="Right" MinWidth="160" SelectionChanged="OnSize" />
+                            <ComboBox x:Name="SizeCombo" AutomationProperties.AutomationId="SizeCombo" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="160" SelectionChanged="OnSize" />
                         </Grid>
                     </Border>
                 </StackPanel>
@@ -163,32 +194,45 @@
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Folder}" />
                                 <TextBlock x:Name="FolderPath" Style="{StaticResource SubtleHint}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
-                            <Button Style="{StaticResource AccentButton}" HorizontalAlignment="Right"
+                            <Button x:Name="ChangeFolderButton" AutomationProperties.AutomationId="ChangeFolderButton"
+                                    Style="{StaticResource AccentButton}" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
                                     Click="OnChangeFolder" Content="{loc:Str Settings.FolderChange}" />
                         </Grid>
                     </Border>
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Clipboard}" />
                                 <TextBlock Text="{loc:Str Settings.ClipboardDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <views:ToggleSwitch x:Name="ClipboardSwitch" HorizontalAlignment="Right" Changed="OnClipboard" />
+                            <views:ToggleSwitch x:Name="ClipboardSwitch" AutomationProperties.AutomationId="ClipboardSwitch" AutomationProperties.Name="{loc:Str Settings.Clipboard}" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Changed="OnClipboard" />
                         </Grid>
                     </Border>
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.OverFullScreen}" />
                                 <TextBlock Text="{loc:Str Settings.OverFullScreenDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <views:ToggleSwitch x:Name="FullScreenSwitch" HorizontalAlignment="Right" Changed="OnFullScreen" />
+                            <views:ToggleSwitch x:Name="FullScreenSwitch" AutomationProperties.AutomationId="FullScreenSwitch" AutomationProperties.Name="{loc:Str Settings.OverFullScreen}" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Changed="OnFullScreen" />
                         </Grid>
                     </Border>
                 </StackPanel>
@@ -204,43 +248,59 @@
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Theme}" />
-                                <TextBlock Text="{loc:Str Settings.ThemeLight}" Style="{StaticResource SubtleHint}" x:Name="ThemeHint" />
+                                <TextBlock Text="{Binding SelectedItem.Label, ElementName=ThemeCombo}" Style="{StaticResource SubtleHint}" x:Name="ThemeHint" />
                             </StackPanel>
-                            <ComboBox x:Name="ThemeCombo" HorizontalAlignment="Right" MinWidth="160" SelectionChanged="OnTheme" />
+                            <ComboBox x:Name="ThemeCombo" AutomationProperties.AutomationId="ThemeCombo" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="160" SelectionChanged="OnTheme" />
                         </Grid>
                     </Border>
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.RevealDelay}" />
                                 <TextBlock Text="{loc:Str Settings.RevealDelayDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <Slider x:Name="RevealSlider" Width="180" HorizontalAlignment="Right"
-                                    Minimum="0" Maximum="1" TickFrequency="0.05"
+                            <Slider x:Name="RevealSlider" AutomationProperties.AutomationId="RevealSlider" Width="180" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Minimum="0.05" Maximum="3" TickFrequency="0.05"
                                     ValueChanged="OnRevealDelay" />
                         </Grid>
                     </Border>
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.TopEdge}" />
                                 <TextBlock Text="{loc:Str Settings.TopEdgeDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <views:ToggleSwitch x:Name="TopEdgeSwitch" HorizontalAlignment="Right" Changed="OnTopEdge" />
+                            <views:ToggleSwitch x:Name="TopEdgeSwitch" AutomationProperties.AutomationId="TopEdgeSwitch" AutomationProperties.Name="{loc:Str Settings.TopEdge}" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Changed="OnTopEdge" />
                         </Grid>
                     </Border>
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Peek}" />
                                 <TextBlock Text="{loc:Str Settings.PeekDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <views:ToggleSwitch x:Name="PeekSwitch" HorizontalAlignment="Right" Changed="OnPeek" />
+                            <views:ToggleSwitch x:Name="PeekSwitch" AutomationProperties.AutomationId="PeekSwitch" AutomationProperties.Name="{loc:Str Settings.Peek}" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Changed="OnPeek" />
                         </Grid>
                     </Border>
                 </StackPanel>
@@ -256,11 +316,15 @@
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.ShortcutToggle}" />
                                 <TextBlock Text="{loc:Str Settings.RecordHint}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <TextBox x:Name="HotkeyBox" Width="200" HorizontalAlignment="Right"
+                            <TextBox x:Name="HotkeyBox" AutomationProperties.AutomationId="HotkeyBox" IsReadOnly="True" Width="200" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
                                      HorizontalContentAlignment="Center"
                                      PreviewKeyDown="OnHotkeyDown" />
                         </Grid>
@@ -268,11 +332,15 @@
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Tray.OpenAtLogin}" />
                                 <TextBlock Text="{loc:Str Settings.RecordHint}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <views:ToggleSwitch x:Name="LoginSwitch" HorizontalAlignment="Right" Changed="OnLogin" />
+                            <views:ToggleSwitch x:Name="LoginSwitch" AutomationProperties.AutomationId="LoginSwitch" AutomationProperties.Name="{loc:Str Tray.OpenAtLogin}" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Changed="OnLogin" />
                         </Grid>
                     </Border>
                 </StackPanel>
@@ -288,7 +356,11 @@
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Version}" />
                                 <TextBlock Text="Pegged 1.0.0" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
@@ -297,18 +369,27 @@
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Website}" />
                                 <TextBlock Text="github.com/dk900912/Pegged" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <Button Style="{StaticResource AccentButton}" HorizontalAlignment="Right"
+                            <Button x:Name="WebsiteButton" AutomationProperties.AutomationId="WebsiteButton"
+                                    Style="{StaticResource AccentButton}" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
                                     Click="OnWebsite" Content="{loc:Str Preview.Open}" />
                         </Grid>
                     </Border>
 
                     <Border Style="{StaticResource SettingsRow}">
                         <Grid>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                 <TextBlock Text="{loc:Str Settings.Credits}" />
                                 <TextBlock Text="A native Windows 11 port of tendedero (MIT) by alejandrobujan."
                                            Style="{StaticResource SubtleHint}" TextWrapping="Wrap" />

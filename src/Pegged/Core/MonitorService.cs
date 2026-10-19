@@ -150,34 +150,55 @@ public static class MonitorService
         if (Monitors.Count == 0) Refresh();
     }
 
-    /// <summary>True when a window is covering a whole monitor: the Windows
-    /// shape of "a full screen app".</summary>
+    /// <summary>True when the window the user is looking at covers a whole
+    /// monitor: the Windows shape of "a full screen app".
+    ///
+    /// This used to enumerate every window on the desktop and ask whether its
+    /// rectangle covered the monitor. Windows itself keeps two such windows
+    /// permanently open - the shell's Program Manager and the IME host
+    /// "Windows 输入体验" - so the answer was always true and the line never
+    /// came down. Only the foreground window counts now.</summary>
     public static bool IsFullScreen(MonitorDescription monitor)
     {
+        var hwnd = NativeMethods.GetForegroundWindow();
+        if (hwnd == IntPtr.Zero || hwnd == NativeMethods.GetShellWindow()) return false;
+        if (!NativeMethods.IsWindowVisible(hwnd)) return false;
+
+        var style = NativeMethods.GetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE);
+        if ((style & NativeMethods.WS_EX_TOOLWINDOW) != 0) return false;
+        if ((style & NativeMethods.WS_EX_NOACTIVATE) != 0) return false;
+        if (IsCloaked(hwnd)) return false;
+
+        // GetWindowRect reports physical pixels, so compare against the
+        // monitor's physical rectangle.
         var r = new NativeMethods.RECT
         {
-            Left = (int)monitor.Bounds.Left,
-            Top = (int)monitor.Bounds.Top,
-            Right = (int)monitor.Bounds.Right,
-            Bottom = (int)monitor.Bounds.Bottom,
+            Left = (int)monitor.Physical.Left,
+            Top = (int)monitor.Physical.Top,
+            Right = (int)monitor.Physical.Right,
+            Bottom = (int)monitor.Physical.Bottom,
         };
 
-        var found = false;
-        NativeMethods.EnumWindows((hWnd, _) =>
+        return NativeMethods.IsFullScreenOn(hwnd, r);
+    }
+
+    private const int DwmwaCloaked = 14;
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmGetWindowAttribute(IntPtr hwnd, int attr, out int value, int size);
+
+    private static bool IsCloaked(IntPtr hwnd)
+    {
+        try
         {
-            if (found) return false;
-            if (hWnd == NativeMethods.GetShellWindow()) return true;
-            if (!NativeMethods.IsWindowVisible(hWnd)) return true;
+            if (DwmGetWindowAttribute(hwnd, DwmwaCloaked, out var cloaked, sizeof(int)) == 0)
+                return cloaked != 0;
+        }
+        catch (Exception)
+        {
+            // No DWM, or an old build: assume the window is real.
+        }
 
-            if (NativeMethods.IsFullScreenOn(hWnd, r))
-            {
-                found = true;
-                return false;
-            }
-
-            return true;
-        }, IntPtr.Zero);
-
-        return found;
+        return false;
     }
 }

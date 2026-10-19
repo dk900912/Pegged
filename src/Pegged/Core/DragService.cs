@@ -61,15 +61,19 @@ public static class DragService
         }
 
         var initial = allOurs ? DragKind.Move : defaultEffect;
-        var initialEffects = initial == DragKind.Move ? DragDropEffects.Move : DragDropEffects.Copy;
-        var allowed = DragDropEffects.Copy | DragDropEffects.Move;
 
-        var raw = DragDrop.DoDragDrop(source, data, allowed);
+        var raw = DragDrop.DoDragDrop(source, data,
+            DragDropEffects.Copy | DragDropEffects.Move);
+
+        // Only an explicit Move means "take the original away". Esc / a drop on
+        // a non-target returns None, and that used to be mapped to `initial`
+        // (which is Move for our own folder) - i.e. pressing Esc deleted the
+        // card. None now means "nothing happened".
         var effect = raw switch
         {
             DragDropEffects.Move => DragKind.Move,
             DragDropEffects.Copy => DragKind.Copy,
-            _ => initial, // user cancelled → treat as the default we offered
+            _ => DragKind.None,
         };
 
         return new Result { Effects = effect, Target = null };

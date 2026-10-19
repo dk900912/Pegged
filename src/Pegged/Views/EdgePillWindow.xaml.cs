@@ -22,6 +22,7 @@ public partial class EdgePillWindow : Window
     private bool _visible = true;
     private Rect _target = new(0, 0, 160, 12);
     private readonly LinearGradientBrush _flowBrush;
+    private double _scale = 1.0;
 
     public EdgePillWindow()
     {
@@ -57,6 +58,10 @@ public partial class EdgePillWindow : Window
         var style = NativeMethods.GetWindowLong(_handle, NativeMethods.GWL_EXSTYLE);
         style |= NativeMethods.WS_EX_TOOLWINDOW | NativeMethods.WS_EX_NOACTIVATE | NativeMethods.WS_EX_TRANSPARENT;
         NativeMethods.SetWindowLong(_handle, NativeMethods.GWL_EXSTYLE, style);
+
+        // PlaceOn() ran before Show(): there was no HWND then, so the pill was
+        // left at Windows' default spot (measured at 32,32). Do it now.
+        MoveTo(_target.Left, _target.Top);
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -83,6 +88,7 @@ public partial class EdgePillWindow : Window
         var left = monitor.Bounds.Left + (monitor.Bounds.Width - this.Width) / 2;
         var top = monitor.Bounds.Top - 1;
         _target = new Rect(left, top, this.Width, this.Height);
+        _scale = monitor.Scale > 0 ? monitor.Scale : 1.0;
         MoveTo(left, top);
     }
 
@@ -90,7 +96,7 @@ public partial class EdgePillWindow : Window
     {
         if (_handle == IntPtr.Zero) return;
 
-        var scale = GetDpiScale(_handle);
+        var scale = _scale > 0 ? _scale : GetDpiScale(_handle);
         NativeMethods.SetWindowPos(_handle, NativeMethods.HWND_TOPMOST,
             (int)Math.Round(dipLeft * scale), (int)Math.Round(dipTop * scale),
             0, 0,
@@ -139,13 +145,15 @@ public partial class EdgePillWindow : Window
 
         if (this.Visibility != Visibility.Visible) this.Visibility = Visibility.Visible;
 
-        // A slow breath, four seconds a cycle: the line is idle, not asleep.
-        _phase += dt * (Math.PI * 2 / 4.0);
+        // A slow breath, 2.4 seconds a cycle (spec 3.1): the line is idle, not
+        // asleep. The pill lives on the screen edge, so it breathes between
+        // 35% and 75% opacity rather than blinking.
+        _phase += dt * (Math.PI * 2 / 2.4);
         if (_phase > Math.PI * 2) _phase -= Math.PI * 2;
 
         var breath = 0.5 + 0.5 * Math.Sin(_phase);   // 0..1
-        var squash = 0.45 + 0.55 * breath;           // thin..full
-        var glow = 0.55 + 0.35 * breath;
+        var squash = 0.85 + 0.15 * breath;           // full..taller..full
+        var glow = 0.35 + 0.40 * breath;             // 0.35..0.75
 
         PillScale.ScaleY = squash;
         Pill.Opacity = glow * _fade;
