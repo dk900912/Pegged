@@ -1,7 +1,0 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Color x:Key="Palette.Card">#E0FEFEFE</Color>
-    <SolidColorBrush x:Key="Brush.Card" Color="{DynamicResource Palette.Card}" />
-    <Color x:Key="Palette.Text">#FF1A1B1F</Color>
-    <SolidColorBrush x:Key="Brush.Text" Color="{DynamicResource Palette.Text}" />
-</ResourceDictionary>

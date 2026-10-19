@@ -8,7 +8,7 @@
   :root{
     --bg:#F3F5F9; --surface:#FFFFFF; --surface-2:#F7F8FC; --border:#E3E6EE;
     --text:#1A1B1F; --text-2:#5C5F66; --accent:#0F6CBD; --accent-2:#7B61FF; --accent-soft:#E1EFFB;
-    --flyout:rgba(244,246,251,.95); --card-bg:rgba(254,254,254,.88);
+    --acrylic:rgba(244,246,251,.78); --card-bg:rgba(254,254,254,.88);
     --rope:#787E8A; --rope-hi:rgba(255,255,255,.45);
     --wood-a:#EEC498; --wood-b:#D69E64; --wood-c:#966034;
     --band-a:#E2E8F0; --band-b:#949EAC;
@@ -19,7 +19,7 @@
   html[data-theme="dark"]{
     --bg:#16181D; --surface:#20242B; --surface-2:#262B33; --border:#333944;
     --text:#FFFFFF; --text-2:#C9CDD4; --accent:#4CC2FF; --accent-2:#9B7BFF; --accent-soft:#16324A;
-    --flyout:rgba(32,36,43,.95); --card-bg:rgba(42,46,54,.86);
+    --acrylic:rgba(32,36,43,.72); --card-bg:rgba(42,46,54,.86);
     --rope:#B9BEC9; --rope-hi:rgba(255,255,255,.18);
     --wood-a:#D8A876; --wood-b:#B9854F; --wood-c:#7A4F2C;
     --band-a:#CBD2DC; --band-b:#79808E;
@@ -30,7 +30,7 @@
   body{margin:0;background:var(--bg);color:var(--text);
        font:14px/1.6 "Segoe UI Variable","Segoe UI",-apple-system,"Microsoft YaHei",sans-serif;}
   header{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:16px;
-    padding:18px 28px;background:var(--flyout);backdrop-filter:blur(24px) saturate(140%);
+    padding:18px 28px;background:var(--acrylic);backdrop-filter:blur(24px) saturate(140%);
     border-bottom:1px solid var(--border);}
   header img{width:34px;height:34px;border-radius:9px}
   header h1{font-size:18px;margin:0;font-weight:600;letter-spacing:.2px}
@@ -63,9 +63,10 @@
   .dock{position:relative;height:230px;border-radius:12px;overflow:hidden;
     background:linear-gradient(160deg,#D9E5F6,#C8D8EF);}
   html[data-theme="dark"] .dock{background:linear-gradient(160deg,#2C313B,#1E222A)}
+  .dock .acrylic{position:absolute;inset:0;background:var(--acrylic);backdrop-filter:blur(18px) saturate(140%)}
   .toolbar{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;
-    padding:6px;border-radius:999px;background:var(--flyout);border:1px solid rgba(255,255,255,.35);
-    box-shadow:0 2px 8px rgba(0,0,0,.12);}
+    padding:6px;border-radius:999px;background:var(--acrylic);border:1px solid rgba(255,255,255,.35);
+    backdrop-filter:blur(20px);box-shadow:0 2px 8px rgba(0,0,0,.12);}
   .toolbar button{width:30px;height:30px;border-radius:50%;border:0;background:transparent;
     color:var(--text);cursor:pointer;font-size:13px;display:grid;place-items:center}
   .toolbar button:hover{background:rgba(127,127,127,.16)}
@@ -88,7 +89,7 @@
     height:100%;width:100%;display:grid;place-items:center;color:#fff;font-size:11px}
   .photo:hover{transform:scale(1.035);box-shadow:var(--shadow-hi)}
   .photo .badge{position:absolute;left:6px;top:6px;width:20px;height:20px;border-radius:50%;
-    background:var(--flyout);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;
+    background:var(--acrylic);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;
     font-size:9px;font-weight:700;color:var(--text)}
   .photo .copied{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%) translateY(16px);
     padding:5px 10px;border-radius:999px;background:var(--success);color:#fff;font-size:11px;
@@ -104,13 +105,13 @@
   @keyframes swing{from{transform:rotate(-2.4deg)}to{transform:rotate(2.4deg)}}
   .photo:hover .hoverbar{opacity:1}
   .hoverbar button{width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.4);
-    background:var(--flyout);color:var(--text);cursor:pointer;font-size:12px}
+    background:var(--acrylic);backdrop-filter:blur(14px);color:var(--text);cursor:pointer;font-size:12px}
   /* --- empty state --- */
   .empty{height:180px;border-radius:12px;position:relative;overflow:hidden;
     background:linear-gradient(160deg,#E8EEF9,#DCE7F6)}
   html[data-theme="dark"] .empty{background:linear-gradient(160deg,#232833,#1B1F27)}
   .empty .capsule{position:absolute;left:50%;top:56%;transform:translateX(-50%);padding:6px 14px;
-    border-radius:999px;background:var(--flyout);font-size:12px;
+    border-radius:999px;background:var(--acrylic);backdrop-filter:blur(14px);font-size:12px;
     font-weight:500;color:var(--text-2);border:1px solid rgba(255,255,255,.3)}
   /* --- crop overlay --- */
   .crop{position:relative;height:300px;border-radius:12px;overflow:hidden;
@@ -132,7 +133,7 @@
   .size-tag{position:absolute;left:0;top:-26px;padding:2px 8px;border-radius:6px;background:#111;
     color:#fff;font-size:11px;font-variant-numeric:tabular-nums}
   .crop-bar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:10px;
-    padding:8px;border-radius:999px;background:var(--flyout);
+    padding:8px;border-radius:999px;background:var(--acrylic);backdrop-filter:blur(20px);
     border:1px solid rgba(255,255,255,.35)}
   .crop-bar button{padding:7px 18px;border-radius:999px;border:1px solid transparent;font-size:12px;cursor:pointer}
   .crop-bar .cancel{background:transparent;color:var(--text);border-color:var(--border)}
@@ -221,10 +222,11 @@
   <section>
     <div class="sec-head">
       <h2>2 · 展开态顶部悬挂舱</h2><span class="tag">Expanded Hanging Dock</span>
-      <p>贯穿式高光挂绳 · 顶部快捷操作栏 · 除此之外整条舱体完全透明</p>
+      <p>亚克力毛玻璃 · 贯穿式高光挂绳 · 顶部快捷操作栏</p>
     </div>
     <div class="stage">
       <div class="dock">
+        <div class="acrylic"></div>
         <svg class="rope" viewBox="0 0 1000 230" preserveAspectRatio="none">
           <path d="M -20 46 Q 500 106 1020 46" fill="none" stroke="rgba(0,0,0,.22)" stroke-width="2.2" transform="translate(0,2)"/>
           <path d="M -20 44 Q 500 104 1020 44" fill="none" stroke="var(--rope)" stroke-width="1.8"/>
@@ -250,7 +252,7 @@
               <div class="hoverbar"><button>⧉</button><button>✂</button><button>🗑</button></div></div></div>
         </div>
       </div>
-      <p class="note">舱体本身不绘制任何面板：只有挂绳、照片和顶部快捷操作栏落在这块屏幕上，其余像素全部透出桌面。夹子三态：默认 / 悬停张开（弹簧箍下移 2px）/ 夹紧下压（卡片顶部锚点缩放 0.95）。挂绳为二次贝塞尔，矢高 ≤30px，两端 8% 渐隐。点「截图 A」可预览 <b>Copied!</b> 微交互。</p>
+      <p class="note">夹子三态：默认 / 悬停张开（弹簧箍下移 2px）/ 夹紧下压（卡片顶部锚点缩放 0.95）。挂绳为二次贝塞尔，矢高 ≤30px，两端 8% 渐隐。点「截图 A」可预览 <b>Copied!</b> 微交互。</p>
     </div>
   </section>
 
@@ -290,7 +292,7 @@
         </div>
         <div class="crop-bar"><button class="cancel">取消</button><button class="ok">确认裁剪</button></div>
       </div>
-      <p class="note">背景冻结桌面截图 + 55% 遮罩；选框外实时显示像素尺寸；底部操作栏是不透明小胶囊（无毛玻璃）；确认后原子替换原文件并备份 <code>.bak</code>，随后刷新绳上缩略图。</p>
+      <p class="note">背景冻结桌面截图 + 55% 遮罩；选框外实时显示像素尺寸；确认后原子替换原文件并备份 <code>.bak</code>，随后刷新绳上缩略图。</p>
     </div>
   </section>
 
@@ -356,7 +358,7 @@
     <div class="stage">
       <table>
         <tr><th>Token</th><th>Light</th><th>Dark</th><th>用途</th></tr>
-        <tr><td>Bg.Flyout</td><td><span class="swatch" style="background:#F4F6FB"></span> #F4F6FB 95%</td><td><span class="swatch" style="background:#20242B"></span> #20242B 95%</td><td>顶部快捷操作栏 / 空态胶囊 / 裁剪操作栏</td></tr>
+        <tr><td>Bg.Acrylic</td><td><span class="swatch" style="background:#F4F6FB"></span> #F4F6FB 78%</td><td><span class="swatch" style="background:#20242B"></span> #20242B 72%</td><td>悬挂舱毛玻璃</td></tr>
         <tr><td>Bg.Card</td><td><span class="swatch" style="background:#FEFEFE"></span> #FEFEFE 88%</td><td><span class="swatch" style="background:#2A2E36"></span> #2A2E36 86%</td><td>拍立得卡片底</td></tr>
         <tr><td>Rope.Core</td><td><span class="swatch" style="background:#787E8A"></span> #787E8A</td><td><span class="swatch" style="background:#B9BEC9"></span> #B9BEC9</td><td>挂绳芯线</td></tr>
         <tr><td>Clothespin.Wood</td><td><span class="swatch" style="background:linear-gradient(90deg,#EEC498,#D69E64,#966034)"></span> 三段木色</td><td><span class="swatch" style="background:linear-gradient(90deg,#D8A876,#B9854F,#7A4F2C)"></span> 三段暗木</td><td>夹子渐变</td></tr>

@@ -25,11 +25,3 @@ packages/
 # Python tooling
 __pycache__/
 *.pyc
-
-# Local acceptance evidence (screenshots of the test machine desktop)
-outputs/acceptance/shots/
-outputs/acceptance/*.png
-outputs/acceptance/*.log
-
-# Minimal repro projects (build output only)
-scratch/*/run/

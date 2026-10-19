@@ -1,1 +1,0 @@
-card=#E0FEFEFE text=#FF1A1B1F bykey=#E0FEFEFE
