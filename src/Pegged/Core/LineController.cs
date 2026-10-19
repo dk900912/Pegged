@@ -263,9 +263,20 @@ public sealed class LineController : IDisposable
     }
 
     /// <summary>Shows the line for a moment, then lets it go back to sleep.
-    /// Used when a new capture lands and on the very first launch.</summary>
+    /// Used when a new capture lands and on the very first launch.
+    ///
+    /// Reachable from the file watcher's thread, which is why it marshals:
+    /// showing the line sets the window's Width and Height, and touching a
+    /// DependencyObject from a background thread throws. Every capture used to
+    /// take this path, so it fired constantly and silently.</summary>
     public void Peek(double seconds = 1.6)
     {
+        if (!_line.Dispatcher.CheckAccess())
+        {
+            _line.Dispatcher.BeginInvoke(new Action(() => Peek(seconds)));
+            return;
+        }
+
         if (_line.Revealed && _line.Pinned) return;
 
         Reveal(pinned: false);
