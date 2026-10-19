@@ -67,6 +67,9 @@
   <data name="Tray.ClearAll" xml:space="preserve">
     <value>Tout décrocher</value>
   </data>
+  <data name="Tray.Inbox" xml:space="preserve">
+    <value>Gérer les captures</value>
+  </data>
   <data name="Tray.Settings" xml:space="preserve">
     <value>Paramètres…</value>
   </data>
@@ -145,6 +148,9 @@
   <data name="Menu.ShortcutNone" xml:space="preserve">
     <value>Aucun</value>
   </data>
+  <data name="Menu.ShortcutChange" xml:space="preserve">
+    <value>Modifier le raccourci…</value>
+  </data>
   <data name="Menu.ChangeShortcut" xml:space="preserve">
     <value>Changer le raccourci…</value>
   </data>
@@ -196,6 +202,18 @@
   <data name="Crop.Title" xml:space="preserve">
     <value>Rogner</value>
   </data>
+  <data name="Preview.Title" xml:space="preserve">
+    <value>Aperçu</value>
+  </data>
+  <data name="Preview.Open" xml:space="preserve">
+    <value>Ouvrir…</value>
+  </data>
+  <data name="Preview.Crop" xml:space="preserve">
+    <value>Rogner</value>
+  </data>
+  <data name="Preview.Close" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
   <data name="Crop.Cancel" xml:space="preserve">
     <value>Annuler</value>
   </data>
@@ -213,6 +231,9 @@
   </data>
   <data name="Settings.GeneralDesc" xml:space="preserve">
     <value>Langue, sons et nombre de captures sur la corde</value>
+  </data>
+  <data name="Settings.LanguageSystem" xml:space="preserve">
+    <value>Suivre le système</value>
   </data>
   <data name="Settings.Language" xml:space="preserve">
     <value>Langue</value>
@@ -321,6 +342,9 @@
   </data>
   <data name="Settings.InboxFailed" xml:space="preserve">
     <value>Windows a refusé de changer le dossier des captures : le mode est désactivé.</value>
+  </data>
+  <data name="Settings.InboxUnavailable" xml:space="preserve">
+    <value>Ce système n'expose pas de dossier de captures à rediriger ({0}) : le mode reste désactivé. La surveillance de dossier ci-dessous continue d'accrocher les nouvelles captures à la corde.</value>
   </data>
   <data name="Settings.License" xml:space="preserve">
     <value>Porté depuis tendedero (MIT). Pegged est sous licence MIT.</value>

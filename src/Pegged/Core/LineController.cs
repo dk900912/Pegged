@@ -18,6 +18,20 @@ namespace Pegged.Core;
 /// </summary>
 public sealed class LineController : IDisposable
 {
+    /// <summary>The breeze comes round every 7 to 16 seconds (showcase 3 and
+    /// the original's scheduleGust): an interval, not a fixed period, so the
+    /// line never breathes on a beat you can count.</summary>
+    private const int GustEveryMin = 7;
+    private const int GustEveryMax = 16;
+
+    /// <summary>How much a card leans when the breeze takes it, in degrees
+    /// (showcase 8 · 微风).</summary>
+    private const double GustLeanMin = 1.6;
+    private const double GustLeanMax = 3.4;
+
+    /// <summary>How far apart the cards answer a breeze, in seconds: 350ms of
+    /// stagger, so a line of cards ripples instead of snapping to one side.</summary>
+    private const double GustStagger = 0.35;
     private readonly DispatcherTimer _poll;
     private readonly LineWindow _line;
     private readonly Dictionary<IntPtr, EdgePillWindow> _pills = new();
@@ -26,6 +40,7 @@ public sealed class LineController : IDisposable
     private double _away;       // seconds since the pointer left the line
     private bool _pinnedOpen;
     private DateTime? _peekUntil;
+    private DateTime _nextGust = DateTime.UtcNow.AddSeconds(GustEveryMin);
     private bool _disposed;
 
     public LineController()
@@ -182,6 +197,42 @@ public sealed class LineController : IDisposable
         _line.OnCardsChanged();
     }
 
+    // ---- the breeze ------------------------------------------------------
+
+    /// <summary>
+    /// A gust takes every card: each leans by a random 1.6 to 3.4 degrees and
+    /// the leans are staggered by up to 350ms, the way the original's
+    /// <c>breeze()</c> does it. A line that never moves reads as a picture of a
+    /// line, and one that moves in lockstep reads as a UI.
+    /// </summary>
+    private void Breeze()
+    {
+        var now = DateTime.UtcNow;
+        if (now < _nextGust) return;
+
+        _nextGust = now.AddSeconds(Random.Shared.Next(GustEveryMin, GustEveryMax + 1));
+
+        var cards = _line.Strip.Views.ToList();
+        if (cards.Count == 0) return;
+
+        var delay = TimeSpan.Zero;
+        foreach (var card in cards)
+        {
+            var lean = Random.Shared.NextDouble() * (GustLeanMax - GustLeanMin) + GustLeanMin;
+            var after = delay;
+            delay += TimeSpan.FromSeconds(GustStagger * Random.Shared.NextDouble());
+
+            // A one-shot timer per card: the leans really do land their stagger
+            // apart, which is the whole point.
+            System.Threading.Timer? timer = null;
+            timer = new System.Threading.Timer(_ =>
+            {
+                timer?.Dispose();
+                _line.Dispatcher.BeginInvoke(new Action(() => card.Lean(lean)));
+            }, null, after, Timeout.InfiniteTimeSpan);
+        }
+    }
+
     // ---- the polling loop -----------------------------------------------
 
     private void OnTick(object? sender, EventArgs e)
@@ -196,6 +247,8 @@ public sealed class LineController : IDisposable
         // Keep the dock's hover state in step with where the pointer is: the
         // line is click-through, so WPF never sees the mouse enter it.
         _line.UpdatePointer(dip);
+
+        Breeze();
 
         // A peek from a new capture or the welcome wins over everything.
         if (_peekUntil is { } until)

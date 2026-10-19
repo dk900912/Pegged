@@ -15,12 +15,16 @@
         UseLayoutRounding="True"
         SnapsToDevicePixels="True">
 
-    <!-- The dock: an acrylic strip along the top of one screen. Its height is
-         set from code, from the card size the user chose. -->
+    <!-- The dock: a strip along the top of one screen. Its height is set from
+         code, from the card size the user chose.
+
+         Nothing paints the strip itself. What used to sit here was a filled
+         panel - first a frosted material, then an opaque rectangle after the
+         material was taken out - and both turned the line into a slab lying
+         across the desktop, with the rope and the cards pasted on top. The
+         showcase says the dock is three things: the rope, the photos and the
+         quick-action bar (showcase 2). Everything else stays transparent. -->
     <Grid x:Name="Root">
-        <!-- Acrylic dock background -->
-        <Border x:Name="Dock" CornerRadius="0,0,14,14" Background="{DynamicResource Brush.Acrylic}"
-                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" />
 
         <!-- The rope, drawn edge to edge, sagging towards the middle -->
         <Canvas x:Name="RopeLayer" IsHitTestVisible="False">
@@ -39,16 +43,16 @@
         <Grid x:Name="Toolbar" HorizontalAlignment="Center" VerticalAlignment="Top"
               Margin="0,10,0,0" Opacity="0">
             <Border Padding="6,4" CornerRadius="18"
-                    Background="{DynamicResource Brush.Acrylic}"
+                    Background="{DynamicResource Brush.Flyout}"
                     BorderBrush="#59FFFFFF" BorderThickness="1"
                     IsHitTestVisible="False"
                     Effect="{DynamicResource Effect.Flyout}" />
             <StackPanel Orientation="Horizontal" Margin="6,4">
-                <Button x:Name="ClearButton" Style="{StaticResource RoundGlassButton}"
+                <Button x:Name="ClearButton" Style="{StaticResource RoundSubtleButton}"
                         Tag="15" ToolTip="{loc:Str Tray.ClearAll}" Click="OnClear" Content="&#x1F5D1;" />
-                <Button x:Name="PinButton" Style="{StaticResource RoundGlassButton}"
+                <Button x:Name="PinButton" Style="{StaticResource RoundSubtleButton}"
                         Tag="15" ToolTip="{loc:Str Tray.HideLine}" Click="OnPin" Content="&#x1F4CC;" />
-                <Button x:Name="SettingsButton" Style="{StaticResource RoundGlassButton}"
+                <Button x:Name="SettingsButton" Style="{StaticResource RoundSubtleButton}"
                         Tag="15" ToolTip="{loc:Str Tray.Settings}" Click="OnSettings" Content="&#x2699;" />
             </StackPanel>
         </Grid>
@@ -62,7 +66,7 @@
              Visibility is driven from UpdateHint(); IsHitTestVisible stays
              false so no part of the pill can ever trap a click. -->
         <Border x:Name="Hint" HorizontalAlignment="Center" VerticalAlignment="Center"
-                Padding="14,7" CornerRadius="16" Background="{DynamicResource Brush.Acrylic}"
+                Padding="14,7" CornerRadius="16" Background="{DynamicResource Brush.Flyout}"
                 BorderBrush="#59FFFFFF" BorderThickness="1"
                 Visibility="Hidden" IsHitTestVisible="False">
             <StackPanel>

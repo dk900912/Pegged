@@ -35,7 +35,7 @@
                            Foreground="{DynamicResource Brush.Text}" TextTrimming="CharacterEllipsis" />
                 <Button HorizontalAlignment="Right" VerticalAlignment="Center"
                         Margin="0,0,10,0" Width="32" Height="28" Padding="0"
-                        Style="{StaticResource RoundGlassButton}" Tag="9"
+                        Style="{StaticResource RoundSubtleButton}" Tag="9"
                         Content="&#x2715;" Click="OnClose" />
             </Grid>
 
@@ -44,7 +44,7 @@
                    Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20,0,20,16">
-                <Button Style="{StaticResource GlassButton}" Padding="14,7" Margin="0,0,8,0"
+                <Button Style="{StaticResource SubtleButton}" Padding="14,7" Margin="0,0,8,0"
                         Click="OnOpen" Content="{loc:Str Preview.Open}" />
                 <Button Style="{StaticResource AccentButton}" Padding="14,7" Margin="0,0,8,0"
                         Click="OnCrop" Content="{loc:Str Preview.Crop}" />

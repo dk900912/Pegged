@@ -4,14 +4,14 @@
       "id": "settings.open",
       "area": "settings",
       "expected": "齿轮打开设置中心",
-      "actual": "settings window hwnd=0xc7093a",
+      "actual": "settings window hwnd=0x180e0c",
       "ok": true
     },
     {
       "id": "settings.takes_keyboard",
       "area": "settings",
       "expected": "设置窗口打开即获得焦点",
-      "actual": "foreground=设置 settings=0xc7093a",
+      "actual": "foreground=设置 settings=0x180e0c",
       "ok": true
     },
     {
@@ -31,8 +31,8 @@
     {
       "id": "settings.theme_live",
       "area": "settings",
-      "expected": "切换深色主题舱体立刻变暗",
-      "actual": "dock luminance light=250 dark=98",
+      "expected": "切换深色主题卡片边框立刻换色",
+      "actual": "card frame light=250 dark=67",
       "ok": true
     },
     {

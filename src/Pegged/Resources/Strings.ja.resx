@@ -67,6 +67,9 @@
   <data name="Tray.ClearAll" xml:space="preserve">
     <value>すべて取り込む</value>
   </data>
+  <data name="Tray.Inbox" xml:space="preserve">
+    <value>スクリーンショットを処理</value>
+  </data>
   <data name="Tray.Settings" xml:space="preserve">
     <value>設定…</value>
   </data>
@@ -145,6 +148,9 @@
   <data name="Menu.ShortcutNone" xml:space="preserve">
     <value>なし</value>
   </data>
+  <data name="Menu.ShortcutChange" xml:space="preserve">
+    <value>ショートカットを変更…</value>
+  </data>
   <data name="Menu.ChangeShortcut" xml:space="preserve">
     <value>ショートカットを変更…</value>
   </data>
@@ -196,6 +202,18 @@
   <data name="Crop.Title" xml:space="preserve">
     <value>トリミング</value>
   </data>
+  <data name="Preview.Title" xml:space="preserve">
+    <value>プレビュー</value>
+  </data>
+  <data name="Preview.Open" xml:space="preserve">
+    <value>開く…</value>
+  </data>
+  <data name="Preview.Crop" xml:space="preserve">
+    <value>トリミング</value>
+  </data>
+  <data name="Preview.Close" xml:space="preserve">
+    <value>閉じる</value>
+  </data>
   <data name="Crop.Cancel" xml:space="preserve">
     <value>キャンセル</value>
   </data>
@@ -213,6 +231,9 @@
   </data>
   <data name="Settings.GeneralDesc" xml:space="preserve">
     <value>言語、サウンド、ラインに保持する枚数</value>
+  </data>
+  <data name="Settings.LanguageSystem" xml:space="preserve">
+    <value>システムに従う</value>
   </data>
   <data name="Settings.Language" xml:space="preserve">
     <value>言語</value>
@@ -321,6 +342,9 @@
   </data>
   <data name="Settings.InboxFailed" xml:space="preserve">
     <value>Windows がフォルダー変更を拒否したため、受信箱モードはオフです。</value>
+  </data>
+  <data name="Settings.InboxUnavailable" xml:space="preserve">
+    <value>このシステムにはリダイレクトできるスクリーンショットフォルダーがありません（{0}）。受信箱モードはオフのままです。下のフォルダー監視は引き続き新しいキャプチャーをラインに掛けます。</value>
   </data>
   <data name="Settings.License" xml:space="preserve">
     <value>tendedero (MIT) からの移植。Pegged は MIT ライセンスです。</value>

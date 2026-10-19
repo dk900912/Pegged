@@ -4,7 +4,7 @@
       "id": "run.no_crash_log",
       "area": "run",
       "expected": "全程无未处理异常",
-      "actual": "crash.log absent",
+      "actual": "crash.log untouched",
       "ok": true
     }
   ]

@@ -65,7 +65,10 @@
     <value>隐藏挂绳</value>
   </data>
   <data name="Tray.ClearAll" xml:space="preserve">
-    <value>全部取下</value>
+    <value>一键清空</value>
+  </data>
+  <data name="Tray.Inbox" xml:space="preserve">
+    <value>接管系统截图</value>
   </data>
   <data name="Tray.Settings" xml:space="preserve">
     <value>设置…</value>
@@ -83,7 +86,7 @@
     <value>Pegged — 挂了 {0} 张</value>
   </data>
   <data name="Tray.OpenAtLogin" xml:space="preserve">
-    <value>开机时启动</value>
+    <value>开机自启</value>
   </data>
   <data name="Tray.CheckForUpdates" xml:space="preserve">
     <value>检查更新…</value>
@@ -104,13 +107,13 @@
     <value>在全屏应用之上</value>
   </data>
   <data name="Menu.WatchClipboard" xml:space="preserve">
-    <value>挂上复制的图片</value>
+    <value>挂复制的图片</value>
   </data>
   <data name="Menu.WatchClipboardHint" xml:space="preserve">
     <value>复制的图片也会挂到绳上</value>
   </data>
   <data name="Menu.ExtraFolders" xml:space="preserve">
-    <value>同时监控文件夹</value>
+    <value>监控文件夹</value>
   </data>
   <data name="Menu.AddFolder" xml:space="preserve">
     <value>添加文件夹…</value>
@@ -119,10 +122,10 @@
     <value>停止监控</value>
   </data>
   <data name="Menu.KeepOnLine" xml:space="preserve">
-    <value>绳上保留数量</value>
+    <value>保留数量</value>
   </data>
   <data name="Menu.KeepFit" xml:space="preserve">
-    <value>随屏宽自适应</value>
+    <value>随屏宽</value>
   </data>
   <data name="Menu.KeepCount" xml:space="preserve">
     <value>{0} 张</value>
@@ -144,6 +147,9 @@
   </data>
   <data name="Menu.ShortcutNone" xml:space="preserve">
     <value>无</value>
+  </data>
+  <data name="Menu.ShortcutChange" xml:space="preserve">
+    <value>更改快捷键…</value>
   </data>
   <data name="Menu.ChangeShortcut" xml:space="preserve">
     <value>更改快捷键…</value>
@@ -199,6 +205,15 @@
   <data name="Preview.Title" xml:space="preserve">
     <value>预览</value>
   </data>
+  <data name="Preview.Open" xml:space="preserve">
+    <value>打开…</value>
+  </data>
+  <data name="Preview.Crop" xml:space="preserve">
+    <value>裁剪</value>
+  </data>
+  <data name="Preview.Close" xml:space="preserve">
+    <value>关闭</value>
+  </data>
   <data name="Crop.Cancel" xml:space="preserve">
     <value>取消</value>
   </data>
@@ -216,6 +231,9 @@
   </data>
   <data name="Settings.GeneralDesc" xml:space="preserve">
     <value>语言、声音与绳上容量</value>
+  </data>
+  <data name="Settings.LanguageSystem" xml:space="preserve">
+    <value>跟随系统</value>
   </data>
   <data name="Settings.Language" xml:space="preserve">
     <value>语言</value>

@@ -67,6 +67,9 @@
   <data name="Tray.ClearAll" xml:space="preserve">
     <value>Tirar tudo</value>
   </data>
+  <data name="Tray.Inbox" xml:space="preserve">
+    <value>Gerenciar capturas</value>
+  </data>
   <data name="Tray.Settings" xml:space="preserve">
     <value>Configurações…</value>
   </data>
@@ -145,6 +148,9 @@
   <data name="Menu.ShortcutNone" xml:space="preserve">
     <value>Nenhum</value>
   </data>
+  <data name="Menu.ShortcutChange" xml:space="preserve">
+    <value>Alterar atalho…</value>
+  </data>
   <data name="Menu.ChangeShortcut" xml:space="preserve">
     <value>Alterar atalho…</value>
   </data>
@@ -196,6 +202,18 @@
   <data name="Crop.Title" xml:space="preserve">
     <value>Recortar</value>
   </data>
+  <data name="Preview.Title" xml:space="preserve">
+    <value>Visualizar</value>
+  </data>
+  <data name="Preview.Open" xml:space="preserve">
+    <value>Abrir…</value>
+  </data>
+  <data name="Preview.Crop" xml:space="preserve">
+    <value>Recortar</value>
+  </data>
+  <data name="Preview.Close" xml:space="preserve">
+    <value>Fechar</value>
+  </data>
   <data name="Crop.Cancel" xml:space="preserve">
     <value>Cancelar</value>
   </data>
@@ -213,6 +231,9 @@
   </data>
   <data name="Settings.GeneralDesc" xml:space="preserve">
     <value>Idioma, sons e quantas capturas a corda guarda</value>
+  </data>
+  <data name="Settings.LanguageSystem" xml:space="preserve">
+    <value>Seguir o sistema</value>
   </data>
   <data name="Settings.Language" xml:space="preserve">
     <value>Idioma</value>
@@ -321,6 +342,9 @@
   </data>
   <data name="Settings.InboxFailed" xml:space="preserve">
     <value>O Windows não permitiu mudar a pasta; o modo caixa de entrada está desligado.</value>
+  </data>
+  <data name="Settings.InboxUnavailable" xml:space="preserve">
+    <value>Este sistema não expõe uma pasta de capturas para redirecionar ({0}), então o modo bandeja continua desativado. A observação de pastas abaixo continua trazendo as novas capturas para a linha.</value>
   </data>
   <data name="Settings.License" xml:space="preserve">
     <value>Portado do tendedero (MIT). Pegged tem licença MIT.</value>

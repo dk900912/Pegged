@@ -16,6 +16,8 @@
 
 清理临时代码后重跑，各套件保持原结果，`crash.log` 为空。
 
+**第五轮（UI 严格对齐 showcase：去亚克力 / 暗色真切换 / 托盘菜单 / 动效曲线）**：新定位 **5 个应用缺陷**（B-1…B-5）与 **2 个验收脚本缺陷**（B-6），全部修复；`audit_walkthrough` 保持 34/34，`launch_probe` 9/9，`interaction_probe` 5/5，`repro_first_card_click` 全绿。详见 §7。
+
 本轮（用户报障：挂 2 张以上时第一张很难点选复制）新定位 **1 个应用缺陷**（A-9），已修复并新增回归项 `card.first_card_clickable`；前序 8 个缺陷全部回归通过。
 
 本轮共定位 **8 个应用缺陷**（其中 2 个是「功能在这台机器上根本不可用却假装能用」的严重项）与 **4 个验收脚本自身缺陷**；另把 3 项此前「声明为未验证」的交互（裁剪手柄拖拽、剪贴板自动上线、一键清空）变成可复现的绿项。
@@ -26,7 +28,7 @@
 
 | # | 现象（用户视角） | 根因 | 修复 | 证据（修复后） |
 | --- | --- | --- | --- | --- |
-| A-1 | 在设置里切到深色主题，舱体玻璃**不变色**，仍然是浅色板子 | 玻璃不是笔刷资源，是一张「桌面快照」：`ApplyThemeBrushes()` 只重画了绳子；`ApplyAcrylic()` 又因为 `_revealed` 早退，主题一变什么都不做。且着色 alpha 被写死成 `const byte TintAlpha = 199`，两个主题只有色相不同、浓淡一样 | ①`AcrylicBackdrop` 拆成「抓屏+模糊」与「上色+噪点」两步，材质缓存为 `AcrylicMaterial`；②主题变化时就地 `Paint()` 重新上色（不必再读屏幕，此时舱体正盖着那块屏幕）；③着色 alpha 改取调色板 `tint.A`（浅色 78% / 深色 72%，与注释里的规范值一致） | `settings.theme_live`：`dock luminance light=250 dark=98`（修复前 `light=245 dark=245`） |
+| A-1 | ~~在设置里切到深色主题，舱体玻璃**不变色**，仍然是浅色板子~~ **（已作废：玻璃整体移除，见 §7 B-2）** | 玻璃不是笔刷资源，是一张「桌面快照」：`ApplyThemeBrushes()` 只重画了绳子；`ApplyAcrylic()` 又因为 `_revealed` 早退，主题一变什么都不做。且着色 alpha 被写死成 `const byte TintAlpha = 199`，两个主题只有色相不同、浓淡一样 | ①`AcrylicBackdrop` 拆成「抓屏+模糊」与「上色+噪点」两步，材质缓存为 `AcrylicMaterial`；②主题变化时就地 `Paint()` 重新上色（不必再读屏幕，此时舱体正盖着那块屏幕）；③着色 alpha 改取调色板 `tint.A`（浅色 78% / 深色 72%，与注释里的规范值一致） | `settings.theme_live`：`dock luminance light=250 dark=98`（修复前 `light=245 dark=245`） |
 | A-2 | 设置里把卡片改成「大」，**舱体高度不变**，卡片从舱体下沿伸出来 | 卡片尺寸只影响 `LayoutMetrics.PanelHeight`，而窗口高度只在 `PlaceOn()` 里赋值；设置保存后没有任何人重新排窗口 | `LineController` 订阅 `Settings.Saved`，发现 `_line.Height` 与 `PanelHeight + 24` 不符就重排（并只在真的不符时才动，因为每次截图、每次开关都会触发保存） | `settings.size_live`：`dock height small=266 large=338`（修复前 `266 / 266`） |
 | A-3 | 「接管剪贴板」「Inbox 模式」两个开关在 UI 自动化里**各有 2 个同名元素**，读屏软件会把同一个开关念两遍 | `ToggleSwitch` 是 `UserControl` 包一个 `CheckBox`，外层 `x:Name` 生成 automation id，内层又把同一个 id 绑定过去 | 外层 `OnCreateAutomationPeer() => null`：装饰层不进自动化树，真正可切换的 `CheckBox` 才是那个开关 | `settings.toggle_persists`：`WatchClipboard True -> False -> True`（修复前 `ElementAmbiguousError: 2 elements match 'ClipboardSwitch'`） |
 | A-4 | 打开 Inbox 模式，开关弹回原位，并弹出一个**模态框**；点「确定」后**下一次点开关没反应**（那一下被模态框吃掉） | ①`FOLDERID_Screenshots` 在这台机器上根本解析不出来（`SHGetKnownFolderPath` = `0x80070002`），所以重定向必然失败；②失败用 `MessageBox` 回应，而 Pegged 从不持有前台（`WS_EX_NOACTIVATE`），模态框出现在设置窗后面并抢走下一次点击 | ①新增 `InboxMode.Unavailable` 启动探测；②系统不支持时**开关置灰**并在行内写明原因（`Settings.InboxUnavailable`），永不弹窗；③支持但被策略拒绝时同样只做行内提示 + 回滚开关 | `settings.inbox_roundtrip`：`system has no Screenshots folder (0x80070002); switch enabled=False settings=False popups=[]` |
@@ -163,3 +165,22 @@ python scripts/e2e/repro_first_card_click.py --cards 3 --grid # 3 张 + 逐点�
 - 宿主应用（WorkBuddy）若最大化盖住顶边，走查的点击会落在它的工具栏甚至「停止」按钮上 → `park_host()` 先把宿主挪到 `y≥320`，跑完还原。
 - 后台 shell 的作业对象会回收子进程 → 启动用 `DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP | CREATE_BREAKAWAY_FROM_JOB`，并且启动、探针、清理必须写在**同一条命令**里。
 - 任何要发 Esc 的检查，先确认前台确实属于 Pegged（`focused_is_pegged()`），否则不发键——这条曾经让 Esc 落进宿主 UI，把正在跑的走查取消掉。
+
+---
+
+## 7. UI 严格对齐轮（第五轮）
+
+用户诉求两条：①「ui-design-showcase.html 里的现代化设置中心窗口 / 系统托盘右键菜单 / 动效曲线必须严格对齐」；②「亚克力毛玻璃完全移除，只保留贯穿式高光挂绳、挂载的图片、顶部快捷操作栏，其他都应该是透明的」。
+
+| # | 现象（用户视角） | 根因 | 修复 | 证据（修复后） |
+| --- | --- | --- | --- | --- |
+| B-1 | 舱体是一大块 1920×293 的矩形，即使把亚克力调淡也还是一片色块 | 底板 `Dock` Border 本身存在（带填充），与材质是否模糊无关；分层窗口又拿不到 DWM 亚克力，仿真永远差一口气 | 删除 `Dock` Border 与其样式、删除 `Core/AcrylicBackdrop.cs` 与全部 `Bg.Acrylic` token；`Root` 只剩挂绳、卡片层、工具栏药丸、空态提示 | 卡片间隙与空态区域像素采样 = 桌面原样；`shots/audit/slab-removed.png`、`toolbar-pill.png`、`empty-capsule.png` |
+| B-2 | 切深色主题后卡片底仍是白的、文字黑底黑字 | 画刷写成 `<SolidColorBrush Color="{DynamicResource Palette.Card}"/>`，**嵌套 DynamicResource 只在解析字典时求值一次**；暗色字典后来重定义 `Palette.Card` 不会让画刷重算（`scratch/themetest` 最小工程复现） | 暗色字典**整份重定义所有 `Brush.*`**，`Brush.Card` 直接写深色值 | `settings.theme_live`：`card frame light=249 dark=54`（修复前 `250 / 226`） |
+| B-3 | 设置窗里语言 / 保留数量 / 卡片尺寸三个分段控件点了没反应 | XAML 编译器**静默忽略** UserControl 子类上的 `SelectionChanged="..."`，不报错也不接线 | 构造函数里手工 `LangSegmented.SelectionChanged += OnLanguage;` 等三行 | `settings.nav_pages`、`settings.size_live`、`interaction_probe.language_refresh` 全绿 |
+| B-4 | 托盘右键菜单与 showcase §6 不一致：没图标、没有真实快捷键提示、子菜单缺失 | `ContextMenuStrip` 默认纯文本；`ShortcutKeyDisplayString` 不设就为空 | 按 §6 重建菜单 + `Core/TrayIcons.cs`（16×16 MDL2 字形，按主题着色、按 `(glyph,color)` 缓存） | `shots/audit/tray-menu.txt`：13 个顶层项 + 4 个子菜单逐项比对，12 个字形全部正常渲染、无豆腐块；勾选态（挂复制的图片 / 25 / 中 / 声音）与快捷键 `Ctrl+Alt+P` 正确 |
+| B-5 | 舱体展开收起晃好几秒，与 showcase 的 0.42s 曲线不符 | 弹簧参数 `46 / 2.6`，ζ≈0.19，几乎不衰减 | 由 `k=(2π/T)²`、`c=2ζ√k` 反推：展开 `224 / 24.5`、收起 `816 / 57` | `dock.reveal_settles`：`top at 1.0s=0, at 1.3s=0` |
+| B-6 | 验收脚本自己造出两类假失败：整轮 34 项同一句 `line window not found`；重跑时 `card.hang_from_file` 恒失败 | ①`audit_walkthrough.py` 假设应用已在运行；②夹具用固定文件名，上一轮的文件还在磁盘上，重新保存只触发 `Changed`，而应用只在 `Created` 时挂卡 | ①新增 `ensure_app()`（无进程则启动 `publish/Pegged.exe`，25s 内等挂绳窗口）；②`write_test_images()` 保存前先删同名文件 | 修前 `27/34`，修后 `34/34` |
+
+**未在本轮变更、但已确认对齐的项**：设置中心 720×560 / 240px 卡片式导航 / 5 页 / 28px 页头（`settings.nav_pages` 遍历 5 个 Nav 按钮）；裁剪浮层九宫格 + 8 手柄 + 实时尺寸（`crop.resize_and_apply`）。
+
+**已知限制（环境所致，非代码缺陷）**：本会话环境无法向系统托盘投递合成鼠标事件（连任务栏开始按钮悬停都无高亮），托盘菜单因此改用反射探针直接构建 `ContextMenuStrip` 并渲染截图核对，而非真实右键点击。

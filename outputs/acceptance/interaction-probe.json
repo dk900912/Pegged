@@ -34,13 +34,13 @@
     ],
     "clicked_at": 1000,
     "settings_rect": [
-      32,
-      32,
-      932,
-      732
+      160,
+      160,
+      1060,
+      860
     ],
     "settings_title": "\u8bbe\u7f6e",
-    "settings_class": "HwndWrapper[Pegged;;b9efff0a-3a41-4bc0-896b-7e0ef442fe03]",
+    "settings_class": "HwndWrapper[Pegged;;b8ebc18d-1031-4c08-a35e-bc5773888ca8]",
     "nav_before": "\ue722 \u6355\u83b7\u6e90 Pegged \u4ece\u54ea\u91cc\u53d1\u73b0\u65b0\u622a\u56fe",
     "nav_after": "\ue722 Capture sources Where Pegged looks for new captures"
   },

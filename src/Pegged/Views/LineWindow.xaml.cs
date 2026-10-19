@@ -40,7 +40,6 @@ public partial class LineWindow : Window
 
     /// <summary>The desktop behind the dock, kept so a theme switch can re-wash
     /// it without reading a screen the dock is now covering.</summary>
-    private AcrylicMaterial? _material;
 
     /// <summary>Card hit rectangles in window coordinates, set by the layout.</summary>
     private readonly System.Collections.Generic.List<Rect> _hitRects = new();
@@ -240,18 +239,14 @@ public partial class LineWindow : Window
         if (_handle != IntPtr.Zero) NativeMethods.RemoveClipboardFormatListener(_handle);
         FrameLoop.Unsubscribe(OnFrame);
         _source?.RemoveHook(WndProc);
-        _material?.Dispose();
-        _material = null;
     }
 
     private void ApplyThemeBrushes()
     {
-        // Every brush in the tree is a DynamicResource and follows on its own.
-        // The dock's glass is not a brush resource though - it is a picture of
-        // the desktop - so it has to be washed with the new tint by hand, or
-        // switching to dark left a light panel behind.
+        // Everything painted here is a DynamicResource, and FluentTheme.Dark.xaml
+        // redefines those brushes in full, so the dictionary swap repaints the
+        // dock on its own. The rope only needs its geometry rebuilt.
         LayoutRope();
-        Paint();
     }
 
     // ---- geometry --------------------------------------------------------
@@ -277,56 +272,6 @@ public partial class LineWindow : Window
 
         MoveTo(left, top - _slide.Value);
         LayoutRope();
-        ApplyAcrylic();
-    }
-
-    /// <summary>
-    /// Rebuilds the frosted material behind the dock. The capture is only ever
-    /// taken while the line is tucked away above the top edge: at that moment
-    /// the screen the dock is about to cover is not covered by us, so the
-    /// snapshot is of the desktop and nothing else. The top 16px are left out
-    /// of the capture because the edge pill lives there, and stretching the
-    /// rest back over it is invisible under a blur this soft.
-    ///
-    /// While the dock is open there is nothing to capture - we are standing in
-    /// front of it - so the last capture is reused and simply re-tinted.
-    /// </summary>
-    private void ApplyAcrylic()
-    {
-        if (_target.Width < 8) return;
-
-        if (!_revealed)
-        {
-            var scale = _scale > 0 ? _scale : 1.0;
-            var region = new Rect(_target.Left, _target.Top + 16,
-                _target.Width, Math.Max(32, _target.Height - 16));
-
-            if (AcrylicBackdrop.Capture(region, scale) is { } fresh)
-            {
-                _material?.Dispose();
-                _material = fresh;
-            }
-        }
-
-        Paint();
-    }
-
-    /// <summary>Paints the glass: the captured desktop, washed with the tint of
-    /// whichever theme is in force right now.</summary>
-    private void Paint()
-    {
-        var tint = TryFindResource("Palette.Acrylic") is Color c
-            ? c
-            : Color.FromRgb(0xF4, 0xF6, 0xFB);
-
-        if (_material?.Finish(tint) is { } frosted)
-        {
-            Dock.Background = frosted;
-            return;
-        }
-
-        // No screen to read: keep the plain translucent panel.
-        if (TryFindResource("Brush.Acrylic") is Brush plain) Dock.Background = plain;
     }
 
     /// <summary>Moves the window without activating it, in physical pixels.
@@ -432,10 +377,6 @@ public partial class LineWindow : Window
     {
         _pinned = pinned;
         if (_revealed) return;
-
-        // Take the glass before anything moves: the window is still above the
-        // screen, so what we capture is the desktop the dock is about to cover.
-        ApplyAcrylic();
 
         _revealed = true;
         _slide.Stiffness = 224;      // 0.42s response

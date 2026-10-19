@@ -21,8 +21,11 @@ T = {
                       "ラインを表示", "줄 보이기", "Mostrar a corda", "Çizgiyi göster", "Xətti göstər"),
     "Tray.HideLine": ("Hide line", "隐藏挂绳", "Ocultar la cuerda", "Masquer la corde",
                       "ラインを隠す", "줄 숨기기", "Ocultar a corda", "Çizgiyi gizle", "Xətti gizlət"),
-    "Tray.ClearAll": ("Take everything down", "全部取下", "Bajar todo", "Tout décrocher",
+    "Tray.ClearAll": ("Take everything down", "一键清空", "Bajar todo", "Tout décrocher",
                       "すべて取り込む", "모두 내리기", "Tirar tudo", "Hepsini indir", "Hamısını yığışdır"),
+    "Tray.Inbox": ("Handle screenshots", "接管系统截图", "Gestionar capturas",
+                   "Gérer les captures", "スクリーンショットを処理", "스크린샷 처리",
+                   "Gerenciar capturas", "Ekran görüntülerini yönet", "Ekran görüntülərinə bax"),
     "Tray.Settings": ("Settings…", "设置…", "Ajustes…", "Paramètres…",
                       "設定…", "설정…", "Configurações…", "Ayarlar…", "Parametrlər…"),
     "Tray.OpenScreenshotsFolder": ("Open screenshots folder", "打开截图文件夹", "Abrir la carpeta de capturas",
@@ -36,7 +39,7 @@ T = {
     "Tray.OnLine": ("Pegged — {0} on the line", "Pegged — 挂了 {0} 张", "Pegged — {0} en la cuerda",
                     "Pegged — {0} sur la corde", "Pegged — {0} 件", "Pegged — {0}개",
                     "Pegged — {0} na corda", "Pegged — çizgide {0}", "Pegged — xətdə {0}"),
-    "Tray.OpenAtLogin": ("Open at login", "开机时启动", "Abrir al iniciar sesión", "Ouvrir à la connexion",
+    "Tray.OpenAtLogin": ("Open at login", "开机自启", "Abrir al iniciar sesión", "Ouvrir à la connexion",
                          "ログイン時に開く", "로그인 시 열기", "Abrir ao entrar",
                          "Oturum açarken başlat", "Girişdə aç"),
     "Tray.CheckForUpdates": ("Check for Updates…", "检查更新…", "Buscar actualizaciones…",
@@ -63,7 +66,7 @@ T = {
                                  "Au-dessus des apps plein écran", "全画面アプリの上に",
                                  "전체 화면 앱 위에", "Sobre apps em tela cheia",
                                  "Tam ekran uygulamaların üzerinde", "Tam ekran tətbiqlərin üzərində"),
-    "Menu.WatchClipboard": ("Hang copied images", "挂上复制的图片", "Colgar imágenes copiadas",
+    "Menu.WatchClipboard": ("Hang copied images", "挂复制的图片", "Colgar imágenes copiadas",
                             "Accrocher les images copiées", "コピーした画像を掛ける",
                             "복사한 이미지 걸기", "Pendurar imagens copiadas",
                             "Kopyalanan görüntüleri as", "Kopyalanmış şəkilləri as"),
@@ -77,7 +80,7 @@ T = {
                                 "Kopyaladığınız şəkillər də xəttə asılır"),
 
     # folders
-    "Menu.ExtraFolders": ("Also watch folders", "同时监控文件夹", "Carpetas que también vigilar",
+    "Menu.ExtraFolders": ("Also watch folders", "监控文件夹", "Carpetas que también vigilar",
                           "Dossiers également surveillés", "監視するフォルダ",
                           "함께 볼 폴더", "Pastas que também observar",
                           "Ayrıca izlenecek klasörler", "Əlavə izlənilən qovluqlar"),
@@ -88,9 +91,9 @@ T = {
                           "İzlemeyi durdur", "İzləməyi dayandır"),
 
     # keep / size
-    "Menu.KeepOnLine": ("Keep on line", "绳上保留数量", "Mantener en la cuerda", "Garder sur la corde",
+    "Menu.KeepOnLine": ("Keep on line", "保留数量", "Mantener en la cuerda", "Garder sur la corde",
                         "ラインに保持", "줄에 유지", "Manter na corda", "Çizgide tut", "Xətdə saxla"),
-    "Menu.KeepFit": ("As many as fit", "随屏宽自适应", "Tantas como quepan", "Autant que possible",
+    "Menu.KeepFit": ("As many as fit", "随屏宽", "Tantas como quepan", "Autant que possible",
                      "画面に収まるだけ", "화면에 맞게", "Quantas couberem", "Sığdığı kadar",
                      "Yerləşdiyi qədər"),
     "Menu.KeepCount": ("{0} captures", "{0} 张", "{0} capturas", "{0} captures",
@@ -104,6 +107,10 @@ T = {
     "Menu.Shortcut": ("Shortcut", "快捷键", "Atajo", "Raccourci", "ショートカット",
                       "바로 가기", "Atalho", "Kısayol", "Qısayol"),
     "Menu.ShortcutNone": ("None", "无", "Ninguno", "Aucun", "なし", "없음", "Nenhum", "Yok", "Yoxdur"),
+    "Menu.ShortcutChange": ("Change Shortcut\u2026", "\u66f4\u6539\u5feb\u6377\u952e\u2026", "Cambiar atajo\u2026",
+                            "Modifier le raccourci\u2026", "\u30b7\u30e7\u30fc\u30c8\u30ab\u30c3\u30c8\u3092\u5909\u66f4\u2026",
+                            "\ub2e8\ucd95\ud0a4 \ubcc0\uacbd\u2026", "Alterar atalho\u2026",
+                            "K\u0131sayolu de\u011fi\u015ftir\u2026", "Q\u0131sayolun d\u0259yi\u015fdirilm\u0259si\u2026"),
     "Menu.ChangeShortcut": ("Change Shortcut…", "更改快捷键…", "Cambiar atajo…", "Changer le raccourci…",
                             "ショートカットを変更…", "바로 가기 변경…", "Alterar atalho…",
                             "Kısayolu değiştir…", "Qısayolu dəyiş…"),
@@ -164,6 +171,17 @@ T = {
     # crop window
     "Crop.Title": ("Crop", "裁剪", "Recortar", "Rogner", "トリミング", "자르기", "Recortar",
                    "Kırpma", "Kəsmə"),
+    "Preview.Title": ("Preview", "预览", "Previsualizar", "Aperçu", "プレビュー", "미리보기",
+                      "Visualizar", "Önizleme", "Öncədən baxış"),
+    "Preview.Open": ("Open\u2026", "\u6253\u5f00\u2026", "Abrir\u2026", "Ouvrir\u2026",
+                     "\u958b\u304f\u2026", "\uc5f4\uae30\u2026", "Abrir\u2026",
+                     "Aç\u2026", "Aç\u2026"),
+    "Preview.Crop": ("Crop", "\u88c1\u526a", "Recortar", "Rogner",
+                     "\u30c8\u30ea\u30df\u30f3\u30b0", "\uc790\ub974\uae30", "Recortar",
+                     "K\u0131rpma", "K\u0259sm\u0259"),
+    "Preview.Close": ("Close", "\u5173\u95ed", "Cerrar", "Fermer",
+                      "\u9589\u3058\u308b", "\ub2eb\uae30", "Fechar",
+                      "Kapat", "Ba\u011fla"),
     "Crop.Cancel": ("Cancel", "取消", "Cancelar", "Annuler", "キャンセル", "취소", "Cancelar",
                     "İptal", "Ləğv et"),
     "Crop.Apply": ("Apply crop", "应用裁剪", "Aplicar recorte", "Appliquer", "適用", "적용",
@@ -182,6 +200,9 @@ T = {
                              "言語、サウンド、ラインに保持する枚数", "언어, 소리, 줄에 보관할 개수",
                              "Idioma, sons e quantas capturas a corda guarda",
                              "Dil, sesler ve çizginin tutacağı sayı", "Dil, səslər və xətdə saxlanacaq miqdar"),
+    "Settings.LanguageSystem": ("Follow system", "跟随系统", "Seguir al sistema",
+                                "Suivre le syst\u00e8me", "\u30b7\u30b9\u30c6\u30e0\u306b\u5f93\u3046", "\uc2dc\uc2a4\ud15c \ub530\ub974\uae30",
+                                "Seguir o sistema", "Sistemi izle", "Sistemi izl\u0259"),
     "Settings.Language": ("Language", "语言", "Idioma", "Langue", "言語", "언어",
                           "Idioma", "Dil", "Dil"),
     "Settings.LanguageDesc": ("Pegged speaks ten languages", "Pegged 支持 10 种语言",
@@ -352,6 +373,30 @@ T = {
                              "O Windows não permitiu mudar a pasta; o modo caixa de entrada está desligado.",
                              "Windows klasörü değiştirmedi; gelen kutusu modu kapalı.",
                              "Windows qovluğu dəyişmədi; gələn qutusu rejimi söndürüldü."),
+    "Settings.InboxUnavailable": (
+        "This system does not expose a screenshot folder to redirect ({0}), so inbox mode stays off. "
+        "The folder watch below still brings new captures to the line.",
+        "此系统没有可供重定向的截图文件夹（{0}），Inbox 模式保持关闭。下方的文件夹监听仍会把新截图挂上线。",
+        "Este sistema no expone una carpeta de capturas que redirigir ({0}), así que el modo bandeja "
+        "sigue desactivado. La vigilancia de carpetas de abajo sigue trayendo las capturas nuevas "
+        "a la cuerda.",
+        "Ce système n'expose pas de dossier de captures à rediriger ({0}) : le mode reste "
+        "désactivé. La surveillance de dossier ci-dessous continue d'accrocher les nouvelles "
+        "captures à la corde.",
+        "このシステムにはリダイレクトできるスクリーンショットフォルダーがありません（{0}）。"
+        "受信箱モードはオフのままです。下のフォルダー監視は引き続き新しいキャプチャーをラインに"
+        "掛けます。",
+        "이 시스템에 리디렉션할 스크린샷 폴더가 없어({0}) 받은 편지함 모드는 꺼진 상태로 유지됩니다. "
+        "아래 폴더 감시는 계속해서 새 캡처를 줄에 걸어 줍니다.",
+        "Este sistema não expõe uma pasta de capturas para redirecionar ({0}), então o modo bandeja "
+        "continua desativado. A observação de pastas abaixo continua trazendo as novas capturas "
+        "para a linha.",
+        "Bu sistem yönlendirilecek bir ekran görüntüsü klasörü sunmuyor ({0}), bu yüzden gelen "
+        "kutusu modu kapalı kalıyor. Aşağıdaki klasör izleme yeni ekran görüntülerini çizgiye "
+        "asmaya devam eder.",
+        "Bu sistem yönləndiriləcək ekran görüntüsü qovluğu təqdim etmir ({0}), buna görə də gələnlər "
+        "qutusu rejimi sönülü qalır. Aşağıdaki qovluq izləməsi yeni çəkilişləri xəttə asmağa davam "
+        "edir."),
     "Settings.License": ("Ported from tendedero (MIT). Pegged is MIT licensed.",
                          "移植自 tendedero（MIT），Pegged 以 MIT 协议开源。",
                          "Portado de tendedero (MIT). Pegged tiene licencia MIT.",

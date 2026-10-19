@@ -16,6 +16,7 @@ import atexit
 import ctypes
 import json
 import os
+import subprocess
 import sys
 import time
 
@@ -90,6 +91,24 @@ def windows_of_app(min_width=0):
     return found
 
 
+def all_windows():
+    """Every visible top-level window on the desktop, ours or not."""
+    found = []
+
+    def cb(hwnd, _):
+        if not win32gui.IsWindowVisible(hwnd):
+            return
+        if not win32gui.GetWindowText(hwnd):
+            return
+        try:
+            found.append((hwnd, win32gui.GetWindowText(hwnd), win32gui.GetWindowRect(hwnd)))
+        except Exception:
+            return
+
+    win32gui.EnumWindows(cb, None)
+    return found
+
+
 def line():
     for hwnd, title, _ in windows_of_app():
         if title == "Pegged":
@@ -99,6 +118,30 @@ def line():
 
 def line_rect():
     return win32gui.GetWindowRect(line())
+
+
+def ensure_app(timeout=25.0):
+    """Starts the published build if nothing is running.
+
+    Every check here drives a live window, so an app that is not up turns the
+    whole sweep into identical "line window not found" failures. Bringing it up
+    ourselves keeps the sweep self-contained and keeps that message meaning
+    "the app really died mid-run" rather than "nobody started it".
+    """
+    exe = os.path.join(ROOT, "publish", "Pegged.exe")
+    if not pegged_pids():
+        if not os.path.exists(exe):
+            raise SystemExit("publish/Pegged.exe missing - run the publish step first")
+        subprocess.Popen([exe], cwd=os.path.dirname(exe))
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            if line():
+                return
+        except RuntimeError:
+            pass
+        time.sleep(0.4)
+    raise SystemExit("Pegged did not present its line window within %.0fs" % timeout)
 
 
 def uia(hwnd=None):
@@ -132,7 +175,7 @@ def settings_window(timeout=8.0):
             try:
                 w = uia(hwnd)
                 if w.child_window(auto_id="NavCapture").exists(timeout=0.3):
-                    return w
+                    return raise_window(w)
             except Exception:
                 continue
         if time.time() >= deadline:
@@ -140,10 +183,42 @@ def settings_window(timeout=8.0):
         time.sleep(0.4)
 
 
+def raise_window(w):
+    """Puts a window in front of everything and waits until it really is.
+
+    A click_input() goes to whatever is on top, so a settings window sitting
+    under a folder window silently clicks the folder instead of the app.
+    SetForegroundWindow alone is not enough: Windows refuses it unless the
+    caller already owns the foreground, which a probe never does. The
+    topmost bounce does not need that right, and the hit test proves it
+    worked instead of assuming it.
+    """
+    handle = w.handle if hasattr(w, "handle") else w
+    for _ in range(4):
+        user32.SetForegroundWindow(handle)
+        user32.BringWindowToTop(handle)
+        win32gui.SetWindowPos(handle, win32con.HWND_TOPMOST, 0, 0, 0, 0,
+                              win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_SHOWWINDOW)
+        win32gui.SetWindowPos(handle, win32con.HWND_NOTOPMOST, 0, 0, 0, 0,
+                              win32con.SWP_NOMOVE | win32con.SWP_NOSIZE)
+        time.sleep(0.2)
+
+        rect = win32gui.GetWindowRect(handle)
+        if rect[2] > rect[0] and rect[3] > rect[1]:
+            at = win32gui.WindowFromPoint(((rect[0] + rect[2]) // 2, (rect[1] + rect[3]) // 2))
+            if at:
+                root = win32gui.GetAncestor(at, win32con.GA_ROOT)
+                if root == handle:
+                    break
+        time.sleep(0.2)
+    time.sleep(0.25)
+    return w
+
+
 def open_settings():
     """The settings window, opening it from the gear if it is not up yet."""
     try:
-        return settings_window(timeout=1.5)
+        return raise_window(settings_window(timeout=1.5))
     except RuntimeError:
         pass
 
@@ -155,10 +230,69 @@ def open_settings():
         except KeyError:
             pass
         try:
-            return settings_window(timeout=4.0)
+            return raise_window(settings_window(timeout=4.0))
         except RuntimeError:
             if attempt == 2:
                 raise
+
+
+def frame_luma():
+    """The card's own border, which is the themed surface token.
+
+    The dock used to be a filled panel and the theme switch was sampled on
+    that fill. The dock paints nothing now, so the fill sample reads whatever
+    desktop is behind it. The polaroid frame is the app's own painted surface
+    that is always there when a card hangs: #FEFEFE on the light theme,
+    #2A2E36 on the dark one - a difference of two hundred, so a theme switch
+    cannot be mistaken for anything else.
+    """
+    write_test_images(1, "audit-theme-%d" % int(time.time()))
+    wait_cards(1)
+    # The line tucks itself away once the pointer has been off it for a
+    # moment, and a tucked card's rect sits above the screen - where a sample
+    # of "three pixels left of it" is a sample of the bottom of the desktop.
+    # So it is brought back down immediately before the reading.
+    reveal()
+    settle()
+
+    found = [e for e in uia().descendants(control_type="Image")
+             if e.element_info.automation_id == "ThumbImage"]
+    if not found:
+        raise RuntimeError("no ThumbImage on the line")
+
+    rect = found[0].rectangle()
+    # Two pixels outside the picture, half way up it: the 4px frame. Not the
+    # top-left corner - the frame's corner is rounded, and a point just
+    # outside the picture there is a point outside the card entirely.
+    x, y = rect.left - 2, rect.top + (rect.bottom - rect.top) // 2
+    return ImageGrab.grab(bbox=(x - 2, y - 2, x + 2, y + 2), all_screens=True) \
+                    .convert("L").getpixel((2, 2))
+
+
+def seg(dialog, control_id, label=None, index=None):
+    """A pill of a segmented control (showcase 5).
+
+    Pick it by its text when that text is language independent - the keep-
+    on-line pills read 25 / 50 / 100 in every language - and by its position
+    when it is not: the size row is 小/中/大 here, Small/Medium/Large
+    elsewhere, but the first pill is always the small one.
+
+    The settings centre shows keep-on-line and card size as rows of pills, not
+    as drop-downs, so "select 3" no longer means anything: the row is clicked
+    on the pill, the way a person would.
+    """
+    host = dialog.child_window(auto_id=control_id)
+    pills = [p for p in host.descendants(control_type="RadioButton")
+             if p.element_info.name]
+    if label is not None:
+        for pill in pills:
+            if pill.element_info.name == label:
+                return pill
+        raise LookupError("no pill %r in %s (have %s)" % (
+            label, control_id, [p.element_info.name for p in pills]))
+    if index is None:
+        return pills[0]
+    return pills[index]
 
 
 def other_windows(min_width=0):
@@ -267,6 +401,13 @@ def write_test_images(count, prefix="audit"):
     made = []
     for i in range(count):
         path = os.path.join(WATCH, "%s-%d.png" % (prefix, i))
+        # The app hangs a capture on the watcher's Created event, and saving over
+        # a file left by an earlier sweep only raises Changed. Drop the stale
+        # fixture first so every call really is "a new screenshot arrived".
+        try:
+            os.remove(path)
+        except FileNotFoundError:
+            pass
         im = Image.new("RGB", (760, 480), (40 + 40 * i, 110, 150))
         d = ImageDraw.Draw(im)
         d.rectangle([18, 18, 742, 462], outline=(255, 255, 255), width=5)
@@ -412,6 +553,15 @@ def host_windows():
     return out
 
 
+def crash_mark():
+    """Size and mtime of the crash log, or None when there is no log."""
+    try:
+        st = os.stat(CRASH)
+        return (st.st_size, st.st_mtime)
+    except OSError:
+        return None
+
+
 def park_host():
     """Moves anything of ours out of the top band, and remembers where it was."""
     del _saved_placements[:]
@@ -441,6 +591,33 @@ def unpark_host():
         except Exception:
             pass
     del _saved_placements[:]
+
+
+def close_launch_windows():
+    """Closes the Explorer folders the launch probe leaves behind.
+
+    Every launch opens the publish folder to double-click the exe, and those
+    folder windows pile up on top of the settings window: a click_input() then
+    lands on folder chrome instead of the app, and a check fails for a reason
+    that has nothing to do with the app. One run measured it - the point over
+    the settings window hit 'publish - 文件资源管理器', so the theme switch never
+    happened and the dark-theme reading was of the desktop.
+
+    Only windows whose title begins with 'publish' are closed, and only by
+    sending them the same WM_CLOSE the X button sends, so no file is touched.
+    """
+    closed = 0
+    for hwnd, title, _ in all_windows():
+        if not title.startswith("publish"):
+            continue
+        try:
+            win32gui.PostMessageW(hwnd, win32con.WM_CLOSE, 0, 0)
+            closed += 1
+        except Exception:
+            pass
+    if closed:
+        time.sleep(0.6)
+    return closed
 
 
 def wheel(notches, x=960, y=60):
@@ -495,6 +672,20 @@ def main():
     os.makedirs(SHOTS, exist_ok=True)
     original_settings = settings()
 
+    # A sweep without a running app reports the same failure 34 times. Bring the
+    # published build up first so the checks are about behaviour, not about us.
+    ensure_app()
+
+    # What the crash log looked like before the run. "No unhandled exception"
+    # means nothing was appended *during* this run: a log left behind by an
+    # earlier session (or by a harness that loaded Pegged's assembly) says
+    # nothing about this one.
+    crash_before = crash_mark()
+
+    # The launch probe's Explorer windows cover the settings window and eat the
+    # clicks aimed at it.
+    close_launch_windows()
+
     # Nothing of ours may sit under the top edge while the dock is being driven.
     park_host()
     atexit.register(unpark_host)
@@ -541,12 +732,18 @@ def main():
         check("dock.toolbar_auto_hide", "dock", "指针离开后工具栏收起并让出点击", dock_toolbar_auto_hide)
 
         def dock_pin_holds():
+            # The toolbar fades in after the pointer arrives; an Invoke that
+            # lands during the fade is swallowed by a button that is not
+            # hit-testable yet, and the check then fails on a line that was
+            # never pinned. Wait for the fade, then prove the pin took.
             reveal()
             pointer(960, 30)
+            time.sleep(0.5)
             b = buttons()
             if "PinButton" not in b:
                 return False, "no pin button"
             b["PinButton"][0].invoke()
+            time.sleep(0.3)
             pointer_away(1.8)
             top = line_rect()[1]
             return top == 0, "top=%d after pointer left (pinned should stay 0)" % top
@@ -554,6 +751,14 @@ def main():
         check("dock.pin_holds_open", "dock", "固定后指针离开仍展开", dock_pin_holds)
 
         def dock_unpin_retracts():
+            # Only meaningful if the line really is pinned first: an invoke
+            # that never took would leave the line tucked, and "still tucked
+            # after unpin" would read as a pass.
+            reveal()
+            pointer(960, 30)
+            time.sleep(0.5)
+            if line_rect()[1] != 0:
+                return False, "line never came down (top=%d), cannot unpin" % line_rect()[1]
             b = buttons()
             b["PinButton"][0].invoke()
             pointer_away(1.8)
@@ -777,7 +982,7 @@ def main():
             w = open_settings()
             w.child_window(auto_id="NavGeneral").click_input()
             time.sleep(0.4)
-            w.child_window(auto_id="KeepCombo").select(3)      # 16
+            seg(w, "KeepSegmented", "25").click_input()
             time.sleep(0.9)
             write_test_images(16, "audit-scroll")
             wait_cards(16, timeout=14.0)
@@ -786,8 +991,7 @@ def main():
             first = buttons()["CopyButton"][0].rectangle().left
             wheel(6)
             moved = buttons()["CopyButton"][0].rectangle().left
-            w.child_window(auto_id="KeepCombo").select(0)      # back to fit
-            time.sleep(0.8)
+            seg(w, "KeepSegmented", "25").click_input()      # 25 again: still on line
             win32gui.PostMessage(w.handle, win32con.WM_CLOSE, 0, 0)
             time.sleep(0.6)
             return moved > first + 20, "first card x %d -> %d after six notches up" % (first, moved)
@@ -958,38 +1162,31 @@ def main():
             w = settings_window()
             w.child_window(auto_id="NavAppearance").click_input()
             time.sleep(0.4)
-            # The glass, not a photo: an empty line means the sample point can
-            # only be the dock's own material.
-            clear_cards()
-            reveal()
-            settle()
-            light = ImageGrab.grab(bbox=(600, 60, 640, 100)).convert("L").getpixel((10, 10))
+            light = frame_luma()
             w.child_window(auto_id="ThemeCombo").select(2)
             time.sleep(1.4)
-            reveal()
-            settle()
-            dark = ImageGrab.grab(bbox=(600, 60, 640, 100)).convert("L").getpixel((10, 10))
+            dark = frame_luma()
             w.child_window(auto_id="ThemeCombo").select(0)
             time.sleep(1.0)
-            return dark < light - 25, "dock luminance light=%d dark=%d" % (light, dark)
+            return dark < light - 60, "card frame light=%d dark=%d" % (light, dark)
 
-        check("settings.theme_live", "settings", "切换深色主题舱体立刻变暗", settings_theme_live)
+        check("settings.theme_live", "settings", "切换深色主题卡片边框立刻换色", settings_theme_live)
 
         def settings_size_live():
             w = settings_window()
             w.child_window(auto_id="NavGeneral").click_input()
             time.sleep(0.4)
-            w.child_window(auto_id="SizeCombo").select(0)
+            seg(w, "SizeSegmented", index=0).click_input()
             time.sleep(1.2)
             reveal()
             settle()
             small_h = line_rect()[3] - line_rect()[1]
-            w.child_window(auto_id="SizeCombo").select(2)
+            seg(w, "SizeSegmented", index=2).click_input()
             time.sleep(1.2)
             reveal()
             settle()
             large_h = line_rect()[3] - line_rect()[1]
-            w.child_window(auto_id="SizeCombo").select(1)
+            seg(w, "SizeSegmented", index=1).click_input()
             time.sleep(1.0)
             return large_h > small_h, "dock height small=%d large=%d" % (small_h, large_h)
 
@@ -1103,12 +1300,13 @@ def main():
     with open(SETTINGS, "w", encoding="utf-8") as f:
         json.dump(original_settings, f, indent=2, ensure_ascii=False)
 
+    grew = crash_mark() != crash_before
     RESULTS.append({"id": "run.no_crash_log", "area": "run",
                     "expected": "全程无未处理异常", "actual":
-                        "crash.log absent" if not os.path.exists(CRASH) else "crash.log written",
-                    "ok": not os.path.exists(CRASH)})
-    print(("PASS " if not os.path.exists(CRASH) else "FAIL ") + "run.no_crash_log".ljust(34)
-          + ("crash.log absent" if not os.path.exists(CRASH) else "crash.log written"), flush=True)
+                        "crash.log untouched" if not grew else "crash.log written during the run",
+                    "ok": not grew})
+    print(("PASS " if not grew else "FAIL ") + "run.no_crash_log".ljust(34)
+          + ("crash.log untouched" if not grew else "crash.log written during the run"), flush=True)
 
     unpark_host()
 

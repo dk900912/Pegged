@@ -237,6 +237,13 @@ def language_switch(settings_hwnd, detail):
     # By handle, not by title: the title is itself a localized string, so it
     # changes the moment the test switches the language and a title lookup
     # starts failing halfway through.
+    #
+    # Raised first: click_input() goes to whatever is on top, and the settings
+    # window is easy to leave behind a folder window. When that happens the
+    # click lands on the folder, the language never changes and this check
+    # reports a bug that is not there.
+    import audit_walkthrough as A
+    A.raise_window(settings_hwnd)
     dlg = Desktop(backend="uia").window(handle=settings_hwnd)
 
     nav = dlg.child_window(auto_id="NavCapture")
@@ -244,29 +251,32 @@ def language_switch(settings_hwnd, detail):
     detail["nav_before"] = before
 
     if "捕获源" in before:
-        target, expected = "English", "Capture sources"
+        target, other, expected = "English", "中文（简体）", "Capture sources"
     else:
-        target, expected = "中文（简体）", "捕获源"
+        target, other, expected = "中文（简体）", "English", "捕获源"
 
-    combo = dlg.child_window(auto_id="LanguageCombo")
-    try:
-        combo.select(target)
-    except Exception:
-        combo.click_input()
-        time.sleep(0.4)
-        from pywinauto.keyboard import send_keys
-        send_keys("{DOWN 1}{ENTER}")
-    time.sleep(1.2)
+    # The language row is a segmented control: three pills in front (follow
+    # the system, 简体中文, English) and the rest under the "…" pill, so the
+    # pill is clicked rather than selected from a list.
+    host = dlg.child_window(auto_id="LangSegmented")
+    pill = [p for p in host.descendants(control_type="RadioButton")
+            if p.element_info.name == target]
+    if pill:
+        pill[0].click_input()
+        time.sleep(1.2)
 
     after = " ".join(t.window_text() for t in nav.descendants(control_type="Text"))
     detail["nav_after"] = after
     checks["language_refresh"] = after != before and expected in after
 
     # Put the language back so the machine is left as it was found.
-    try:
-        combo.select("中文（简体）" if target == "English" else "English")
-    except Exception:
-        pass
+    if after != before:
+        host = dlg.child_window(auto_id="LangSegmented")
+        back = [p for p in host.descendants(control_type="RadioButton")
+                if p.element_info.name == other]
+        if back:
+            back[0].click_input()
+            time.sleep(1.2)
 
     return checks
 
