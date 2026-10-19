@@ -1,0 +1,26 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Dark palette. Merged on top of FluentTheme.xaml to switch the theme:
+         every brush below is a DynamicResource reference in the styles. -->
+
+    <Color x:Key="Palette.Acrylic">#B820242B</Color>
+    <Color x:Key="Palette.Card">#DB2A2E36</Color>
+    <Color x:Key="Palette.Surface">#FF20242B</Color>
+    <Color x:Key="Palette.SurfaceAlt">#FF262B33</Color>
+    <Color x:Key="Palette.Border">#FF333944</Color>
+    <Color x:Key="Palette.Text">#FFFFFFFF</Color>
+    <Color x:Key="Palette.TextSecondary">#FFC9CDD4</Color>
+    <Color x:Key="Palette.Accent">#FF4CC2FF</Color>
+    <Color x:Key="Palette.AccentAlt">#FF9B7BFF</Color>
+    <Color x:Key="Palette.Rope">#FFB9BEC9</Color>
+    <Color x:Key="Palette.RopeHighlight">#2EFFFFFF</Color>
+    <Color x:Key="Palette.WoodLight">#FFD8A876</Color>
+    <Color x:Key="Palette.WoodMid">#FFB9854F</Color>
+    <Color x:Key="Palette.WoodDark">#FF7A4F2C</Color>
+    <Color x:Key="Palette.BandLight">#FFCBD2DC</Color>
+    <Color x:Key="Palette.BandDark">#FF79808E</Color>
+    <Color x:Key="Palette.Success">#FF6CCB5F</Color>
+    <Color x:Key="Palette.Mask">#9E000000</Color>
+    <Color x:Key="Palette.Shadow">#59000000</Color>
+</ResourceDictionary>

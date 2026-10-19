@@ -130,4 +130,8 @@
 | 1 | `dotnet` 不在 PATH | 本机无 .NET SDK | `dotnet-install.ps1 -Channel 8.0` 装至 `%USERPROFILE%\dotnet` |
 | 2 | 克隆参考仓库 CONNECT tunnel 502 / schannel 中断 | 代理对 github.com git 智能 HTTP 不稳定 | 改走 `codeload.github.com` tarball；`--retry 5 --retry-all-errors` |
 | 3 | tarball 首次下载 7.3MB 截断 | codeload 不支持 Range 续传，连接被重置 | 整包重下 + `gzip -t` 校验 + `tar tzf` 计数核对 114 条目 |
-| 4 | （Module 阶段将持续追加……） | | |
+| 4 | Phase 2 提交后 `git push` 全部失败：`CONNECT tunnel failed, response 502` | 沙箱仅允许走本机代理 `127.0.0.1:54068`，该代理对 github.com 的 git 智能 HTTP（`info/refs?service=git-receive-pack`）返回 502；直连超时；SSH 无密钥 | 新建 `scripts/push-via-api.py`：经 api.github.com（Git Data API）建 blob→tree→commit→PATCH ref，本地用 `pushed` tag 记账保证幂等 |
+| 5 | `git update-ref refs/remotes/origin/main <new-sha>` 退出 128 | API 创建的 commit 对象不在本地对象库 | 改为 `git tag -f pushed <最后一个本地 commit>` 作为下次基线 |
+| 6 | `CS0104: “Application”是“System.Windows.Forms.Application”和“System.Windows.Application”之间的不明确的引用` | 托盘图标需要 `UseWindowsForms`，两个 `Application` 同时被隐式 using 引入 | 在 `App.xaml.cs` / `ThemeManager.cs` 中写全 `System.Windows.Application` |
+| 7 | `CS0720: 不能在静态类中声明索引器` | `Loc` 索引器写在静态类里 | 去掉索引器，XAML 改用 `StrExtension` 标记扩展 |
+| 8 | 本机无 .NET SDK，`dotnet build` 不可用 | 环境预装缺失 | `dotnet-install.ps1 -Channel 8.0` 安装 8.0.426（含 WindowsDesktop 8.0.32 运行时），后续统一用绝对路径调用 |

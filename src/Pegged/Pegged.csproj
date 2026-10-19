@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <AssemblyName>Pegged</AssemblyName>
+    <RootNamespace>Pegged</RootNamespace>
+    <ApplicationIcon>$(MSBuildThisFileDirectory)..\..\assets\app.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <Company>dk900912</Company>
+    <Product>Pegged</Product>
+    <Description>A clothesline for your screenshots. Pegged hangs captures on a line above your screen.</Description>
+    <Copyright>Copyright (c) 2026 Pegged contributors. Ported from tendedero (MIT).</Copyright>
+    <NeutralLanguage>en</NeutralLanguage>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\app.ico" Link="app.ico" />
+    <None Include="..\..\assets\logo.png" Link="logo.png" />
+    <Resource Include="..\..\assets\logo.png" Link="assets\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

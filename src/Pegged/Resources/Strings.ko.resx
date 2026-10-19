@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Tray.ShowLine" xml:space="preserve">
+    <value>줄 보이기</value>
+  </data>
+  <data name="Tray.HideLine" xml:space="preserve">
+    <value>줄 숨기기</value>
+  </data>
+  <data name="Tray.ClearAll" xml:space="preserve">
+    <value>모두 내리기</value>
+  </data>
+  <data name="Tray.Settings" xml:space="preserve">
+    <value>설정…</value>
+  </data>
+  <data name="Tray.OpenScreenshotsFolder" xml:space="preserve">
+    <value>스크린샷 폴더 열기</value>
+  </data>
+  <data name="Tray.Sounds" xml:space="preserve">
+    <value>소리</value>
+  </data>
+  <data name="Tray.OpenAtLogin" xml:space="preserve">
+    <value>로그인 시 열기</value>
+  </data>
+  <data name="Tray.CheckForUpdates" xml:space="preserve">
+    <value>업데이트 확인…</value>
+  </data>
+  <data name="Tray.Quit" xml:space="preserve">
+    <value>Pegged 종료</value>
+  </data>
+  <data name="Menu.BringLineDown" xml:space="preserve">
+    <value>줄 내리기</value>
+  </data>
+  <data name="Menu.ConditionTopEdge" xml:space="preserve">
+    <value>포인터가 위쪽 가장자리에 머물 때</value>
+  </data>
+  <data name="Menu.ConditionNew" xml:space="preserve">
+    <value>새 항목이 걸릴 때</value>
+  </data>
+  <data name="Menu.ConditionFullScreen" xml:space="preserve">
+    <value>전체 화면 앱 위에</value>
+  </data>
+  <data name="Menu.WatchClipboard" xml:space="preserve">
+    <value>복사한 이미지 걸기</value>
+  </data>
+  <data name="Menu.WatchClipboardHint" xml:space="preserve">
+    <value>복사한 이미지도 줄에 걸립니다</value>
+  </data>
+  <data name="Menu.ExtraFolders" xml:space="preserve">
+    <value>함께 볼 폴더</value>
+  </data>
+  <data name="Menu.AddFolder" xml:space="preserve">
+    <value>폴더 추가…</value>
+  </data>
+  <data name="Menu.StopWatching" xml:space="preserve">
+    <value>보기 중지</value>
+  </data>
+  <data name="Menu.KeepOnLine" xml:space="preserve">
+    <value>줄에 유지</value>
+  </data>
+  <data name="Menu.KeepFit" xml:space="preserve">
+    <value>화면에 맞게</value>
+  </data>
+  <data name="Menu.KeepCount" xml:space="preserve">
+    <value>{0}개</value>
+  </data>
+  <data name="Menu.Size" xml:space="preserve">
+    <value>크기</value>
+  </data>
+  <data name="Menu.SizeSmall" xml:space="preserve">
+    <value>작게</value>
+  </data>
+  <data name="Menu.SizeMedium" xml:space="preserve">
+    <value>보통</value>
+  </data>
+  <data name="Menu.SizeLarge" xml:space="preserve">
+    <value>크게</value>
+  </data>
+  <data name="Menu.Shortcut" xml:space="preserve">
+    <value>바로 가기</value>
+  </data>
+  <data name="Menu.ShortcutNone" xml:space="preserve">
+    <value>없음</value>
+  </data>
+  <data name="Menu.ChangeShortcut" xml:space="preserve">
+    <value>바로 가기 변경…</value>
+  </data>
+  <data name="Card.Copy" xml:space="preserve">
+    <value>복사</value>
+  </data>
+  <data name="Card.Open" xml:space="preserve">
+    <value>열기</value>
+  </data>
+  <data name="Card.Preview" xml:space="preserve">
+    <value>미리 보기</value>
+  </data>
+  <data name="Card.Crop" xml:space="preserve">
+    <value>자르기</value>
+  </data>
+  <data name="Card.Annotate" xml:space="preserve">
+    <value>주석 달기</value>
+  </data>
+  <data name="Card.ShowInExplorer" xml:space="preserve">
+    <value>탐색기에서 보기</value>
+  </data>
+  <data name="Card.SaveToDesktop" xml:space="preserve">
+    <value>바탕 화면에 저장</value>
+  </data>
+  <data name="Card.Discard" xml:space="preserve">
+    <value>버리기</value>
+  </data>
+  <data name="Card.TakeDown" xml:space="preserve">
+    <value>내리기</value>
+  </data>
+  <data name="Card.Recycle" xml:space="preserve">
+    <value>휴지통으로 이동</value>
+  </data>
+  <data name="Card.TakeDownLeft" xml:space="preserve">
+    <value>왼쪽의 모든 항목 내리기</value>
+  </data>
+  <data name="Card.TakeDownRight" xml:space="preserve">
+    <value>오른쪽의 모든 항목 내리기</value>
+  </data>
+  <data name="Card.Copied" xml:space="preserve">
+    <value>복사됨!</value>
+  </data>
+  <data name="Line.Empty" xml:space="preserve">
+    <value>스크린샷을 찍으면 여기에 걸립니다</value>
+  </data>
+  <data name="Line.EmptyHint" xml:space="preserve">
+    <value>이미지를 복사해도 걸립니다</value>
+  </data>
+  <data name="Crop.Title" xml:space="preserve">
+    <value>자르기</value>
+  </data>
+  <data name="Crop.Cancel" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="Crop.Apply" xml:space="preserve">
+    <value>적용</value>
+  </data>
+  <data name="Crop.Size" xml:space="preserve">
+    <value>{0} × {1}</value>
+  </data>
+  <data name="Settings.Title" xml:space="preserve">
+    <value>설정</value>
+  </data>
+  <data name="Settings.General" xml:space="preserve">
+    <value>일반</value>
+  </data>
+  <data name="Settings.GeneralDesc" xml:space="preserve">
+    <value>언어, 소리, 줄에 보관할 개수</value>
+  </data>
+  <data name="Settings.Language" xml:space="preserve">
+    <value>언어</value>
+  </data>
+  <data name="Settings.LanguageDesc" xml:space="preserve">
+    <value>Pegged는 10개 언어를 지원합니다</value>
+  </data>
+  <data name="Settings.Sounds" xml:space="preserve">
+    <value>소리</value>
+  </data>
+  <data name="Settings.SoundsDesc" xml:space="preserve">
+    <value>캡처를 걸거나 내릴 때 부드러운 소리</value>
+  </data>
+  <data name="Settings.Keep" xml:space="preserve">
+    <value>줄에 유지</value>
+  </data>
+  <data name="Settings.KeepDesc" xml:space="preserve">
+    <value>오래된 캡처는 끝에서 떨어집니다</value>
+  </data>
+  <data name="Settings.Size" xml:space="preserve">
+    <value>카드 크기</value>
+  </data>
+  <data name="Settings.SizeDesc" xml:space="preserve">
+    <value>캡처가 걸리는 크기</value>
+  </data>
+  <data name="Settings.Capture" xml:space="preserve">
+    <value>캡처 소스</value>
+  </data>
+  <data name="Settings.CaptureDesc" xml:space="preserve">
+    <value>Pegged가 새 캡처를 찾는 위치</value>
+  </data>
+  <data name="Settings.Folder" xml:space="preserve">
+    <value>스크린샷 폴더</value>
+  </data>
+  <data name="Settings.FolderDesc" xml:space="preserve">
+    <value>새 이미지를 위해 관찰됨</value>
+  </data>
+  <data name="Settings.FolderChange" xml:space="preserve">
+    <value>변경…</value>
+  </data>
+  <data name="Settings.Extra" xml:space="preserve">
+    <value>함께 볼 폴더</value>
+  </data>
+  <data name="Settings.ExtraDesc" xml:space="preserve">
+    <value>최대 세 폴더; 새 이미지도 함께 걸립니다</value>
+  </data>
+  <data name="Settings.Clipboard" xml:space="preserve">
+    <value>복사한 이미지 걸기</value>
+  </data>
+  <data name="Settings.ClipboardDesc" xml:space="preserve">
+    <value>어느 앱에서 복사한 이미지도 줄에 걸립니다</value>
+  </data>
+  <data name="Settings.Appearance" xml:space="preserve">
+    <value>모양 및 디스플레이</value>
+  </data>
+  <data name="Settings.AppearanceDesc" xml:space="preserve">
+    <value>테마, 타이밍, 줄을 사용할 화면</value>
+  </data>
+  <data name="Settings.Theme" xml:space="preserve">
+    <value>테마</value>
+  </data>
+  <data name="Settings.ThemeAuto" xml:space="preserve">
+    <value>Windows를 따름</value>
+  </data>
+  <data name="Settings.ThemeLight" xml:space="preserve">
+    <value>밝게</value>
+  </data>
+  <data name="Settings.ThemeDark" xml:space="preserve">
+    <value>어둡게</value>
+  </data>
+  <data name="Settings.RevealDelay" xml:space="preserve">
+    <value>호버 지연</value>
+  </data>
+  <data name="Settings.RevealDelayDesc" xml:space="preserve">
+    <value>포인터가 멈춘 후 줄이 내려오는 시간</value>
+  </data>
+  <data name="Settings.TopEdge" xml:space="preserve">
+    <value>위쪽 가장자리에서 표시</value>
+  </data>
+  <data name="Settings.TopEdgeDesc" xml:space="preserve">
+    <value>화면 위쪽에 포인터를 두면 줄이 내려옵니다</value>
+  </data>
+  <data name="Settings.Peek" xml:space="preserve">
+    <value>새 캡처에서 표시</value>
+  </data>
+  <data name="Settings.PeekDesc" xml:space="preserve">
+    <value>새 캡처가 있으면 줄이 잠시 보입니다</value>
+  </data>
+  <data name="Settings.OverFullScreen" xml:space="preserve">
+    <value>전체 화면 앱 위에</value>
+  </data>
+  <data name="Settings.OverFullScreenDesc" xml:space="preserve">
+    <value>앱이 화면을 채워도 줄이 내려옵니다</value>
+  </data>
+  <data name="Settings.Shortcuts" xml:space="preserve">
+    <value>바로 가기</value>
+  </data>
+  <data name="Settings.ShortcutsDesc" xml:space="preserve">
+    <value>키 바인딩</value>
+  </data>
+  <data name="Settings.ShortcutToggle" xml:space="preserve">
+    <value>줄 표시 또는 숨기기</value>
+  </data>
+  <data name="Settings.Record" xml:space="preserve">
+    <value>새 바로 가기를 누르세요</value>
+  </data>
+  <data name="Settings.RecordHint" xml:space="preserve">
+    <value>Esc 취소, Delete는 바로 가기 제거.</value>
+  </data>
+  <data name="Settings.About" xml:space="preserve">
+    <value>정보</value>
+  </data>
+  <data name="Settings.AboutDesc" xml:space="preserve">
+    <value>버전, 라이선스 및 출처</value>
+  </data>
+  <data name="Settings.Version" xml:space="preserve">
+    <value>버전 {0}</value>
+  </data>
+  <data name="Settings.Website" xml:space="preserve">
+    <value>웹사이트</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>Alejandro Bujan의 macOS용 tendedero의 네이티브 Windows 이식판(MIT 라이선스).</value>
+  </data>
+  <data name="Dialog.WatchFolderPrompt" xml:space="preserve">
+    <value>이 폴더에 저장된 새 이미지는 줄에 걸립니다.</value>
+  </data>
+  <data name="Dialog.Watch" xml:space="preserve">
+    <value>보기</value>
+  </data>
+  <data name="Dialog.LoginFailed" xml:space="preserve">
+    <value>로그인 설정을 변경할 수 없습니다</value>
+  </data>
+  <data name="Dialog.LoginFailedBody" xml:space="preserve">
+    <value>쓰기 권한이 있는 폴더에서 Pegged를 실행해 보세요.</value>
+  </data>
+  <data name="Dialog.CropFailed" xml:space="preserve">
+    <value>이 이미지를 자를 수 없습니다</value>
+  </data>
+  <data name="Dialog.TrashFailed" xml:space="preserve">
+    <value>이 파일을 휴지통으로 옮길 수 없습니다</value>
+  </data>
+  <data name="Dialog.ClipboardOffered" xml:space="preserve">
+    <value>복사한 이미지를 Pegged에 걸까요?</value>
+  </data>
+</root>
