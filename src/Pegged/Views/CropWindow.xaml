@@ -36,8 +36,10 @@
                            FontFamily="{DynamicResource Font.Ui}" FontSize="11"
                            Foreground="{DynamicResource Brush.Text}" />
                 <Button Style="{StaticResource GlassButton}" Padding="14,7" Margin="0,0,8,0"
+                        AutomationProperties.AutomationId="CropCancel"
                         Click="OnCancel" Content="{loc:Str Crop.Cancel}" />
                 <Button Style="{StaticResource AccentButton}" Padding="14,7"
+                        AutomationProperties.AutomationId="CropApply"
                         Click="OnApply" Content="{loc:Str Crop.Apply}" />
             </StackPanel>
         </Border>

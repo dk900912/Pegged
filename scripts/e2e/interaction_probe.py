@@ -180,6 +180,15 @@ def main():
             report["detail"]["language_error"] = f"{type(error).__name__}: {error}"
             report["checks"]["language_refresh"] = False
 
+        # Leave the machine as it was found: this probe opened the settings
+        # centre, and a probe that leaves it up makes the next one report a
+        # stray window it did not create.
+        try:
+            win32gui.PostMessage(settings, win32con.WM_CLOSE, 0, 0)
+            time.sleep(0.8)
+        except Exception as error:
+            report["detail"]["settings_close_error"] = f"{type(error).__name__}: {error}"
+
     return write(report)
 
 

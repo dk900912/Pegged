@@ -1,0 +1,81 @@
+{
+  "results": [
+    {
+      "id": "clipboard.hangs_capture",
+      "area": "card",
+      "expected": "复制图片自动上线一张",
+      "actual": "cards=1 after a bitmap on the clipboard (WatchClipboard=True)",
+      "ok": true
+    },
+    {
+      "id": "card.hang_from_file",
+      "area": "card",
+      "expected": "新截图自动挂上",
+      "actual": "cards=1 after one file (expect 1)",
+      "ok": true
+    },
+    {
+      "id": "card.hover_chrome",
+      "area": "card",
+      "expected": "悬停出现复制/裁剪/删除/关闭",
+      "actual": "copy/crop/delete/close all present",
+      "ok": true
+    },
+    {
+      "id": "card.click_copies_image",
+      "area": "card",
+      "expected": "单击卡片复制，且不把自己的图片再挂一张",
+      "actual": "clipboard image=True, cards 1 -> 1 (a copy must not hang a duplicate)",
+      "ok": true
+    },
+    {
+      "id": "card.double_click_preview",
+      "area": "card",
+      "expected": "双击打开预览窗口",
+      "actual": "new windows=['预览']",
+      "ok": true
+    },
+    {
+      "id": "card.preview_takes_keyboard",
+      "area": "card",
+      "expected": "预览窗口打开即获得焦点（Esc 可关）",
+      "actual": "foreground=预览 preview=0x480ae2",
+      "ok": true
+    },
+    {
+      "id": "card.preview_close",
+      "area": "card",
+      "expected": "Esc 关闭预览窗口",
+      "actual": "preview 0x480ae2 closed=True",
+      "ok": true
+    },
+    {
+      "id": "card.right_click_drops",
+      "area": "card",
+      "expected": "右键取下卡片",
+      "actual": "cards 1 -> 0",
+      "ok": true
+    },
+    {
+      "id": "card.close_button_drops",
+      "area": "card",
+      "expected": "卡片右上角 × 取下",
+      "actual": "cards 1 -> 0",
+      "ok": true
+    },
+    {
+      "id": "card.prune_external",
+      "area": "card",
+      "expected": "外部删除文件后卡片自动脱落",
+      "actual": "cards=0 after external delete",
+      "ok": true
+    },
+    {
+      "id": "card.wheel_scroll",
+      "area": "card",
+      "expected": "卡片超出一屏时滚轮向旧照片滚动",
+      "actual": "first card x -1809 -> -1126 after six notches up",
+      "ok": true
+    }
+  ]
+}

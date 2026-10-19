@@ -28,7 +28,20 @@ public partial class PreviewWindow : Window
 
         try
         {
-            BigImage.Source = new BitmapImage(new Uri(path));
+            // Load the pixels now and let go of the file. A BitmapImage built
+            // from a Uri keeps the file open until it is collected, and while
+            // it is open the screenshot cannot be copied (the clipboard gets
+            // only the file drop) or moved to the Recycle Bin - taking the
+            // card down failed with "some operations were aborted" and the
+            // card simply stayed on the line.
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+            image.UriSource = new Uri(path);
+            image.EndInit();
+            image.Freeze();
+            BigImage.Source = image;
         }
         catch
         {
@@ -37,6 +50,21 @@ public partial class PreviewWindow : Window
         }
 
         PreviewKeyDown += OnPreviewKeyDown;
+
+        // Shown from the line, which never activates: without this the window
+        // appears but the keyboard still belongs to the app in front of it,
+        // so Esc does nothing until the window is clicked.
+        Loaded += (_, _) => Dispatcher.BeginInvoke(
+            System.Windows.Threading.DispatcherPriority.Input,
+            new Action(() => WindowFocus.Take(this)));
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        // Hand the foreground back to whatever had it before the preview, or
+        // the system is left pointing at a window that no longer exists.
+        WindowFocus.Release();
+        base.OnClosed(e);
     }
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)

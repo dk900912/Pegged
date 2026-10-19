@@ -417,6 +417,25 @@ public partial class CardView : UserControl
         }
     }
 
+    /// <summary>The picture's bounds, with the card's tilt applied.
+    ///
+    /// TransformToAncestor cannot be used here: the strip lays the cards out by
+    /// setting Canvas.Left/Top and then asks for the hit rects straight away,
+    /// and the visual offsets are only updated on the next layout pass, so the
+    /// transform would come back as identity. The tilt is the only transform
+    /// that moves the picture inside the card, so it is applied by hand,
+    /// around the same pivot the render transform uses.</summary>
+    public Rect PhotoWithTilt()
+    {
+        var photo = PhotoRect;
+        var angle = Tilt.Angle;
+        if (Math.Abs(angle) < 0.01) return photo;
+
+        var matrix = Matrix.Identity;
+        matrix.RotateAt(angle, ActualWidth / 2, PivotY);
+        return new System.Windows.Media.MatrixTransform(matrix).TransformBounds(photo);
+    }
+
     /// <summary>How tall the whole card is, peg included.</summary>
     public double CardHeight => Photo.Height + 32;
 }

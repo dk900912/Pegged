@@ -39,13 +39,18 @@
         <!-- Cards hang here. Module 3 fills it. -->
         <Canvas x:Name="CardLayer" />
 
-        <!-- Top quick actions: clear, pin, settings -->
-        <Border x:Name="Toolbar" HorizontalAlignment="Center" VerticalAlignment="Top"
-                Margin="0,10,0,0" Padding="6,4" CornerRadius="18"
-                Background="{DynamicResource Brush.Acrylic}"
-                BorderBrush="#59FFFFFF" BorderThickness="1" Opacity="0"
-                Effect="{DynamicResource Effect.Flyout}">
-            <StackPanel Orientation="Horizontal">
+        <!-- Top quick actions: clear, pin, settings.
+             The pill behind the buttons is decoration and is deliberately not
+             hit testable: it floats over the top of the cards, and a pill that
+             takes clicks would be a dead strip across every photo. -->
+        <Grid x:Name="Toolbar" HorizontalAlignment="Center" VerticalAlignment="Top"
+              Margin="0,10,0,0" Opacity="0">
+            <Border Padding="6,4" CornerRadius="18"
+                    Background="{DynamicResource Brush.Acrylic}"
+                    BorderBrush="#59FFFFFF" BorderThickness="1"
+                    IsHitTestVisible="False"
+                    Effect="{DynamicResource Effect.Flyout}" />
+            <StackPanel Orientation="Horizontal" Margin="6,4">
                 <Button x:Name="ClearButton" Style="{StaticResource RoundGlassButton}"
                         Tag="15" ToolTip="{loc:Str Tray.ClearAll}" Click="OnClear" Content="&#x1F5D1;" />
                 <Button x:Name="PinButton" Style="{StaticResource RoundGlassButton}"
@@ -53,7 +58,7 @@
                 <Button x:Name="SettingsButton" Style="{StaticResource RoundGlassButton}"
                         Tag="15" ToolTip="{loc:Str Tray.Settings}" Click="OnSettings" Content="&#x2699;" />
             </StackPanel>
-        </Border>
+        </Grid>
 
         <!-- Empty state -->
         <Border x:Name="Hint" HorizontalAlignment="Center" VerticalAlignment="Center"

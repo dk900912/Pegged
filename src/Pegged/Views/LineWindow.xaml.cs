@@ -22,7 +22,12 @@ namespace Pegged.Views;
 /// </summary>
 public partial class LineWindow : Window
 {
-    private readonly Spring _slide = new(0, 0, stiffness: 46, damping: 2.6);
+    // The slide is a spring, but not a loose one: the original comes down on a
+    // 0.42s spring at 0.82 damping (a hair of bounce) and goes back up on a
+    // 0.22s curve. Stiffness and damping follow from that: k = (2*pi/response)^2
+    // and c = 2*zeta*sqrt(k). The first numbers here (46 / 2.6) were five times
+    // less damped than the spec, so the dock kept wobbling for seconds.
+    private readonly Spring _slide = new(0, 0, stiffness: 224, damping: 24.5);
     private HwndSource? _source;
     private IntPtr _handle;
     private bool _revealed;
@@ -32,6 +37,10 @@ public partial class LineWindow : Window
 
     /// <summary>Where the line hangs when it is down, in WPF units.</summary>
     private Rect _target = new(0, 0, 800, 210);
+
+    /// <summary>The desktop behind the dock, kept so a theme switch can re-wash
+    /// it without reading a screen the dock is now covering.</summary>
+    private AcrylicMaterial? _material;
 
     /// <summary>Card hit rectangles in window coordinates, set by the layout.</summary>
     private readonly System.Collections.Generic.List<Rect> _hitRects = new();
@@ -95,12 +104,20 @@ public partial class LineWindow : Window
         LayoutRope();
     }
 
-    /// <summary>With more on the line than fits, the wheel slides it along.</summary>
+    /// <summary>
+    /// With more on the line than fits, the wheel slides it along. Up goes
+    /// towards the older photos (the line moves right under the pointer), the
+    /// way a wheel moves any other list towards its beginning.
+    ///
+    /// Windows delivers the wheel to the window under the pointer even when it
+    /// is not the active one, which is why a dock that never takes the focus
+    /// still gets this at all.
+    /// </summary>
     private void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
-        if (App.CaptureStore.LiveCount <= LayoutMetrics.CapacityFor(this.Width)) return;
+        if (!Strip.CanScroll) return;
 
-        Strip.Scroll(e.Delta < 0 ? -LayoutMetrics.Spacing / 2 : LayoutMetrics.Spacing / 2);
+        Strip.Scroll(e.Delta > 0 ? LayoutMetrics.Spacing / 2 : -LayoutMetrics.Spacing / 2);
         e.Handled = true;
     }
 
@@ -184,11 +201,22 @@ public partial class LineWindow : Window
             if (grown.Contains(client)) return NativeMethods.HTCLIENT;
         }
 
-        // The quick action bar is solid only while it is actually showing.
-        if (Toolbar.Opacity > 0.4 && RectOf(Toolbar).Contains(client)) return NativeMethods.HTCLIENT;
+        // The quick action bar: only its buttons are solid. The pill behind
+        // them floats over the top of the cards, so letting the pill itself
+        // take clicks made a dead strip across every photo underneath.
+        if (Toolbar.Opacity > 0.4)
+        {
+            foreach (var button in ToolbarButtons)
+            {
+                if (button.IsVisible && RectOf(button).Contains(client))
+                    return NativeMethods.HTCLIENT;
+            }
+        }
 
         return NativeMethods.HTTRANSPARENT;
     }
+
+    private System.Windows.Controls.Button[] ToolbarButtons => new[] { ClearButton, PinButton, SettingsButton };
 
     private Rect RectOf(FrameworkElement element)
     {
@@ -212,13 +240,18 @@ public partial class LineWindow : Window
         if (_handle != IntPtr.Zero) NativeMethods.RemoveClipboardFormatListener(_handle);
         FrameLoop.Unsubscribe(OnFrame);
         _source?.RemoveHook(WndProc);
+        _material?.Dispose();
+        _material = null;
     }
 
     private void ApplyThemeBrushes()
     {
-        // Nothing to rebuild: every brush is a DynamicResource. The rope and
-        // hint are redrawn so gradients follow the theme at once.
+        // Every brush in the tree is a DynamicResource and follows on its own.
+        // The dock's glass is not a brush resource though - it is a picture of
+        // the desktop - so it has to be washed with the new tint by hand, or
+        // switching to dark left a light panel behind.
         LayoutRope();
+        Paint();
     }
 
     // ---- geometry --------------------------------------------------------
@@ -248,27 +281,45 @@ public partial class LineWindow : Window
     }
 
     /// <summary>
-    /// Rebuilds the frosted material behind the dock. Only ever runs while the
-    /// line is tucked away above the top edge: at that moment the screen the
-    /// dock is about to cover is not covered by us, so the snapshot is of the
-    /// desktop and nothing else. The top 16px are left out of the capture
-    /// because the edge pill lives there, and stretching the rest back over it
-    /// is invisible under a blur this soft.
+    /// Rebuilds the frosted material behind the dock. The capture is only ever
+    /// taken while the line is tucked away above the top edge: at that moment
+    /// the screen the dock is about to cover is not covered by us, so the
+    /// snapshot is of the desktop and nothing else. The top 16px are left out
+    /// of the capture because the edge pill lives there, and stretching the
+    /// rest back over it is invisible under a blur this soft.
+    ///
+    /// While the dock is open there is nothing to capture - we are standing in
+    /// front of it - so the last capture is reused and simply re-tinted.
     /// </summary>
     private void ApplyAcrylic()
     {
-        if (_revealed || _target.Width < 8) return;
+        if (_target.Width < 8) return;
 
+        if (!_revealed)
+        {
+            var scale = _scale > 0 ? _scale : 1.0;
+            var region = new Rect(_target.Left, _target.Top + 16,
+                _target.Width, Math.Max(32, _target.Height - 16));
+
+            if (AcrylicBackdrop.Capture(region, scale) is { } fresh)
+            {
+                _material?.Dispose();
+                _material = fresh;
+            }
+        }
+
+        Paint();
+    }
+
+    /// <summary>Paints the glass: the captured desktop, washed with the tint of
+    /// whichever theme is in force right now.</summary>
+    private void Paint()
+    {
         var tint = TryFindResource("Palette.Acrylic") is Color c
             ? c
             : Color.FromRgb(0xF4, 0xF6, 0xFB);
 
-        var scale = _scale > 0 ? _scale : 1.0;
-        var region = new Rect(_target.Left, _target.Top + 16,
-            _target.Width, Math.Max(32, _target.Height - 16));
-
-        var frosted = AcrylicBackdrop.Capture(region, scale, tint);
-        if (frosted is not null)
+        if (_material?.Finish(tint) is { } frosted)
         {
             Dock.Background = frosted;
             return;
@@ -387,6 +438,8 @@ public partial class LineWindow : Window
         ApplyAcrylic();
 
         _revealed = true;
+        _slide.Stiffness = 224;      // 0.42s response
+        _slide.Damping = 24.5;       // damping fraction 0.82
         _slide.Target = 0;
         UpdateHint();
     }
@@ -398,6 +451,8 @@ public partial class LineWindow : Window
         if (!_revealed) return;
 
         _revealed = false;
+        _slide.Stiffness = 816;      // 0.22s, as the original's easeIn
+        _slide.Damping = 57;         // critically damped: no bounce on the way out
         _slide.Target = this.Height + 12;
         UpdateHint();
     }

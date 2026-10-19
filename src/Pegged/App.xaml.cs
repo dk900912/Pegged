@@ -147,7 +147,7 @@ public partial class App : System.Windows.Application
     private void OnSettingsRequested(object? sender, EventArgs e)    {
         var existing = System.Windows.Application.Current.Windows
             .OfType<Views.SettingsWindow>().FirstOrDefault();
-        if (existing is not null) { existing.Activate(); return; }
+        if (existing is not null) { Core.WindowFocus.Take(existing); return; }
         var w = new Views.SettingsWindow();
         w.Show();
     }

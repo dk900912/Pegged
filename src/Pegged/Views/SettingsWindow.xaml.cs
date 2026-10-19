@@ -34,6 +34,12 @@ public partial class SettingsWindow : Window
         // {loc:Str} is a live binding now, so the labels relabel themselves.
         // The combo boxes hold pre-built strings, so they are rebuilt here.
         Loc.LanguageChanged += OnLanguageChanged;
+
+        // Opened from the line, which never activates: take the keyboard or
+        // the window opens behind the focus and the first click only wakes it.
+        Loaded += (_, _) => Dispatcher.BeginInvoke(
+            System.Windows.Threading.DispatcherPriority.Input,
+            new Action(() => WindowFocus.Take(this)));
     }
 
     private void OnLanguageChanged(object? sender, EventArgs e)
@@ -56,6 +62,7 @@ public partial class SettingsWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         Loc.LanguageChanged -= OnLanguageChanged;
+        WindowFocus.Release();
         base.OnClosed(e);
     }
 
@@ -363,8 +370,23 @@ public partial class SettingsWindow : Window
 
     // ---- inbox mode ------------------------------------------------------
 
+    /// <summary>
+    /// The row says what the mode can actually do here. Where the shell has no
+    /// Screenshots folder to redirect the switch is greyed out with the reason
+    /// instead of being offered and then bouncing back - a switch that refuses
+    /// to stay on reads as a broken app, not as a system that said no.
+    /// </summary>
     private void UpdateInboxText()
     {
+        if (InboxMode.Unavailable is { } why)
+        {
+            InboxSwitch.IsEnabled = false;
+            InboxSwitch.IsOn = false;
+            InboxText.Text = Loc.Format("Settings.InboxUnavailable", why);
+            return;
+        }
+
+        InboxSwitch.IsEnabled = true;
         var current = InboxMode.CurrentSystemFolder() ?? Settings.Current.ScreenshotFolder ?? "";
         InboxText.Text = Loc.Format("Settings.InboxPath", current);
     }
@@ -378,8 +400,14 @@ public partial class SettingsWindow : Window
             _initializing = true;
             InboxSwitch.IsOn = false;
             _initializing = false;
-            MessageBox.Show(this, Loc.Get("Settings.InboxFailed"),
-                Loc.Get("Settings.Inbox"), MessageBoxButton.OK, MessageBoxImage.Warning);
+
+            // Inline, never a modal: Pegged never owns the foreground, so a
+            // MessageBox opened from here appears behind the settings window
+            // and the next click on the switch dismisses it instead of
+            // reaching the switch. That is how this check used to "fail".
+            InboxText.Text = Loc.Format("Settings.InboxUnavailable",
+                InboxMode.LastError ?? InboxMode.Unavailable ?? "-");
+            return;
         }
 
         UpdateInboxText();

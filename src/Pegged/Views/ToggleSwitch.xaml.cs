@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 
 namespace Pegged.Views;
@@ -37,4 +38,15 @@ public partial class ToggleSwitch : UserControl
         var control = (ToggleSwitch)sender;
         control.RaiseEvent(new RoutedEventArgs(ChangedEvent, control));
     }
+
+    /// <summary>
+    /// This wrapper is a decoration around a real CheckBox, and the CheckBox
+    /// carries the same automation id on purpose (that is what the settings
+    /// window names). Two elements with one id is not a usable switch: UI
+    /// Automation reports the wrapper as a second "ClipboardSwitch" and any
+    /// FindFirst on the id is a coin toss. No peer here means the wrapper does
+    /// not exist as far as assistive tech is concerned and the CheckBox inside
+    /// is the switch - which it is.
+    /// </summary>
+    protected override AutomationPeer OnCreateAutomationPeer() => null!;
 }

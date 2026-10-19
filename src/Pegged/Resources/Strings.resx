@@ -196,6 +196,9 @@
   <data name="Crop.Title" xml:space="preserve">
     <value>Crop</value>
   </data>
+  <data name="Preview.Title" xml:space="preserve">
+    <value>Preview</value>
+  </data>
   <data name="Crop.Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -321,6 +324,9 @@
   </data>
   <data name="Settings.InboxFailed" xml:space="preserve">
     <value>Windows would not change the screenshot folder, so inbox mode is off.</value>
+  </data>
+  <data name="Settings.InboxUnavailable" xml:space="preserve">
+    <value>This system does not expose a screenshot folder to redirect ({0}), so inbox mode stays off. The folder watch below still brings new captures to the line.</value>
   </data>
   <data name="Settings.License" xml:space="preserve">
     <value>Ported from tendedero (MIT). Pegged is MIT licensed.</value>

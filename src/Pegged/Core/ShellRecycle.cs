@@ -23,12 +23,19 @@ public static class ShellRecycle
 
         try
         {
-            var result = NativeMethods.SHFileOperation(ref op);
-            return result == 0 && !op.fAnyOperationsAborted;
+            NativeMethods.SHFileOperation(ref op);
+
+            // Whether it worked is decided by where the file is, not by what
+            // the call reports. SHFileOperation returns 0 and still sets
+            // fAnyOperationsAborted on an ordinary successful delete often
+            // enough that trusting it meant "the file went to the bin but the
+            // app thought it had failed": an error sound, and the card left
+            // hanging until the file watcher noticed the file was gone.
+            return !File.Exists(path);
         }
         catch (Exception)
         {
-            return false;
+            return !File.Exists(path);
         }
     }
 }

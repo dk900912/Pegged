@@ -45,6 +45,7 @@ public sealed class LineController : IDisposable
         _poll.Tick += OnTick;
 
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
+        Settings.Saved += OnSettingsSaved;
         App.CaptureStore.Changed += (_, _) => _line.OnCardsChanged();
     }
 
@@ -83,6 +84,7 @@ public sealed class LineController : IDisposable
         _poll.Stop();
         _poll.Tick -= OnTick;
         SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
+        Settings.Saved -= OnSettingsSaved;
 
         foreach (var pill in _pills.Values)
         {
@@ -152,6 +154,34 @@ public sealed class LineController : IDisposable
         return null;
     }
 
+    /// <summary>
+    /// The card size is a window measurement, not just a card measurement: the
+    /// strip is PanelHeight tall and the window is sized from it. Saving the
+    /// setting used to leave the window at its old height, so "large" gave
+    /// bigger cards hanging out of a dock that had not grown, until the next
+    /// monitor change. Re-place the line whenever the height no longer agrees
+    /// with the setting - and only then, because Save() also fires for every
+    /// capture and every toggle.
+    /// </summary>
+    private void OnSettingsSaved(object? sender, EventArgs e)
+    {
+        if (_disposed) return;
+
+        if (!_line.Dispatcher.CheckAccess())
+        {
+            _line.Dispatcher.BeginInvoke(new Action(() => OnSettingsSaved(sender, e)));
+            return;
+        }
+
+        var wanted = LayoutMetrics.PanelHeight + 24;
+        if (Math.Abs(_line.Height - wanted) < 0.5) return;
+
+        var home = _line.Monitor ?? MonitorService.All[0];
+        _line.PlaceOn(home);
+        if (!_line.Revealed) _line.SnapConcealed();
+        _line.OnCardsChanged();
+    }
+
     // ---- the polling loop -----------------------------------------------
 
     private void OnTick(object? sender, EventArgs e)
@@ -173,7 +203,12 @@ public sealed class LineController : IDisposable
             if (DateTime.UtcNow >= until)
             {
                 _peekUntil = null;
-                if (!_pinnedOpen) Retract();
+                // Never pull the line out from under the pointer: a peek that
+                // expires while the cursor is resting on a card used to tuck
+                // the whole dock away mid-click. The original treats "the
+                // pointer is inside" as busy and lets the normal away-timer
+                // do the retracting once the pointer leaves.
+                if (!_pinnedOpen && !OverLine(dip)) Retract();
             }
             else
             {
