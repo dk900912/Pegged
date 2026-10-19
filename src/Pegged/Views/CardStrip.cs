@@ -30,6 +30,12 @@ public sealed class CardStrip
     /// <summary>Raised after every relayout: the window refreshes its hit rects.</summary>
     public event EventHandler? LayoutChanged;
 
+    /// <summary>Raised when the user wants to open the preview for a card.</summary>
+    public event EventHandler<LineItem>? PreviewRequested;
+
+    /// <summary>Raised when the user wants the in-app quick crop for a card.</summary>
+    public event EventHandler<LineItem>? CropRequested;
+
     /// <summary>The card views currently on the line, oldest first.</summary>
     public IEnumerable<CardView> Views => _views.Values.OrderBy(v => Canvas.GetLeft(v));
 
@@ -48,8 +54,11 @@ public sealed class CardStrip
         var gone = _views.Keys.Where(id => live.All(i => i.Id != id)).ToList();
         foreach (var id in gone)
         {
-            _views[id].TakeDownRequested -= OnTakeDown;
-            _canvas.Children.Remove(_views[id]);
+            var v = _views[id];
+            v.TakeDownRequested -= OnTakeDown;
+            v.PreviewRequested -= OnPreview;
+            v.CropRequested -= OnCrop;
+            _canvas.Children.Remove(v);
             _views.Remove(id);
         }
 
@@ -59,6 +68,8 @@ public sealed class CardStrip
 
             var view = new CardView(item);
             view.TakeDownRequested += OnTakeDown;
+            view.PreviewRequested += OnPreview;
+            view.CropRequested += OnCrop;
             _views[item.Id] = view;
             _canvas.Children.Add(view);
         }
@@ -142,5 +153,15 @@ public sealed class CardStrip
     private void OnTakeDown(object? sender, EventArgs e)
     {
         if (sender is CardView view) App.CaptureStore.Discard(view.Item.Id);
+    }
+
+    private void OnPreview(object? sender, EventArgs e)
+    {
+        if (sender is CardView view) PreviewRequested?.Invoke(this, view.Item);
+    }
+
+    private void OnCrop(object? sender, EventArgs e)
+    {
+        if (sender is CardView view) CropRequested?.Invoke(this, view.Item);
     }
 }

@@ -39,6 +39,18 @@
     <Using Include="System.Windows.IDataObject" Alias="IDataObject" />
     <Using Include="System.Windows.Clipboard" Alias="Clipboard" />
     <Using Include="System.Windows.DataFormats" Alias="DataFormats" />
+    <Using Include="System.Windows.DataObject" Alias="DataObject" />
+    <Using Include="System.Windows.DragDrop" Alias="DragDrop" />
+    <Using Include="System.Windows.DragDropEffects" Alias="DragDropEffects" />
+    <Using Include="System.Windows.Input.KeyEventArgs" Alias="KeyEventArgs" />
+    <Using Include="System.Windows.Input.MouseEventArgs" Alias="MouseEventArgs" />
+    <Using Include="System.Windows.Input.MouseButtonEventArgs" Alias="MouseButtonEventArgs" />
+    <Using Include="System.Windows.Media.Brushes" Alias="Brushes" />
+    <Using Include="System.Windows.Input.Cursors" Alias="Cursors" />
+    <Using Include="System.Windows.Shapes.Rectangle" Alias="Rectangle" />
+    <Using Include="System.Windows.Application" Alias="Application" />
+    <Using Include="System.Windows.Controls.Button" Alias="Button" />
+    <Using Include="System.Windows.MessageBox" Alias="MessageBox" />
   </ItemGroup>
 
   <ItemGroup>
