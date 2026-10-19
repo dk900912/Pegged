@@ -20,6 +20,7 @@
     <Color x:Key="Palette.Border">#FFE3E6EE</Color>
     <Color x:Key="Palette.Text">#FF1A1B1F</Color>
     <Color x:Key="Palette.TextSecondary">#FF5C5F66</Color>
+    <Color x:Key="Palette.SubtleText">#FF6F737B</Color>
     <Color x:Key="Palette.Accent">#FF0F6CBD</Color>
     <Color x:Key="Palette.AccentAlt">#FF7B61FF</Color>
     <Color x:Key="Palette.Rope">#FF787E8A</Color>
@@ -32,6 +33,8 @@
     <Color x:Key="Palette.Success">#FF0F7B0F</Color>
     <Color x:Key="Palette.Mask">#8C000000</Color>
     <Color x:Key="Palette.Shadow">#2E000000</Color>
+    <Color x:Key="Palette.Window">#FFF6F7FB</Color>
+    <Color x:Key="Palette.Sidebar">#FFEFF1F6</Color>
 
     <!-- Brushes -->
     <SolidColorBrush x:Key="Brush.Acrylic" Color="{DynamicResource Palette.Acrylic}" />
@@ -41,12 +44,15 @@
     <SolidColorBrush x:Key="Brush.Border" Color="{DynamicResource Palette.Border}" />
     <SolidColorBrush x:Key="Brush.Text" Color="{DynamicResource Palette.Text}" />
     <SolidColorBrush x:Key="Brush.TextSecondary" Color="{DynamicResource Palette.TextSecondary}" />
+    <SolidColorBrush x:Key="Brush.SubtleText" Color="{DynamicResource Palette.SubtleText}" />
     <SolidColorBrush x:Key="Brush.Accent" Color="{DynamicResource Palette.Accent}" />
     <SolidColorBrush x:Key="Brush.AccentAlt" Color="{DynamicResource Palette.AccentAlt}" />
     <SolidColorBrush x:Key="Brush.Rope" Color="{DynamicResource Palette.Rope}" />
     <SolidColorBrush x:Key="Brush.RopeHighlight" Color="{DynamicResource Palette.RopeHighlight}" />
     <SolidColorBrush x:Key="Brush.Success" Color="{DynamicResource Palette.Success}" />
     <SolidColorBrush x:Key="Brush.Mask" Color="{DynamicResource Palette.Mask}" />
+    <SolidColorBrush x:Key="Brush.Window" Color="{DynamicResource Palette.Window}" />
+    <SolidColorBrush x:Key="Brush.Sidebar" Color="{DynamicResource Palette.Sidebar}" />
 
     <!-- Gradients -->
     <LinearGradientBrush x:Key="Brush.Wood" StartPoint="0,0" EndPoint="1,0">
@@ -212,6 +218,14 @@
                 <Setter Property="Background" Value="{DynamicResource Brush.SurfaceAlt}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style x:Key="SubtleHint" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{DynamicResource Font.Ui}" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.SubtleText}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,2,0,0" />
     </Style>
 
     <Style x:Key="NavItem" TargetType="ListBoxItem">

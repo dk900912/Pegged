@@ -156,3 +156,10 @@
 | 27 | `App.CropWindow.xaml.cs` 的 `Path` 在 `using System.IO;` 与 `using System.Windows.Shapes;` 之间无法消歧 | 同名空间来自两个不同的 using | 局部用 `new System.Windows.Shapes.Path { ... }` 限定，把 `System.IO.Path` 也改成 `System.IO.Path.*` 全限定 |
 | 28 | `CombinedGeometry(bg, hole, mode, xform)` 4-参构造 `CS1503` | 实际签名是 `(GeometryCombineMode, Geometry, Geometry, Transform)`，3 参简写也只接受 `(GeometryCombineMode, Geometry, Geometry)` | 调成 `new CombinedGeometry(GeometryCombineMode.Exclude, bgRect, holeRect)`，并去掉多余的 `bg`/`hole` 两个 `Rectangle` 占位 |
 | 29 | `CardView.CropRequested` 报 `CS0067` 从不使用 | 外部只在 PreviewWindow 通过 `CropRequested` 事件，CardView 上没有订阅者 | 显式声明 `add { } remove { }` 访问器，明确"此 hook 保留给以后"，消除 warning |
+| 30 | Module 6 编译 `CS0234: 命名空间 System.Drawing 中不存在类型 SystemIcon` | `SystemIcon` 拼写错误（应该是 `SystemIcons`） | 改 `System.Drawing.SystemIcons.Application` |
+| 31 | SettingsWindow 三个 `??` 运算符报 `CS0019`，参数是 `(string, T)` 元组 | C# `??` 不支持元组（无空合并语义） | 三个 `BuildXxxCombo` 全部改成显式类（`KeepOption`/`SizeOption`/`ThemeOption`），`List<T>.Find` + `?? items[0]` 处理默认 |
+| 32 | `App.Instance?.Watch?.Restart()` 报 `CS1061` | 老的 `WatchService` 只有 `Rebuild`，没暴露 `Restart` | 加 `public void Restart() => Rebuild();`，等价别名 |
+| 33 | `s.Shortcut.Display` 触发 `CS8602` | `HotkeyBinding?` 可空，访问 `.Display` 要先 null-check | 改 `s.Shortcut?.Display ?? ""` |
+| 34 | `HotkeyParser.Render` 引用了不存在的 `HotkeyModifiers` 枚举 | Settings 里 `HotkeyBinding.Modifiers` 是 `uint` 而不是枚举 | 把 `HotkeyParser` 改成直接操作 `NativeMethods.MOD_*` 位掩码；保持与 Win32 一致 |
+| 35 | `ToggleSwitch.xaml.cs` 报 `CS0246: 找不到 Shape` | WPF `Shape` 派生类在 `System.Windows.Shapes` 命名空间，需要 `using` | 加 `using System.Windows.Shapes;` |
+| 36 | SettingsWindow.xaml `ToggleSwitch` 报 `MC3074: 标记不存在` | 控件在 `Pegged.Views` 命名空间，XAML 里要加 xmlns | 加 `xmlns:views="clr-namespace:Pegged.Views"`，所有 ToggleSwitch 加 `views:` 前缀 |

@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Windows;
 using Microsoft.Win32;
 using Pegged.Core;
@@ -21,6 +22,9 @@ public partial class App : System.Windows.Application
 
     /// <summary>The folder watchers, kept alive while the app is running.</summary>
     internal WatchService? Watch { get; private set; }
+
+    /// <summary>The system-tray icon. Disposing it lets the app exit.</summary>
+    internal TrayService? Tray { get; private set; }
 
     internal static App Instance => (App)System.Windows.Application.Current;
 
@@ -63,8 +67,23 @@ public partial class App : System.Windows.Application
         // fresh captures, and listen to the clipboard.
         Watch = new WatchService();
 
+        // Module 6: tray + settings + (sync) launch-at-login state.
+        Settings.Current.LaunchAtLogin = StartupService.IsEnabled();
+        Settings.Current.Save();
+        Tray = new TrayService();
+        SettingsRequested += OnSettingsRequested;
+
         SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
         Exit += OnExit;
+    }
+
+    private void OnSettingsRequested(object? sender, EventArgs e)
+    {
+        var existing = System.Windows.Application.Current.Windows
+            .OfType<Views.SettingsWindow>().FirstOrDefault();
+        if (existing is not null) { existing.Activate(); return; }
+        var w = new Views.SettingsWindow();
+        w.Show();
     }
 
     /// <summary>Raised when the user asks for the settings window. Module 6
@@ -79,6 +98,8 @@ public partial class App : System.Windows.Application
     private void OnExit(object sender, ExitEventArgs e)
     {
         SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
+        SettingsRequested -= OnSettingsRequested;
+        Tray?.Dispose();
         Watch?.Dispose();
         Line?.Dispose();
         Store.Save();
