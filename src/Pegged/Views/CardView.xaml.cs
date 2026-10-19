@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -100,8 +100,9 @@ public partial class CardView : UserControl
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
         SizeChanged += OnSizeChanged;
-        MouseEnter += (_, _) => item.Hovering = true;
-        MouseLeave += (_, _) => { item.Hovering = false; item.Pressed = false; };
+        // Hover is driven by the pointer poll (CardStrip.UpdateHover), not by
+        // WPF: this window is click-through, so it never receives the
+        // MouseLeave that would make a second MouseEnter possible.
 
         // Single click: copy to clipboard. Double click: preview. Right
         // click: take down. Press-and-drag: OLE drag-out.
@@ -227,7 +228,17 @@ public partial class CardView : UserControl
 
         NameBar.Opacity = Math.Clamp(_hover.Value * 1.2, 0, 1);
         CloseButton.Opacity = Math.Clamp(_hover.Value * 1.2, 0, 1);
-        ActionRowBg.Opacity = Math.Clamp(_hover.Value * 1.2, 0, 1);
+        ActionRowHost.Opacity = Math.Clamp(_hover.Value * 1.2, 0, 1);
+
+        // The row fades in with the pointer, and a faded element still takes
+        // clicks: at rest these 28px buttons would sit invisibly over the bottom
+        // of the picture and quietly copy or take down a card the user meant to
+        // click. So the buttons only own their pixels while the row is up.
+        ActionRow.IsHitTestVisible = Item.Hovering;
+
+        // Same for the cross in the corner: invisible at rest, and it takes the
+        // card down, so it must not be the thing a click lands on.
+        CloseButton.IsHitTestVisible = Item.Hovering;
 
         // The shadow only swaps when it has to: re-assigning an effect every
         // frame would redo the layout work behind it.

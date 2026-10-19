@@ -90,7 +90,7 @@
       "id": "card.first_card_clickable",
       "area": "card",
       "expected": "挂 2 张以上时第一张仍可单击复制",
-      "actual": "clicked the first card's picture at (846,114): clipboard image=True",
+      "actual": "clicked the first card's picture at (825,107): clipboard image=True",
       "ok": true
     },
     {
@@ -104,14 +104,14 @@
       "id": "card.preview_takes_keyboard",
       "area": "card",
       "expected": "预览窗口打开即获得焦点（Esc 可关）",
-      "actual": "foreground=预览 preview=0x400c50",
+      "actual": "foreground=预览 preview=0x73074a",
       "ok": true
     },
     {
       "id": "card.preview_close",
       "area": "card",
       "expected": "Esc 关闭预览窗口",
-      "actual": "preview 0x400c50 closed=True",
+      "actual": "preview 0x73074a closed=True",
       "ok": true
     },
     {
@@ -125,7 +125,7 @@
       "id": "card.close_button_drops",
       "area": "card",
       "expected": "卡片右上角 × 取下",
-      "actual": "cards 1 -> 0",
+      "actual": "cards after a real click on the cross=0",
       "ok": true
     },
     {
@@ -139,7 +139,7 @@
       "id": "card.wheel_scroll",
       "area": "card",
       "expected": "卡片超出一屏时滚轮向旧照片滚动",
-      "actual": "first card x -1854 -> -1171 after six notches up",
+      "actual": "first card x -1834 -> -1720 after six notches up",
       "ok": true
     },
     {
@@ -153,14 +153,14 @@
       "id": "crop.takes_keyboard",
       "area": "crop",
       "expected": "裁剪浮层一打开就拿到键盘",
-      "actual": "foreground=裁剪 overlay=0x140e0c (Esc needs the overlay focused)",
+      "actual": "foreground=裁剪 overlay=0x16006a (Esc needs the overlay focused)",
       "ok": true
     },
     {
       "id": "crop.esc_cancels",
       "area": "crop",
       "expected": "Esc 取消裁剪",
-      "actual": "overlay 0x140e0c closed=True",
+      "actual": "overlay 0x16006a closed=True",
       "ok": true
     },
     {
@@ -174,14 +174,14 @@
       "id": "settings.open",
       "area": "settings",
       "expected": "齿轮打开设置中心",
-      "actual": "settings window hwnd=0x180e0c",
+      "actual": "settings window hwnd=0x1a006a",
       "ok": true
     },
     {
       "id": "settings.takes_keyboard",
       "area": "settings",
       "expected": "设置窗口打开即获得焦点",
-      "actual": "foreground=设置 settings=0x180e0c",
+      "actual": "foreground=设置 settings=0x1a006a",
       "ok": true
     },
     {
@@ -202,7 +202,7 @@
       "id": "settings.theme_live",
       "area": "settings",
       "expected": "切换深色主题卡片边框立刻换色",
-      "actual": "card frame light=250 dark=67",
+      "actual": "card frame light=249 dark=43",
       "ok": true
     },
     {

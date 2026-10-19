@@ -156,6 +156,9 @@ python scripts/e2e/audit_walkthrough.py --only crop # 只跑一区
 # 4) 定向复现：多张卡片时每张图的可点区域（原文报障的复现脚本）
 python scripts/e2e/repro_first_card_click.py                 # 2 张
 python scripts/e2e/repro_first_card_click.py --cards 3 --grid # 3 张 + 逐点网格
+
+# 5) 定向复现：卡片悬停栏三个按钮各自归位（第六轮报障的复现脚本）
+python scripts/e2e/repro_card_buttons.py                     # 6 项，真实鼠标
 ```
 
 结果落在 `outputs/acceptance/audit.json`（全量）与 `outputs/acceptance/audit-<area>.json`（分区），截图在 `outputs/acceptance/shots/audit/`。
@@ -184,3 +187,22 @@ python scripts/e2e/repro_first_card_click.py --cards 3 --grid # 3 张 + 逐点�
 **未在本轮变更、但已确认对齐的项**：设置中心 720×560 / 240px 卡片式导航 / 5 页 / 28px 页头（`settings.nav_pages` 遍历 5 个 Nav 按钮）；裁剪浮层九宫格 + 8 手柄 + 实时尺寸（`crop.resize_and_apply`）。
 
 **已知限制（环境所致，非代码缺陷）**：本会话环境无法向系统托盘投递合成鼠标事件（连任务栏开始按钮悬停都无高亮），托盘菜单因此改用反射探针直接构建 `ContextMenuStrip` 并渲染截图核对，而非真实右键点击。
+
+---
+
+## 8. 卡片悬停栏按钮轮（第六轮）
+
+用户报障：「打包运行最新版本，贴上一张图后，三个按钮小图标点击后都是显示：已复制！」
+
+| # | 现象（用户视角） | 根因 | 修复 | 证据（修复后） |
+| --- | --- | --- | --- | --- |
+| C-1 | 悬停栏的复制 / 裁剪 / 删除三个图标，点哪个都只弹绿色「已复制！」，裁剪层不开、卡片不下架 | 装饰底板 `ActionRowBg` 是三个按钮的**父级**且带 `IsHitTestVisible="False"`；该属性**继承**，子按钮一起失去命中测试，点击穿到照片上触发「点图即复制」 | 底板降为按钮的兄弟（`Grid` 内先 Border 后 StackPanel，与工具栏同构），三个按钮恢复可点 | 修前 `repro_card_buttons.py`：三个按钮 `badge=1060~1151, clipboard=True, crop_open=False, cards=1`；修后 `crop.opens=True`、`delete.takes_down cards=0` |
+| C-2 | 同一张卡片，**第二次**把指针移上去时，三个图标再也不出现（点下去依旧是「已复制」） | 悬停靠 WPF `MouseEnter` 置真；窗口逐点穿透，指针离开卡片后收不到鼠标消息，`MouseLeave` 永不到达，WPF 认为指针从未离开（实测 `IsMouseOver=True`、`enter=1 leave=0`），第二次 `MouseEnter` 不再触发 | 悬停改由指针轮询单一驱动（`LineWindow.UpdatePointer` → `CardStrip.UpdateHover`），删掉 `CardView` 的 `MouseEnter/MouseLeave` | `row.hover_repeats`：移开→回来→点裁剪，`crop opened on the second hover=True` |
+| C-3 | 指针刚落到卡片上、图标还没淡入的那一瞬间点下去，会静默把卡片删掉（`×`）或复制 | `Opacity=0` 的元素**仍然参与命中测试**，与第 88 条（空态提示吞点击）同源 | `ActionRow.IsHitTestVisible = Item.Hovering`、`CloseButton.IsHitTestVisible = Item.Hovering` | `row.hidden_not_clickable` / `corner.hidden_not_clickable`：`cards=1`（未被取下），且剪贴板拿到图片 |
+| C-4 | 这套缺陷此前**全部验收通过**，没有任何红灯 | 审计里 `crop.opens`、`card.close_button_drops` 都用 UIA `Invoke()`：它直接调按钮的 automation peer 触发 `Click`，**绕过命中测试**，正是出问题的那一层 | `card.close_button_drops` 改为「悬停 + 真实鼠标点击 + 等卡片真的消失」；新增 `repro_card_buttons.py`（6 项，全部真实鼠标） | audit `34/34`、launch `9/9`、interaction `5/5`、repro `6/6`，`crash.log` 无新增 |
+
+**举一反三的排查范围**（同类模式全库过一遍）：
+
+1. **「不可命中父级包住可点控件」**：`CardView` 的 `Pin` / `NameBar` / `CopiedTag`、`LineWindow` 的 `RopeLayer` / 工具栏底板 / `Hint`、`CropWindow` 的遮罩与网格线、`ComboBox` 模板里的 `ContentPresenter` —— 逐个确认其子树内**没有**按钮，唯一命中的是 `ActionRowBg`，已修。
+2. **「穿透窗口里靠 WPF 悬停」**：全库仅 `CardView` 一处，已改为轮询；`FluentTheme` 里的 `IsMouseOver` 触发器都只作用于设置窗 / 裁剪窗这类**普通窗口**（能正常收到 MouseLeave），不受影响。
+3. **「透明但仍吃点击」**：卡片右上角 `×` 与底部三按钮，已随悬停态收紧；`VideoBadge` 用 `Collapsed`、`CopiedTag` 显式 `IsHitTestVisible=False`，无此问题。

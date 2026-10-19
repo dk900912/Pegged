@@ -96,3 +96,11 @@
 - [x] 修复：验收脚本两处假失败（应用未启动未报错 / 夹具固定文件名不触发 `Created`）→ `ensure_app()` + 先删后写
 - [x] 回归：`audit_walkthrough` 34/34、`launch_probe` 9/9、`interaction_probe` 5/5、`repro_first_card_click` GREEN，`crash.log` 无新增
 - [x] 重新发布 Release 构建（0 Error 0 Warning）
+
+## Phase 6 — 卡片悬停栏按钮（第六轮：三个图标全变「已复制」）
+- [x] 修复：`ActionRowBg` 作为按钮父级带 `IsHitTestVisible="False"`（该属性继承）→ 底板降为兄弟层，按钮恢复可点
+- [x] 修复：悬停只触发一次（穿透窗口收不到 `MouseLeave`，`MouseEnter` 不再重来）→ 改由指针轮询 `CardStrip.UpdateHover` 单一驱动
+- [x] 修复：不可见的 `×` 与三按钮仍吃点击 → 命中测试跟随 `Item.Hovering`
+- [x] 新增 `scripts/e2e/repro_card_buttons.py`：6 项真实鼠标断言（三个按钮各自归位 / 隐藏态不吞点击 / 悬停可重复）
+- [x] 加固：`card.close_button_drops` 从 UIA `Invoke` 改为真实点击（`Invoke` 绕过命中测试，正是它放过了本缺陷）
+- [x] 回归：audit 34/34、launch 9/9、interaction 5/5、repro 6/6，`crash.log` 无新增；Release 0 错误 0 警告

@@ -1,0 +1,70 @@
+{
+  "ok": true,
+  "results": [
+    {
+      "button": "CopyButton",
+      "clicked_at": [
+        894,
+        117
+      ],
+      "badge_pixels": 1147,
+      "badge_showing": true,
+      "clipboard_image": true,
+      "crop_open": false,
+      "cards": 1,
+      "shot": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\outputs\\acceptance\\shots\\audit\\repro-copy.png"
+    },
+    {
+      "button": "CropButton",
+      "clicked_at": [
+        940,
+        131
+      ],
+      "badge_pixels": 0,
+      "badge_showing": false,
+      "clipboard_image": false,
+      "crop_open": true,
+      "cards": 1,
+      "shot": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\outputs\\acceptance\\shots\\audit\\repro-crop.png"
+    },
+    {
+      "button": "DeleteButton",
+      "clicked_at": [
+        983,
+        141
+      ],
+      "badge_pixels": 0,
+      "badge_showing": false,
+      "clipboard_image": false,
+      "crop_open": false,
+      "cards": 0,
+      "shot": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\outputs\\acceptance\\shots\\audit\\repro-delete.png"
+    },
+    {
+      "button": "DeleteButton",
+      "clicked_at": [
+        976,
+        143
+      ],
+      "badge_pixels": 1112,
+      "badge_showing": true,
+      "clipboard_image": true,
+      "crop_open": false,
+      "cards": 1,
+      "shot": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\outputs\\acceptance\\shots\\audit\\repro-instant.png"
+    },
+    {
+      "button": "CloseButton",
+      "clicked_at": [
+        1035,
+        90
+      ],
+      "badge_pixels": 842,
+      "badge_showing": true,
+      "clipboard_image": true,
+      "crop_open": false,
+      "cards": 1,
+      "shot": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\outputs\\acceptance\\shots\\audit\\repro-corner.png"
+    }
+  ]
+}

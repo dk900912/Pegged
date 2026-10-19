@@ -953,14 +953,22 @@ def main():
         check("card.right_click_drops", "card", "右键取下卡片", card_right_click_drops)
 
         def card_close_button():
-            reveal()
+            # A real click, not Invoke: the automation peer skips hit testing, and
+            # hit testing is exactly what went wrong when the hover row turned out
+            # to be unclickable (see repro_card_buttons.py).
+            clear_cards()
             write_test_images(1, "audit-close")
             wait_cards(1)
-            before = card_count()
-            buttons()["CloseButton"][0].invoke()
-            time.sleep(1.6)
-            after = card_count()
-            return after == before - 1, "cards %d -> %d" % (before, after)
+            reveal()
+            btns = buttons()
+            rect = btns["CloseButton"][0].rectangle()
+            cx, cy = (rect.left + rect.right) // 2, (rect.top + rect.bottom) // 2
+            pointer(cx, cy, 0.6)
+            click(cx, cy)
+            deadline = time.time() + 2.5
+            while time.time() < deadline and card_count() == 1:
+                time.sleep(0.2)
+            return card_count() == 0, "cards after a real click on the cross=%d" % card_count()
 
         check("card.close_button_drops", "card", "卡片右上角 × 取下", card_close_button)
 

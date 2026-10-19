@@ -79,14 +79,20 @@
                                Foreground="White" TextTrimming="CharacterEllipsis" />
                 </Border>
 
-                <!-- Bottom hover action row: copy / crop / delete. The glass
-                     behind the buttons is decoration; only the buttons take
-                     clicks, so the pill itself is not hit testable. -->
-                <Border x:Name="ActionRowBg" VerticalAlignment="Bottom" Margin="4,0,4,26"
-                        CornerRadius="10" Background="#66000000" Padding="4,3"
-                        Opacity="0" IsHitTestVisible="False">
+                <!-- Bottom hover action row: copy / crop / delete.
+
+                     The glass is a SIBLING of the buttons, not their parent.
+                     IsHitTestVisible is an inherited property, so a Border with
+                     IsHitTestVisible="False" wrapping the row leaves all three
+                     buttons unclickable - every click fell through to the photo
+                     and copied it, which is exactly the "all three say 已复制"
+                     report. Same arrangement as the toolbar in LineWindow. -->
+                <Grid x:Name="ActionRowHost" VerticalAlignment="Bottom" Margin="4,0,4,26"
+                      Opacity="0">
+                    <Border x:Name="ActionRowBg" CornerRadius="10" Background="#66000000"
+                            IsHitTestVisible="False" />
                     <StackPanel x:Name="ActionRow" Orientation="Horizontal"
-                                HorizontalAlignment="Center">
+                                HorizontalAlignment="Center" Margin="4,3">
                         <Button x:Name="CopyButton" Style="{StaticResource RoundSubtleButton}" Tag="14"
                                 Width="28" Height="28" Padding="0" Margin="0,0,6,0"
                                 ToolTip="{loc:Str Card.Copied}" Content="&#x2398;" Click="OnCopy" />
@@ -97,7 +103,7 @@
                                 Width="28" Height="28" Padding="0"
                                 ToolTip="{loc:Str Card.TakeDown}" Content="&#x1F5D1;" Click="OnTakeDown" />
                     </StackPanel>
-                </Border>
+                </Grid>
 
                 <!-- "Copied!" lands on the card for a moment -->
                 <Border x:Name="CopiedTag" HorizontalAlignment="Center" VerticalAlignment="Bottom"

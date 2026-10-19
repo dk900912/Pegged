@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -159,6 +159,27 @@ public sealed class CardStrip
             if (!view.Item.Hovering && !view.Item.Pressed) continue;
             view.Item.Hovering = false;
             view.Item.Pressed = false;
+        }
+    }
+
+    /// <summary>Marks the card under the pointer as hovered and every other card
+    /// as not.
+    ///
+    /// Hover must come from the pointer poll, not from WPF: the line is
+    /// click-through, so the window stops receiving mouse messages the moment
+    /// the pointer leaves a card. WPF therefore raises MouseEnter once and never
+    /// the matching MouseLeave, and the card stays "entered" forever - the first
+    /// hover would be the only one it ever gets, leaving the name strip and the
+    /// copy/crop/delete row invisible for the rest of its life.
+    /// </summary>
+    public void UpdateHover(CardView? over)
+    {
+        foreach (var view in _views.Values)
+        {
+            var hovered = ReferenceEquals(view, over);
+            if (view.Item.Hovering == hovered) continue;
+            view.Item.Hovering = hovered;
+            if (!hovered && !view.Item.Dragging) view.Item.Pressed = false;
         }
     }
 

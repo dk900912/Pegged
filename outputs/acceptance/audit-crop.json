@@ -11,14 +11,14 @@
       "id": "crop.takes_keyboard",
       "area": "crop",
       "expected": "裁剪浮层一打开就拿到键盘",
-      "actual": "foreground=裁剪 overlay=0x140e0c (Esc needs the overlay focused)",
+      "actual": "foreground=裁剪 overlay=0x16006a (Esc needs the overlay focused)",
       "ok": true
     },
     {
       "id": "crop.esc_cancels",
       "area": "crop",
       "expected": "Esc 取消裁剪",
-      "actual": "overlay 0x140e0c closed=True",
+      "actual": "overlay 0x16006a closed=True",
       "ok": true
     },
     {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -470,7 +470,10 @@ public partial class LineWindow : Window
             if (grown.Contains(cursorInWindow)) { overCard = true; break; }
         }
 
-        if (!overCard) Strip.ClearHover();
+        // Hover is decided here, once per poll, for every card: WPF cannot do it
+        // on a click-through window (it never sees the pointer leave, so it only
+        // ever reports one MouseEnter per card). See CardStrip.UpdateHover.
+        Strip.UpdateHover(overCard ? Strip.CardAt(cursorInWindow) : null);
     }
 
     // ---- toolbar ---------------------------------------------------------
