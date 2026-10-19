@@ -28,7 +28,16 @@
 - [x] Module 6: Fluent 设置中心窗口、系统托盘菜单、`RegisterHotKey` 全局热键、开机自启
 
 ## Phase 4 — 打包发布、文档脱敏与复盘
-- [ ] `dotnet publish -c Release -r win-x64 --self-contained false -o ./publish`
-- [ ] 删除 `_reference_macos/`，`AGENTS.md` 改为日常维护规范，完善 `README.md`
-- [ ] 最终 git commit & push
-- [ ] 输出完整复盘报告
+- [x] `dotnet publish -c Release -r win-x64 --self-contained false -o ./publish`
+- [x] 删除 `_reference_macos/`，`AGENTS.md` 改为日常维护规范，完善 `README.md`
+- [x] 最终 git commit & push
+- [x] 输出完整复盘报告
+
+## Phase 5 — UI 设计目标与实际效果核对（追加验证）
+- [x] 端到端自动测试：启动 → 边缘唤醒 → 挂卡 → 悬停 → 复制 → 预览 → 裁剪 → 设置 → 收回
+- [x] 修复：双击预览窗口被遮挡（改 CenterScreen + Topmost，移除 Owner 绑定）
+- [x] 修复：卡片悬停镀铬不完整（添加 Copy/Crop/Delete 底部操作行 + 衣夹悬停张开动画）
+- [x] 修复：裁剪窗口非全屏遮罩（重写为 Maximized + 33% 九宫格白线 + 底部浮动操作栏）
+- [x] 修复：设置窗口尺寸与导航不符合规范（720×560 / 240px 左栏 / 图标+副标题导航 / 28px 页头）
+- [x] 修复：空状态绳子无微风 + 边缘胶囊无流光（添加 `_breezePhase` 摆动 + 流光 GradientStop 滑动）
+- [x] 重新发布 Release 构建（验证 0 Error 0 Warning）
