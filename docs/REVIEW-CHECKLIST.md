@@ -206,3 +206,4 @@ python scripts/e2e/repro_card_buttons.py                     # 6 项，真实鼠
 1. **「不可命中父级包住可点控件」**：`CardView` 的 `Pin` / `NameBar` / `CopiedTag`、`LineWindow` 的 `RopeLayer` / 工具栏底板 / `Hint`、`CropWindow` 的遮罩与网格线、`ComboBox` 模板里的 `ContentPresenter` —— 逐个确认其子树内**没有**按钮，唯一命中的是 `ActionRowBg`，已修。
 2. **「穿透窗口里靠 WPF 悬停」**：全库仅 `CardView` 一处，已改为轮询；`FluentTheme` 里的 `IsMouseOver` 触发器都只作用于设置窗 / 裁剪窗这类**普通窗口**（能正常收到 MouseLeave），不受影响。
 3. **「透明但仍吃点击」**：卡片右上角 `×` 与底部三按钮，已随悬停态收紧；`VideoBadge` 用 `Collapsed`、`CopiedTag` 显式 `IsHitTestVisible=False`，无此问题。
+| C-5 | 鼠标**还没点**，只是移到复制图标上，就弹出「已复制！」 | 复制按钮的 `ToolTip` 绑的是结果文案 `Card.Copied`（"已复制！"），而不是动作文案 `Card.Copy`（"复制"）；后者在资源里存在但从未被引用 | 三个按钮改用动作文案；图钉按钮同族的错误文案（"隐藏挂绳"实为"固定展开"）一并改为 `Tray.Pin` / `Tray.Unpin` | `tooltip.CopyButton='复制'`、`tooltip.CropButton='裁剪'`、`tooltip.DeleteButton='取下'`（UIA 读取真实提示窗）；截图 `outputs/acceptance/tooltip-copy.png` |

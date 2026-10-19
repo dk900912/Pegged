@@ -7,9 +7,9 @@
   ],
   "processes": [
     {
-      "exe": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\publish\\Pegged.exe",
-      "pid": 21920,
-      "name": "Pegged.exe"
+      "pid": 36572,
+      "name": "Pegged.exe",
+      "exe": "C:\\Users\\dk900\\WorkBuddy AI\\win11-tendedero\\publish\\Pegged.exe"
     }
   ],
   "windows": [
@@ -32,7 +32,7 @@
         -15
       ],
       "texts": [
-        "btn-corner-1792414523705.png",
+        "btn-tip-DeleteButton-1792417246231.png",
         "⎘",
         "✂",
         "🗑",

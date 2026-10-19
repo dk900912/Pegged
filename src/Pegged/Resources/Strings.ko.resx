@@ -64,6 +64,12 @@
   <data name="Tray.HideLine" xml:space="preserve">
     <value>줄 숨기기</value>
   </data>
+  <data name="Tray.Pin" xml:space="preserve">
+    <value>고정</value>
+  </data>
+  <data name="Tray.Unpin" xml:space="preserve">
+    <value>고정 해제</value>
+  </data>
   <data name="Tray.ClearAll" xml:space="preserve">
     <value>모두 내리기</value>
   </data>

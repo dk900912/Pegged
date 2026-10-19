@@ -4,10 +4,10 @@
     {
       "button": "CopyButton",
       "clicked_at": [
-        894,
+        895,
         117
       ],
-      "badge_pixels": 1147,
+      "badge_pixels": 1141,
       "badge_showing": true,
       "clipboard_image": true,
       "crop_open": false,
@@ -17,7 +17,7 @@
     {
       "button": "CropButton",
       "clicked_at": [
-        940,
+        939,
         131
       ],
       "badge_pixels": 0,
@@ -30,8 +30,8 @@
     {
       "button": "DeleteButton",
       "clicked_at": [
-        983,
-        141
+        978,
+        142
       ],
       "badge_pixels": 0,
       "badge_showing": false,
@@ -43,10 +43,10 @@
     {
       "button": "DeleteButton",
       "clicked_at": [
-        976,
-        143
+        978,
+        142
       ],
-      "badge_pixels": 1112,
+      "badge_pixels": 1113,
       "badge_showing": true,
       "clipboard_image": true,
       "crop_open": false,
@@ -56,11 +56,11 @@
     {
       "button": "CloseButton",
       "clicked_at": [
-        1035,
-        90
+        1023,
+        106
       ],
-      "badge_pixels": 842,
-      "badge_showing": true,
+      "badge_pixels": 0,
+      "badge_showing": false,
       "clipboard_image": true,
       "crop_open": false,
       "cards": 1,

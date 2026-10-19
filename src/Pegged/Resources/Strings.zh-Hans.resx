@@ -64,6 +64,12 @@
   <data name="Tray.HideLine" xml:space="preserve">
     <value>隐藏挂绳</value>
   </data>
+  <data name="Tray.Pin" xml:space="preserve">
+    <value>固定展开</value>
+  </data>
+  <data name="Tray.Unpin" xml:space="preserve">
+    <value>取消固定</value>
+  </data>
   <data name="Tray.ClearAll" xml:space="preserve">
     <value>一键清空</value>
   </data>

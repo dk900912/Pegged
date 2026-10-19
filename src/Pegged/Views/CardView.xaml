@@ -95,10 +95,10 @@
                                 HorizontalAlignment="Center" Margin="4,3">
                         <Button x:Name="CopyButton" Style="{StaticResource RoundSubtleButton}" Tag="14"
                                 Width="28" Height="28" Padding="0" Margin="0,0,6,0"
-                                ToolTip="{loc:Str Card.Copied}" Content="&#x2398;" Click="OnCopy" />
+                                ToolTip="{loc:Str Card.Copy}" Content="&#x2398;" Click="OnCopy" />
                         <Button x:Name="CropButton" Style="{StaticResource RoundSubtleButton}" Tag="14"
                                 Width="28" Height="28" Padding="0" Margin="0,0,6,0"
-                                ToolTip="{loc:Str Crop.Title}" Content="&#x2702;" Click="OnCrop" />
+                                ToolTip="{loc:Str Card.Crop}" Content="&#x2702;" Click="OnCrop" />
                         <Button x:Name="DeleteButton" Style="{StaticResource RoundSubtleButton}" Tag="14"
                                 Width="28" Height="28" Padding="0"
                                 ToolTip="{loc:Str Card.TakeDown}" Content="&#x1F5D1;" Click="OnTakeDown" />

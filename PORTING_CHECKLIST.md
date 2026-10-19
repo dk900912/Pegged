@@ -104,3 +104,5 @@
 - [x] 新增 `scripts/e2e/repro_card_buttons.py`：6 项真实鼠标断言（三个按钮各自归位 / 隐藏态不吞点击 / 悬停可重复）
 - [x] 加固：`card.close_button_drops` 从 UIA `Invoke` 改为真实点击（`Invoke` 绕过命中测试，正是它放过了本缺陷）
 - [x] 回归：audit 34/34、launch 9/9、interaction 5/5、repro 6/6，`crash.log` 无新增；Release 0 错误 0 警告
+- [x] 修复：复制按钮的悬停提示误用结果文案（`Card.Copied` → `Card.Copy`），图钉按钮的「隐藏挂绳」→ `Tray.Pin` / `Tray.Unpin`
+- [x] 新增回归：`tooltip.CopyButton/CropButton/DeleteButton`（读真实提示窗，禁止出现「已复制」）

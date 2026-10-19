@@ -64,6 +64,12 @@
   <data name="Tray.HideLine" xml:space="preserve">
     <value>Ocultar la cuerda</value>
   </data>
+  <data name="Tray.Pin" xml:space="preserve">
+    <value>Fijar abierto</value>
+  </data>
+  <data name="Tray.Unpin" xml:space="preserve">
+    <value>Soltar</value>
+  </data>
   <data name="Tray.ClearAll" xml:space="preserve">
     <value>Bajar todo</value>
   </data>

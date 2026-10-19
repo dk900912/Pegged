@@ -484,8 +484,10 @@ public partial class LineWindow : Window
     {
         TogglePin();
         // A pin means "stay down"; an arrow means "go back up when I leave".
+        // The tooltip has to name that action: it used to say 隐藏挂绳 / 显示挂绳,
+        // which described a button that does not exist.
         PinButton.Content = _pinned ? "\U0001F4CC" : "\u2B06";
-        PinButton.ToolTip = Loc.Get(_pinned ? "Tray.ShowLine" : "Tray.HideLine");
+        PinButton.ToolTip = Loc.Get(_pinned ? "Tray.Unpin" : "Tray.Pin");
     }
 
     private void OnSettings(object sender, RoutedEventArgs e) => SettingsRequested?.Invoke(this, EventArgs.Empty);

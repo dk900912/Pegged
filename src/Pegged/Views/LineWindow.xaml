@@ -51,7 +51,7 @@
                 <Button x:Name="ClearButton" Style="{StaticResource RoundSubtleButton}"
                         Tag="15" ToolTip="{loc:Str Tray.ClearAll}" Click="OnClear" Content="&#x1F5D1;" />
                 <Button x:Name="PinButton" Style="{StaticResource RoundSubtleButton}"
-                        Tag="15" ToolTip="{loc:Str Tray.HideLine}" Click="OnPin" Content="&#x1F4CC;" />
+                        Tag="15" ToolTip="{loc:Str Tray.Pin}" Click="OnPin" Content="&#x1F4CC;" />
                 <Button x:Name="SettingsButton" Style="{StaticResource RoundSubtleButton}"
                         Tag="15" ToolTip="{loc:Str Tray.Settings}" Click="OnSettings" Content="&#x2699;" />
             </StackPanel>

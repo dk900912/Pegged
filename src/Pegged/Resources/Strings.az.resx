@@ -64,6 +64,12 @@
   <data name="Tray.HideLine" xml:space="preserve">
     <value>Xətti gizlət</value>
   </data>
+  <data name="Tray.Pin" xml:space="preserve">
+    <value>Bərkid</value>
+  </data>
+  <data name="Tray.Unpin" xml:space="preserve">
+    <value>Bərkidilməni götür</value>
+  </data>
   <data name="Tray.ClearAll" xml:space="preserve">
     <value>Hamısını yığışdır</value>
   </data>

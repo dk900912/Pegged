@@ -86,6 +86,26 @@ def windows_of_app():
     return out
 
 
+def all_app_windows():
+    """Every top-level window of the app, including untitled ones.
+
+    Tooltips live in their own borderless window with no title, so the titled
+    list above cannot see them.
+    """
+    out = []
+    mine = pids()
+
+    def cb(hwnd, _):
+        _, pid = win32process.GetWindowThreadProcessId(hwnd)
+        if pid not in mine:
+            return
+        out.append((hwnd, win32gui.GetClassName(hwnd), win32gui.GetWindowText(hwnd),
+                    win32gui.GetWindowRect(hwnd), win32gui.IsWindowVisible(hwnd)))
+
+    win32gui.EnumWindows(cb, None)
+    return out
+
+
 def line():
     for hwnd, title, _ in windows_of_app():
         if title == "Pegged":
@@ -309,6 +329,73 @@ def hover_repeats():
     return opened, "crop opened on the second hover=%s" % opened
 
 
+def tooltip_text():
+    """The text of the tooltip that is on screen right now, if any.
+
+    A WPF tooltip is its own borderless top-level window with no title, so it
+    shows up in the process's window list next to the line window.
+    """
+    for hwnd, _cls, title, rect, visible in all_app_windows():
+        if not visible or title:
+            continue
+        w, h = rect[2] - rect[0], rect[3] - rect[1]
+        if not (20 <= w <= 420 and 12 <= h <= 140):
+            continue
+        try:
+            texts = [t.window_text() for t in
+                     Desktop(backend="uia").window(handle=hwnd).descendants(control_type="Text")]
+        except Exception:
+            continue
+        texts = [t for t in texts if t]
+        if texts:
+            return " ".join(texts)
+    return ""
+
+
+def tooltip_check(button_id, expected, tag):
+    """Hovers a button and reads what the tooltip actually says.
+
+    The copy button used to borrow the badge's text ("已复制！"), so hovering it
+    announced a copy that had not happened yet.
+    """
+    clear_cards()
+    close_crop()
+    write_one(tag)
+    if not wait_cards(1):
+        return False, "the card never hung"
+    reveal()
+    rect = by_id()[button_id][0].rectangle()
+    cx, cy = (rect.left + rect.right) // 2, (rect.top + rect.bottom) // 2
+    user32.SetCursorPos(960, 2)
+    time.sleep(0.9)
+    user32.SetCursorPos(cx, cy)
+    time.sleep(1.8)
+    text = tooltip_text()
+    user32.SetCursorPos(960, 2)
+    time.sleep(0.5)
+    ok = expected in text and "已复制" not in text and "Copied" not in text
+    return ok, "tooltip=%r (expect %r)" % (text, expected)
+
+
+def expected_label(key):
+    """The string the running app should show for `key`, in its own language."""
+    import re
+    lang = "zh-Hans"
+    try:
+        with open(os.path.join(os.environ["APPDATA"], "Pegged", "settings.json"),
+                  encoding="utf-8") as f:
+            lang = json.load(f).get("Language") or "zh-Hans"
+    except Exception:
+        pass
+    path = os.path.join(ROOT, "src", "Pegged", "Resources", "Strings.%s.resx" % lang)
+    if not os.path.exists(path):
+        path = os.path.join(ROOT, "src", "Pegged", "Resources", "Strings.resx")
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    m = re.search(r'<data name="%s"[^>]*>\s*<value>(.*?)</value>' % re.escape(key), text, re.S)
+    return m.group(1).strip() if m else key
+
+
 def main():
     ensure_app()
     results = []
@@ -357,6 +444,14 @@ def main():
     check("corner.hidden_not_clickable", corner.get("cards") == 1,
           "cards after an instant click on the hidden cross=%s (expect 1)"
           % corner.get("cards"))
+
+    # A tooltip must name the action, never its result: hovering "copy" used to
+    # announce 已复制！ before anything was clicked.
+    for button_id, key in (("CopyButton", "Card.Copy"),
+                           ("CropButton", "Card.Crop"),
+                           ("DeleteButton", "Card.TakeDown")):
+        ok, detail = tooltip_check(button_id, expected_label(key), "tip-" + button_id)
+        check("tooltip.%s" % button_id, ok, detail)
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:

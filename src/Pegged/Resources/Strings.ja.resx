@@ -64,6 +64,12 @@
   <data name="Tray.HideLine" xml:space="preserve">
     <value>ラインを隠す</value>
   </data>
+  <data name="Tray.Pin" xml:space="preserve">
+    <value>固定</value>
+  </data>
+  <data name="Tray.Unpin" xml:space="preserve">
+    <value>固定を解除</value>
+  </data>
   <data name="Tray.ClearAll" xml:space="preserve">
     <value>すべて取り込む</value>
   </data>
