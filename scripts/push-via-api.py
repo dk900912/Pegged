@@ -12,6 +12,7 @@ Afterwards the local tracking ref is updated, so `git status` stays quiet and
 the next run only uploads new commits.
 """
 import base64
+import http.client
 import json
 import os
 import subprocess
@@ -64,6 +65,11 @@ def api(path, method="GET", payload=None, attempts=12):
                 raise
             last = e
         except urllib.error.URLError as e:
+            last = e
+        except (http.client.HTTPException, OSError) as e:
+            # Not a proxy 502 but the same flakiness: the connection is cut
+            # mid-body and http.client raises IncompleteRead while reading a
+            # large response. The request is idempotent, so try it again.
             last = e
         if attempt + 1 < attempts:
             wait = min(0.4 * (2 ** attempt), 6.0)
