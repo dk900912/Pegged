@@ -108,7 +108,7 @@
                 </ListBox>
 
                 <StackPanel Grid.Row="2" Margin="20,0,20,16" Orientation="Horizontal">
-                    <Button x:Name="CloseButton" AutomationProperties.AutomationId="CloseButton" Style="{StaticResource GlassButton}" Padding="12,6"
+                    <Button x:Name="CloseButton" AutomationProperties.AutomationId="CloseButton" Style="{StaticResource SubtleButton}" Padding="12,6"
                             Click="OnClose" Content="{loc:Str Preview.Close}" />
                 </StackPanel>
             </Grid>
@@ -136,7 +136,13 @@
                                 <TextBlock Text="{loc:Str Settings.Language}" />
                                 <TextBlock Text="{loc:Str Settings.LanguageDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <ComboBox x:Name="LanguageCombo" AutomationProperties.AutomationId="LanguageCombo" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="180" SelectionChanged="OnLanguage" />
+                            <!-- Showcase 5: language is a segmented row, not a
+                                 dropdown. Ten languages do not fit in pills, so
+                                 the first three stay and the rest live under
+                                 the trailing "…" pill. -->
+                            <views:Segmented x:Name="LangSegmented" AutomationProperties.AutomationId="LangSegmented"
+                                             Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                             />
                         </Grid>
                     </Border>
 
@@ -164,7 +170,12 @@
                                 <TextBlock Text="{loc:Str Settings.Keep}" />
                                 <TextBlock Text="{loc:Str Settings.KeepDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <ComboBox x:Name="KeepCombo" AutomationProperties.AutomationId="KeepCombo" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="120" SelectionChanged="OnKeep" />
+                            <!-- Showcase 5: 随屏宽 / 25 / 50 / 100, as on the
+                                 original. The vignettes used to offer
+                                 8/12/16/20/32, which the original never had. -->
+                            <views:Segmented x:Name="KeepSegmented" AutomationProperties.AutomationId="KeepSegmented"
+                                             Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                             />
                         </Grid>
                     </Border>
 
@@ -178,7 +189,9 @@
                                 <TextBlock Text="{loc:Str Settings.Size}" />
                                 <TextBlock Text="{loc:Str Settings.SizeDesc}" Style="{StaticResource SubtleHint}" />
                             </StackPanel>
-                            <ComboBox x:Name="SizeCombo" AutomationProperties.AutomationId="SizeCombo" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="160" SelectionChanged="OnSize" />
+                            <views:Segmented x:Name="SizeSegmented" AutomationProperties.AutomationId="SizeSegmented"
+                                             Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                             />
                         </Grid>
                     </Border>
                 </StackPanel>
@@ -251,10 +264,10 @@
                                            TextWrapping="Wrap" Margin="0,4,0,0" />
                             </StackPanel>
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <Button Style="{StaticResource GlassButton}" Padding="10,5" Margin="0,0,6,0"
+                                <Button Style="{StaticResource SubtleButton}" Padding="10,5" Margin="0,0,6,0"
                                         AutomationProperties.AutomationId="AddExtraFolder"
                                         Click="OnAddExtraFolder" Content="{loc:Str Settings.FolderAdd}" />
-                                <Button Style="{StaticResource GlassButton}" Padding="10,5"
+                                <Button Style="{StaticResource SubtleButton}" Padding="10,5"
                                         AutomationProperties.AutomationId="ClearExtraFolders"
                                         Click="OnClearExtraFolders" Content="{loc:Str Settings.FolderClear}" />
                             </StackPanel>
@@ -277,7 +290,7 @@
                                            TextWrapping="Wrap" Margin="0,4,0,0" />
                             </StackPanel>
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <Button Style="{StaticResource GlassButton}" Padding="10,5" Margin="0,0,6,0"
+                                <Button Style="{StaticResource SubtleButton}" Padding="10,5" Margin="0,0,6,0"
                                         AutomationProperties.AutomationId="RestoreInbox"
                                         Click="OnRestoreInbox" Content="{loc:Str Settings.InboxRestore}" />
                                 <views:ToggleSwitch x:Name="InboxSwitch"

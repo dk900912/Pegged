@@ -15,6 +15,9 @@
             <TransformGroup>
                 <RotateTransform x:Name="Tilt" Angle="0" />
                 <TranslateTransform x:Name="Slide" X="0" Y="0" />
+                <!-- A discarded card keeps falling on its own, past where the
+                     dock ends, so the fall is its own transform. -->
+                <TranslateTransform x:Name="Fall" X="0" Y="0" />
                 <ScaleTransform x:Name="Pop" ScaleX="1" ScaleY="1" />
                 <ScaleTransform x:Name="Press" ScaleX="1" ScaleY="1" />
             </TransformGroup>
@@ -84,13 +87,13 @@
                         Opacity="0" IsHitTestVisible="False">
                     <StackPanel x:Name="ActionRow" Orientation="Horizontal"
                                 HorizontalAlignment="Center">
-                        <Button x:Name="CopyButton" Style="{StaticResource RoundGlassButton}" Tag="14"
+                        <Button x:Name="CopyButton" Style="{StaticResource RoundSubtleButton}" Tag="14"
                                 Width="28" Height="28" Padding="0" Margin="0,0,6,0"
                                 ToolTip="{loc:Str Card.Copied}" Content="&#x2398;" Click="OnCopy" />
-                        <Button x:Name="CropButton" Style="{StaticResource RoundGlassButton}" Tag="14"
+                        <Button x:Name="CropButton" Style="{StaticResource RoundSubtleButton}" Tag="14"
                                 Width="28" Height="28" Padding="0" Margin="0,0,6,0"
                                 ToolTip="{loc:Str Crop.Title}" Content="&#x2702;" Click="OnCrop" />
-                        <Button x:Name="DeleteButton" Style="{StaticResource RoundGlassButton}" Tag="14"
+                        <Button x:Name="DeleteButton" Style="{StaticResource RoundSubtleButton}" Tag="14"
                                 Width="28" Height="28" Padding="0"
                                 ToolTip="{loc:Str Card.TakeDown}" Content="&#x1F5D1;" Click="OnTakeDown" />
                     </StackPanel>
@@ -111,7 +114,7 @@
                 <!-- Take it down (top-right) -->
                 <Button x:Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top"
                         Width="20" Height="20" Margin="0,4,4,0" Padding="0"
-                        Style="{StaticResource RoundGlassButton}" Tag="9"
+                        Style="{StaticResource RoundSubtleButton}" Tag="9"
                         ToolTip="{loc:Str Card.TakeDown}" Content="&#x2715;" Opacity="0"
                         Click="OnTakeDown" />
             </Grid>

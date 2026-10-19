@@ -11,6 +11,7 @@ Pegged is a Win11 native port of [alejandrobujan/tendedero](https://github.com/a
 ## Highlights
 
 - **Always-on-top, focus-less, click-through line** — a transparent strip along the top of any monitor; never takes the focus, lets every click through to whatever is underneath unless the pointer is on a card.
+- **Nothing but the clothesline** — no dock, no acrylic slab, no panel: on screen there is only the highlighted rope, the photos hanging from it, and a pill toolbar that fades in when you hover. Everything else is fully transparent, pixel for pixel.
 - **Multi-monitor support** with per-monitor DPI (`GetDpiForMonitor` + `PerMonitorV2`).
 - **Real physics** — every card is a `Pendulum` (gravity-driven) and a `Spring` (hover/press/lift), driven by a single 60 fps `CompositionTarget.Rendering` loop.
 - **Screenshots, just by happening** — `FileSystemWatcher` with `FileShare.ReadWrite` + exponential backoff + magic-number validation so the watcher does not flicker on partial writes.
@@ -57,7 +58,7 @@ Pegged/
 ├── README.md            # ← you are here
 ├── PORTING_CHECKLIST.md # 4 phases × 6 modules, all ticked
 ├── docs/
-│   ├── TECHNICAL_DECISIONS.md   # 36+ decisions on the macOS → Win11 port
+│   ├── TECHNICAL_DECISIONS.md   # 96 decisions on the macOS → Win11 port
 │   ├── UI_DESIGN_SPEC.md        # 7-component Fluent 2 design spec
 │   └── ui-design-showcase.html  # interactive board
 ├── assets/              # logo.svg / logo.png / app.ico (16–256)

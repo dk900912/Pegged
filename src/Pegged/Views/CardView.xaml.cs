@@ -23,17 +23,41 @@ public partial class CardView : UserControl
     /// this is the point the card swings around.</summary>
     public const double PivotY = 14;
 
+    // Showcase 8 · 卡片挂上: the card swings in from 16 degrees, and the
+    // swing back is the original's interpolatingSpring(stiffness: 46,
+    // damping: 2.6). The port models it as a pendulum rather than a spring so a
+    // card keeps rocking for a moment after something pushes it, which is the
+    // same settling curve with a body behind it.
+    private const double ArriveAngle = 16;
+
+    // Showcase 8 · 卡片挂上 (drop-in half): a capture with no known capture
+    // area - every capture on Windows - simply drops in from 46px above on a
+    // 0.42s spring at 0.72 damping, k = (2*pi/0.42)^2 and c = 2*0.72*sqrt(k).
+    private const double ArriveFrom = 46;
+
+    // Showcase 8 · 丢弃掉落: 550ms of ease-in cubic, 520px down, tilting
+    // further and fading out.
+    private const double FallMs = 550;
+    private const double FallDrop = 520;
+
+    // Showcase 8 · Copied! 弹起 180ms, 停留 1.2s, 淡出 200ms.
+    private const double CopiedHold = 1.2;
+    private const double CopiedPop = 0.18;
+    private const double CopiedFade = 0.2;
+
     private readonly Pendulum _swing = new();
     private readonly Spring _hover = new(0, 0, stiffness: 180, damping: 18);
     private readonly Spring _lift = new(0, 0, stiffness: 220, damping: 22);
+    private readonly Spring _drop = new(0, 0, stiffness: 224, damping: 21.5);
     private readonly Spring _pegOpen = new(0, 0, stiffness: 260, damping: 24);
     private readonly Spring _pressScale = new(1, 1, stiffness: 300, damping: 28);
 
     private readonly Effect? _effectCard;
     private readonly Effect? _effectHover;
 
-    private double _fallVelocity;
+    private double _fallFor;
     private bool _falling;
+    private double _fallTilt;
     private double _copiedFor;
     private double _fade = 1;
     private bool _hoverLook;
@@ -60,7 +84,7 @@ public partial class CardView : UserControl
         VideoBadge.Visibility = item.IsRecording ? Visibility.Visible : Visibility.Collapsed;
 
         _swing.Rest = item.Tilt;
-        _swing.Nudge(-13);   // it swings in, then settles
+        _swing.Nudge(ArriveAngle);   // it swings in, then settles
 
         // A capture that arrived while this card was being built already has
         // Flying = true, and the PropertyChanged subscription below is too
@@ -68,7 +92,7 @@ public partial class CardView : UserControl
         // pops into place.
         if (item.Flying)
         {
-            _lift.SnapTo(-190);
+            _drop.SnapTo(-ArriveFrom);
             item.Flying = false;
         }
 
@@ -142,15 +166,16 @@ public partial class CardView : UserControl
 
             case nameof(LineItem.Falling) when Item.Falling:
                 _falling = true;
-                _fallVelocity = 40;
+                _fallFor = 0;
+                _fallTilt = _swing.Angle;
                 break;
 
             case nameof(LineItem.Copied) when Item.Copied:
-                _copiedFor = 1.1;
+                _copiedFor = CopiedHold;
                 break;
 
             case nameof(LineItem.Flying) when Item.Flying:
-                _lift.SnapTo(-190);
+                _drop.SnapTo(-ArriveFrom);
                 break;
         }
     }
@@ -176,6 +201,10 @@ public partial class CardView : UserControl
         var liftTarget = Item.Dragging ? 6 : Item.Pressed ? -1.5 : 0;
         _lift.Target = liftTarget;
         if (!_lift.AtRest) _lift.Step(dt);
+
+        // The drop-in: 46px above its place, on a 0.42s spring at 0.72 damping.
+        _drop.Target = 0;
+        if (!_drop.AtRest) _drop.Step(dt);
 
         // Peg opens on hover (spec 3.3): the band slides down 2px and the two
         // slats part by 2px between them.
@@ -209,15 +238,21 @@ public partial class CardView : UserControl
             Photo.Effect = hovered ? _effectHover : _effectCard;
         }
 
-        // "Copied!" pops and goes away on its own.
+        // "Copied!" pops and goes away on its own: 180ms to pop up, held, then
+        // a 200ms fade - 1.2 seconds in all, the time the original holds it.
         if (_copiedFor > 0)
         {
             _copiedFor -= dt;
-            var t = Math.Clamp(_copiedFor / 1.1, 0, 1);
-            var grow = t > 0.75 ? (1 - t) / 0.25 : 1;      // pop in
-            CopiedTag.Opacity = Math.Clamp(t * 3, 0, 1);
-            CopiedScale.ScaleX = 0.6 + 0.4 * grow;
-            CopiedScale.ScaleY = 0.6 + 0.4 * grow;
+            var age = CopiedHold - _copiedFor;             // seconds since it appeared
+            var grow = Math.Clamp(age / CopiedPop, 0, 1);  // 0 -> 1 in 180ms
+            var ease = 1 - (1 - grow) * (1 - grow);        // ease-out
+            var fade = _copiedFor <= CopiedFade
+                ? Math.Clamp(_copiedFor / CopiedFade, 0, 1)
+                : 1;
+
+            CopiedTag.Opacity = fade;
+            CopiedScale.ScaleX = 0.6 + 0.4 * ease;
+            CopiedScale.ScaleY = 0.6 + 0.4 * ease;
 
             if (_copiedFor <= 0) Item.Copied = false;
         }
@@ -226,19 +261,35 @@ public partial class CardView : UserControl
             CopiedTag.Opacity = 0;
         }
 
-        // Flying in from wherever it was captured.
-        Slide.Y = _lift.Value;
+        // Dropping in from above, when the capture had no known origin.
+        Slide.Y = _drop.Value + _lift.Value;
 
-        // Falling off the line: gravity, no spring.
+        // Falling off the line: ease-in cubic for 550ms, 520px down, tilting
+        // further and further and fading out. The dock is only as tall as the
+        // line, so the draw happens past its bottom edge.
         if (_falling)
         {
-            _fallVelocity += 1500 * dt;
-            Slide.Y += _fallVelocity * dt;
-            _fade -= dt * 1.6;
-            Root.Opacity = Math.Clamp(_fade, 0, 1);
+            _fallFor += dt;
+            var e = Math.Min(1, _fallFor / (FallMs / 1000.0));
+            var curved = e * e * e;
+
+            Fall.Y = FallDrop * curved;
+            Tilt.Angle = _fallTilt + (_fallTilt * 7 + 20) * curved;
+            _fade = 1 - curved;
+            if (e >= 1) _falling = false;
         }
 
         Root.Opacity = Math.Clamp(_fade, 0, 1) * (Item.Dragging ? 0.7 : 1);
+    }
+
+    /// <summary>
+    /// Leans the card to <paramref name="degrees"/> and lets the pendulum bring
+    /// it back: the breeze (a random 1.6 to 3.4 degrees, showcase 8) and the
+    /// three-degree lean after a copy both do exactly this.
+    /// </summary>
+    public void Lean(double degrees)
+    {
+        _swing.Nudge(degrees);
     }
 
     /// <summary>Gives the card a push, in degrees per second.</summary>
@@ -395,8 +446,9 @@ public partial class CardView : UserControl
             Clipboard.SetDataObject(data, true);
 
             Item.Copied = true;
-            // Spec 3.3: a light 3 degree shove so the card acknowledges it.
-            _swing.Impulse(26);
+            // Showcase 5 · 卡片挂上 and the original both acknowledge a copy
+            // with a small lean: three degrees, then the pendulum brings it back.
+            Lean(3);
             if (Settings.Current.Sounds) SoundService.Play(SoundService.Sound.Copy);
         }
         catch

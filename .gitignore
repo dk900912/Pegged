@@ -30,3 +30,6 @@ __pycache__/
 outputs/acceptance/shots/
 outputs/acceptance/*.png
 outputs/acceptance/*.log
+
+# Minimal repro projects (build output only)
+scratch/*/run/

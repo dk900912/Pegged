@@ -22,9 +22,18 @@ public partial class SettingsWindow : Window
     public SettingsWindow()
     {
         InitializeComponent();
-        BuildLanguageCombo();
-        BuildKeepCombo();
-        BuildSizeCombo();
+
+        // Wired here rather than in the markup: the markup compiler silently
+        // ignores SelectionChanged="..." on a UserControl subclass - no error,
+        // no warning, the control just never tells anyone. The segmented rows
+        // work only because these three lines exist.
+        LangSegmented.SelectionChanged += OnLanguage;
+        KeepSegmented.SelectionChanged += OnKeep;
+        SizeSegmented.SelectionChanged += OnSize;
+
+        BuildLanguageSegmented();
+        BuildKeepSegmented();
+        BuildSizeSegmented();
         BuildThemeCombo();
         ApplyValues();
         _initializing = false;
@@ -32,7 +41,7 @@ public partial class SettingsWindow : Window
         UpdateNavigation();
 
         // {loc:Str} is a live binding now, so the labels relabel themselves.
-        // The combo boxes hold pre-built strings, so they are rebuilt here.
+        // The segmented rows hold pre-built strings, so they are rebuilt here.
         Loc.LanguageChanged += OnLanguageChanged;
 
         // Opened from the line, which never activates: take the keyboard or
@@ -47,8 +56,8 @@ public partial class SettingsWindow : Window
         _initializing = true;
         try
         {
-            BuildKeepCombo();
-            BuildSizeCombo();
+            BuildKeepSegmented();
+            BuildSizeSegmented();
             BuildThemeCombo();
             UpdateExtraFoldersText();
             UpdateInboxText();
@@ -70,18 +79,23 @@ public partial class SettingsWindow : Window
 
     private record LangItem(string Name, string Culture)
     {
-        // WPF asks the item for its text when the combo box reports itself to
-        // accessibility tools, and a record's generated ToString() would put
-        // "LangItem { Name = … }" in the dropdown's automation name.
+        // A row of pills shows the pill's text, which is the record's name.
         public override string ToString() => Name;
     }
 
-    private void BuildLanguageCombo()
+    /// <summary>
+    /// The language row (showcase 5): three pills for the languages Windows
+    /// itself offers first — follow-the-system, Simplified Chinese and English —
+    /// and a "…" pill that opens the rest. The control does the splitting, so
+    /// all ten languages stay reachable without a drop-down.
+    /// </summary>
+    private void BuildLanguageSegmented()
     {
         var langs = new List<LangItem>
         {
-            new("English",      "en"),
+            new(Loc.Get("Settings.LanguageSystem"), ""),
             new("中文（简体）",  "zh-Hans"),
+            new("English",      "en"),
             new("Español",      "es"),
             new("Français",     "fr"),
             new("日本語",        "ja"),
@@ -90,25 +104,34 @@ public partial class SettingsWindow : Window
             new("Türkçe",       "tr"),
             new("Azərbaycan",   "az"),
         };
-        LanguageCombo.DisplayMemberPath = "Name";
-        LanguageCombo.ItemsSource = langs;
-        var cur = Settings.Current.Language ?? "en";
-        LanguageCombo.SelectedItem = langs.FirstOrDefault(l => l.Culture == cur) ?? langs[0];
+
+        LangSegmented.VisibleCount = 4;
+        LangSegmented.Items = langs;
+
+        var cur = Settings.Current.Language ?? "";
+        LangSegmented.SelectedValue =
+            langs.FirstOrDefault(l => l.Culture == cur) ?? langs[0];
     }
 
-    private void BuildKeepCombo()
+    /// <summary>
+    /// Keep-on-line: as many as fit, or 25/50/100. The choices are the
+    /// original's (<c>Line.keepChoices</c>); 8/12/16/20/32 was never a real
+    /// option and made the line hold eight screenshots and nothing more.
+    /// </summary>
+    private void BuildKeepSegmented()
     {
         var items = new List<KeepOption>
         {
             new(Loc.Get("Menu.KeepFit"), null),
-            new("8",  8), new("12", 12), new("16", 16), new("20", 20), new("32", 32),
+            new("25", 25), new("50", 50), new("100", 100),
         };
-        KeepCombo.DisplayMemberPath = "Label";
-        KeepCombo.ItemsSource = items;
-        KeepCombo.SelectedItem = items.Find(i => i.Value == Settings.Current.KeepOnLine) ?? items[0];
+
+        KeepSegmented.Items = items;
+        KeepSegmented.SelectedValue =
+            items.Find(i => i.Value == Settings.Current.KeepOnLine) ?? items[0];
     }
 
-    private void BuildSizeCombo()
+    private void BuildSizeSegmented()
     {
         var items = new List<SizeOption>
         {
@@ -116,9 +139,8 @@ public partial class SettingsWindow : Window
             new(Loc.Get("Menu.SizeMedium"), 1),
             new(Loc.Get("Menu.SizeLarge"),  2),
         };
-        SizeCombo.DisplayMemberPath = "Label";
-        SizeCombo.ItemsSource = items;
-        SizeCombo.SelectedItem = items.Find(i => i.Value == (int)Settings.Current.Size) ?? items[1];
+        SizeSegmented.Items = items;
+        SizeSegmented.SelectedValue = items.Find(i => i.Value == (int)Settings.Current.Size) ?? items[1];
     }
 
     private void BuildThemeCombo()
@@ -153,6 +175,26 @@ public partial class SettingsWindow : Window
 
     // ---- nav -------------------------------------------------------------
 
+    /// <summary>Brings the page with the given tag ("general", "capture",
+    /// "appearance", "shortcuts", "about") to the front. Used when something
+    /// else sends the user here - the tray's "add folder" opens the capture
+    /// page, its "change shortcut" opens this window's shortcut page.</summary>
+    public void SelectPage(string tag)
+    {
+        var target = NavList.Items.OfType<ListBoxItem>()
+            .FirstOrDefault(i => string.Equals(i.Tag as string, tag, StringComparison.OrdinalIgnoreCase));
+        if (target is null) return;
+
+        if (NavList.SelectedItem != target)
+        {
+            NavList.SelectedItem = target;
+        }
+        else
+        {
+            UpdateNavigation();
+        }
+    }
+
     private void OnNavChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_initializing) return;
@@ -174,32 +216,34 @@ public partial class SettingsWindow : Window
     private void OnLanguage(object sender, SelectionChangedEventArgs e)
     {
         if (_initializing) return;
-        if (LanguageCombo.SelectedItem is LangItem l)
+        if (LangSegmented.SelectedValue is LangItem l)
         {
-            Settings.Current.Language = l.Culture;
+            // An empty culture means "follow Windows": recorded as null so the
+            // next launch follows whatever the shell is set to then.
+            Settings.Current.Language = string.IsNullOrEmpty(l.Culture) ? null : l.Culture;
             Settings.Current.Save();
             Loc.Apply(Settings.Current);
         }
     }
 
-    private void OnSounds(object sender, RoutedEventArgs e)
-    {
-        if (_initializing) return;
-        Settings.Current.Sounds = SoundsSwitch.IsOn;
-        Settings.Current.Save();
-    }
-
     private void OnKeep(object sender, SelectionChangedEventArgs e)
     {
         if (_initializing) return;
-        if (KeepCombo.SelectedItem is KeepOption v) Settings.Current.KeepOnLine = v.Value;
+        if (KeepSegmented.SelectedValue is KeepOption v) Settings.Current.KeepOnLine = v.Value;
         Settings.Current.Save();
     }
 
     private void OnSize(object sender, SelectionChangedEventArgs e)
     {
         if (_initializing) return;
-        if (SizeCombo.SelectedItem is SizeOption v) Settings.Current.Size = (CardSize)v.Value;
+        if (SizeSegmented.SelectedValue is SizeOption v) Settings.Current.Size = (CardSize)v.Value;
+        Settings.Current.Save();
+    }
+
+    private void OnSounds(object sender, RoutedEventArgs e)
+    {
+        if (_initializing) return;
+        Settings.Current.Sounds = SoundsSwitch.IsOn;
         Settings.Current.Save();
     }
 

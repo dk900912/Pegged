@@ -29,13 +29,13 @@
         <!-- Floating glass action bar at bottom center -->
         <Border HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,40"
                 Padding="10,6" CornerRadius="20"
-                Background="{DynamicResource Brush.Acrylic}"
+                Background="{DynamicResource Brush.Flyout}"
                 BorderBrush="#59FFFFFF" BorderThickness="1">
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Name="SizeHint" VerticalAlignment="Center" Margin="0,0,14,0"
                            FontFamily="{DynamicResource Font.Ui}" FontSize="11"
                            Foreground="{DynamicResource Brush.Text}" />
-                <Button Style="{StaticResource GlassButton}" Padding="14,7" Margin="0,0,8,0"
+                <Button Style="{StaticResource SubtleButton}" Padding="14,7" Margin="0,0,8,0"
                         AutomationProperties.AutomationId="CropCancel"
                         Click="OnCancel" Content="{loc:Str Crop.Cancel}" />
                 <Button Style="{StaticResource AccentButton}" Padding="14,7"

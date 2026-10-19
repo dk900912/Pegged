@@ -8,12 +8,19 @@
     <!-- ==================================================================
          Pegged · Fluent Design 2.0 tokens
          This dictionary holds the light values and every control style.
-         Themes/FluentTheme.Dark.xaml overrides the brushes only, so a theme
-         switch is a dictionary swap with no code branching.
+         Themes/FluentTheme.Dark.xaml is the dark half: it redefines the
+         palette AND every brush, gradient and shadow that looks different,
+         because a nested {DynamicResource Palette.X} inside a brush is
+         resolved once and never again - a palette-only overlay is a no-op at
+         runtime. A theme switch is a dictionary swap with no code branching.
          ================================================================== -->
 
     <!-- Light palette -->
-    <Color x:Key="Palette.Acrylic">#C8F4F6FB</Color>
+    <!-- A small floating panel (the quick-action pill, the empty-state
+         capsule, the crop bar). Not a material: no blur, no grain - just a
+         nearly opaque fill, so it reads on any desktop without turning the
+         strip into a slab. -->
+    <Color x:Key="Palette.Flyout">#F2F4F8FC</Color>
     <Color x:Key="Palette.Card">#E0FEFEFE</Color>
     <Color x:Key="Palette.Surface">#FFFFFFFF</Color>
     <Color x:Key="Palette.SurfaceAlt">#FFF7F8FC</Color>
@@ -43,7 +50,7 @@
     <Color x:Key="Palette.CardEdgeBottom">#2EFFFFFF</Color>
 
     <!-- Brushes -->
-    <SolidColorBrush x:Key="Brush.Acrylic" Color="{DynamicResource Palette.Acrylic}" />
+    <SolidColorBrush x:Key="Brush.Flyout" Color="{DynamicResource Palette.Flyout}" />
     <SolidColorBrush x:Key="Brush.Card" Color="{DynamicResource Palette.Card}" />
     <SolidColorBrush x:Key="Brush.Surface" Color="{DynamicResource Palette.Surface}" />
     <SolidColorBrush x:Key="Brush.SurfaceAlt" Color="{DynamicResource Palette.SurfaceAlt}" />
@@ -122,9 +129,9 @@
 
     <!-- ====================== Controls ====================== -->
 
-    <Style x:Key="GlassButton" TargetType="Button">
+    <Style x:Key="SubtleButton" TargetType="Button">
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
-        <Setter Property="Background" Value="{DynamicResource Brush.Acrylic}" />
+        <Setter Property="Background" Value="{DynamicResource Brush.Flyout}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.CardEdge}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FontFamily" Value="{DynamicResource Font.Ui}" />
@@ -158,7 +165,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="RoundGlassButton" TargetType="Button" BasedOn="{StaticResource GlassButton}">
+    <Style x:Key="RoundSubtleButton" TargetType="Button" BasedOn="{StaticResource SubtleButton}">
         <Setter Property="Width" Value="30" />
         <Setter Property="Height" Value="30" />
         <Setter Property="Tag" Value="15" />

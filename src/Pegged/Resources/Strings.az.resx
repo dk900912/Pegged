@@ -67,6 +67,9 @@
   <data name="Tray.ClearAll" xml:space="preserve">
     <value>Hamısını yığışdır</value>
   </data>
+  <data name="Tray.Inbox" xml:space="preserve">
+    <value>Ekran görüntülərinə bax</value>
+  </data>
   <data name="Tray.Settings" xml:space="preserve">
     <value>Parametrlər…</value>
   </data>
@@ -145,6 +148,9 @@
   <data name="Menu.ShortcutNone" xml:space="preserve">
     <value>Yoxdur</value>
   </data>
+  <data name="Menu.ShortcutChange" xml:space="preserve">
+    <value>Qısayolun dəyişdirilməsi…</value>
+  </data>
   <data name="Menu.ChangeShortcut" xml:space="preserve">
     <value>Qısayolu dəyiş…</value>
   </data>
@@ -196,6 +202,18 @@
   <data name="Crop.Title" xml:space="preserve">
     <value>Kəsmə</value>
   </data>
+  <data name="Preview.Title" xml:space="preserve">
+    <value>Öncədən baxış</value>
+  </data>
+  <data name="Preview.Open" xml:space="preserve">
+    <value>Aç…</value>
+  </data>
+  <data name="Preview.Crop" xml:space="preserve">
+    <value>Kəsmə</value>
+  </data>
+  <data name="Preview.Close" xml:space="preserve">
+    <value>Bağla</value>
+  </data>
   <data name="Crop.Cancel" xml:space="preserve">
     <value>Ləğv et</value>
   </data>
@@ -213,6 +231,9 @@
   </data>
   <data name="Settings.GeneralDesc" xml:space="preserve">
     <value>Dil, səslər və xətdə saxlanacaq miqdar</value>
+  </data>
+  <data name="Settings.LanguageSystem" xml:space="preserve">
+    <value>Sistemi izlə</value>
   </data>
   <data name="Settings.Language" xml:space="preserve">
     <value>Dil</value>
@@ -321,6 +342,9 @@
   </data>
   <data name="Settings.InboxFailed" xml:space="preserve">
     <value>Windows qovluğu dəyişmədi; gələn qutusu rejimi söndürüldü.</value>
+  </data>
+  <data name="Settings.InboxUnavailable" xml:space="preserve">
+    <value>Bu sistem yönləndiriləcək ekran görüntüsü qovluğu təqdim etmir ({0}), buna görə də gələnlər qutusu rejimi sönülü qalır. Aşağıdaki qovluq izləməsi yeni çəkilişləri xəttə asmağa davam edir.</value>
   </data>
   <data name="Settings.License" xml:space="preserve">
     <value>tendedero (MIT) əsasında. Pegged MIT lisenziyalıdır.</value>

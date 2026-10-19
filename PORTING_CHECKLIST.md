@@ -45,7 +45,7 @@
 ## Phase 6 — 真实端到端验收与闭环（第三轮）
 - [x] `scripts/e2e/launch_probe.py`：资源管理器真实双击 exe，断言单实例 / 贴顶 / 全宽 / 收起藏于屏幕上方 / 展开 293px / 感应条居中（9/9 PASS）
 - [x] `scripts/e2e/interaction_probe.py`：`WM_NCHITTEST` 逐点穿透、工具栏可点、设置中心打开（720×560）、语言实时刷新（5/5 PASS）
-- [x] 修复：舱体亚克力改为真实"抓屏 + 高斯模糊 + 着色 + 噪点"（`Core/AcrylicBackdrop.cs`）
+- [x] ~~修复：舱体亚克力改为真实"抓屏 + 高斯模糊 + 着色 + 噪点"（`Core/AcrylicBackdrop.cs`）~~ —— **已作废**：用户否决亚克力，整套材质与底板已删除（见 Phase 6 第五轮）
 - [x] 修复：`WM_NCHITTEST` 逐点点击穿透（取代整窗 `WS_EX_TRANSPARENT`），快捷操作栏恢复可点
 - [x] 修复：卡片白边 4px / 圆角 16-12 同心 / 照片 `Uniform` 等比适配
 - [x] 修复：衣夹 9×26 + 5×1.4 系绳槽 + 13×13 弹簧箍，悬停张开按规范
@@ -62,7 +62,7 @@
 
 ## Phase 6 — 全量交互走查（第四轮，真跑真点）
 - [x] 新增 `scripts/e2e/audit_walkthrough.py`：四区 33 项真实交互断言（dock 8 / card 11 / crop 4 / settings 9 / 无崩溃 1）
-- [x] 修复：主题切换后舱体玻璃不变色（`AcrylicMaterial` 缓存 + 主题变化就地重上色 + alpha 取调色板）
+- [x] ~~修复：主题切换后舱体玻璃不变色（`AcrylicMaterial` 缓存 + 主题变化就地重上色 + alpha 取调色板）~~ —— **已作废**：玻璃整体移除；主题切换改由完整暗色画刷字典实现（见 Phase 6 第五轮）
 - [x] 修复：卡片尺寸改变后舱体高度不变（`LineController` 订阅 `Settings.Saved` 重排）
 - [x] 修复：`ToggleSwitch` 双 automation id（外层取消 automation peer）
 - [x] 修复：Inbox 模式在无 `FOLDERID_Screenshots` 的系统上弹模态框并吞掉下一次点击 → 探测 + 置灰 + 行内说明
@@ -81,3 +81,18 @@
 - [x] 回归：新增 `card.first_card_clickable`；audit 34/34、launch 9/9、interaction 5/5，crash.log 为空
 - [x] 清理：删除 `diag_line_tree.py` / `diag_point_owner.py` 一次性脚本
 - [x] 交付：`docs/REVIEW-CHECKLIST.md` 增补 1.1 节；`TECHNICAL_DECISIONS.md` 第 88 条
+
+## Phase 6 — UI 严格对齐 showcase（第五轮：去亚克力 / 暗色真切换 / 托盘菜单 / 动效曲线）
+- [x] 移除：`Core/AcrylicBackdrop.cs` 与整个仿 DWM 材质（抓屏 + 模糊 + 着色 + 噪点）
+- [x] 移除：`LineWindow` 的 `Dock` 底板 Border 及其样式；舱体间隙像素采样 = 桌面原样（`shots/audit/slab-removed.png`）
+- [x] 保留：贯穿式高光挂绳（三笔叠加 + 两端 8% 渐隐）、拍立得卡片、顶部快捷操作栏药丸（`Brush.Flyout`）、空态提示
+- [x] 修复：暗色主题假切换（嵌套 `DynamicResource` 只求值一次）→ 暗色字典整份重定义 `Brush.*`
+- [x] 修复：设置窗三个分段控件点不动（XAML 静默忽略 UserControl 子类事件）→ 构造函数手工接线
+- [x] 重建：托盘右键菜单按 showcase §6（切换行 + 真实快捷键、图标、监控文件夹/保留数量/尺寸/快捷键子菜单、声音/开机自启勾选）
+- [x] 新增：`Core/TrayIcons.cs` 16×16 MDL2 字形位图，按主题着色并缓存
+- [x] 修复：动效曲线对齐规范（展开 224/24.5 = 0.42s ζ0.82，收起 816/57 = 0.22s，微风 7–16s / 1.6–3.4° / 350ms 错峰）
+- [x] 调整：保留数量改为 随屏宽 / 25 / 50 / 100
+- [x] 本地化：手工文案补回主表 `scripts/gen-localization.py`；新增闸门 `scripts/check_string_keys.py`（9 个 resx 键集一致）
+- [x] 修复：验收脚本两处假失败（应用未启动未报错 / 夹具固定文件名不触发 `Created`）→ `ensure_app()` + 先删后写
+- [x] 回归：`audit_walkthrough` 34/34、`launch_probe` 9/9、`interaction_probe` 5/5、`repro_first_card_click` GREEN，`crash.log` 无新增
+- [x] 重新发布 Release 构建（0 Error 0 Warning）
