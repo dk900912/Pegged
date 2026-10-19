@@ -21,6 +21,7 @@ public partial class EdgePillWindow : Window
     private double _fade = 1;
     private bool _visible = true;
     private Rect _target = new(0, 0, 160, 12);
+    private readonly LinearGradientBrush _flowBrush;
 
     public EdgePillWindow()
     {
@@ -28,6 +29,18 @@ public partial class EdgePillWindow : Window
         SourceInitialized += OnSourceInitialized;
         Loaded += OnLoaded;
         Closing += OnClosing;
+
+        // Flowing light: a gradient that slides back and forth.
+        _flowBrush = new LinearGradientBrush
+        {
+            StartPoint = new Point(0, 0),
+            EndPoint = new Point(1, 0),
+        };
+        _flowBrush.GradientStops.Add(new GradientStop(Colors.Transparent, 0));
+        _flowBrush.GradientStops.Add(new GradientStop(Color.FromArgb(255, 0x4C, 0xC2, 0xFF), 0.35));
+        _flowBrush.GradientStops.Add(new GradientStop(Color.FromArgb(255, 0x7B, 0x61, 0xFF), 0.65));
+        _flowBrush.GradientStops.Add(new GradientStop(Colors.Transparent, 1));
+        Pill.Background = _flowBrush;
     }
 
     private void OnSourceInitialized(object? sender, EventArgs e)
@@ -137,5 +150,10 @@ public partial class EdgePillWindow : Window
         PillScale.ScaleY = squash;
         Pill.Opacity = glow * _fade;
         Root.Opacity = _fade;
+
+        // Flowing light: the accent gradient slides gently.
+        var flow = (_phase / (Math.PI * 2)) * 0.4 - 0.2;
+        _flowBrush.GradientStops[1].Offset = 0.25 + flow;
+        _flowBrush.GradientStops[2].Offset = 0.55 + flow;
     }
 }

@@ -28,6 +28,7 @@ public partial class LineWindow : Window
     private bool _revealed;
     private bool _pinned;
     private bool _transparent = true;
+    private double _breezePhase;
 
     /// <summary>Where the line hangs when it is down, in WPF units.</summary>
     private Rect _target = new(0, 0, 800, 210);
@@ -74,13 +75,12 @@ public partial class LineWindow : Window
     {
         var preview = new PreviewWindow(path);
         preview.CropRequested += (_, p) => ShowCrop(p);
-        preview.Owner = this;
         preview.Show();
     }
 
     public void ShowCrop(string path)
     {
-        var crop = new CropWindow(path) { Owner = this };
+        var crop = new CropWindow(path);
         if (crop.ShowDialog() == true && crop.CroppedPath is { } outPath)
         {
             // Add the new file to the line as its own capture.
@@ -211,9 +211,13 @@ public partial class LineWindow : Window
         var sag = Math.Min(30, width * 0.018);
         var top = LayoutMetrics.RopeTop;
 
+        // Breeze: a gentle sine wave sway when the line is empty.
+        var cards = CardLayer.Children.Count;
+        var breeze = cards == 0 ? Math.Sin(_breezePhase) * 2.5 : 0;
+
         var figure = new PathFigure { StartPoint = new Point(-20, top) };
         figure.Segments.Add(new QuadraticBezierSegment(
-            new Point(width / 2, top + 2 * sag), new Point(width + 20, top), true));
+            new Point(width / 2, top + 2 * sag + breeze), new Point(width + 20, top), true));
 
         var geometry = new PathGeometry();
         geometry.Figures.Add(figure);
@@ -311,6 +315,10 @@ public partial class LineWindow : Window
 
         _slide.Step(dt);
         MoveTo(_target.Left, _target.Top - _slide.Value);
+
+        // Breeze phase: one full cycle every ~10 seconds.
+        _breezePhase += dt * 0.628;
+        if (CardLayer.Children.Count == 0) LayoutRope();
     }
 
     // ---- click through ---------------------------------------------------
