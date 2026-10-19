@@ -157,8 +157,13 @@ public sealed class LineController : IDisposable
     {
         var dt = _poll.Interval.TotalSeconds;
         var settings = Settings.Current;
-        NativeMethods.GetCursorPos(out var raw);
-        var cursor = new Point(raw.X, raw.Y);
+
+        // The pointer speaks in real pixels; the line is laid out in WPF units.
+        var cursor = MonitorService.CursorPosition();
+        var dip = _line.Monitor?.ToDip(cursor) ?? cursor;
+
+        // Keep the window's click-through in step with where the pointer is.
+        _line.UpdateClickThrough(dip);
 
         // A peek from a new capture or the welcome wins over everything.
         if (_peekUntil is { } until)
@@ -181,7 +186,7 @@ public sealed class LineController : IDisposable
             return;
         }
 
-        var onLine = _line.Revealed && OverLine(cursor);
+        var onLine = _line.Revealed && OverLine(dip);
 
         MonitorDescription? band = null;
         if (!onLine && settings.RevealOnTopEdge && MonitorService.IsInHotBand(cursor, out var hot))

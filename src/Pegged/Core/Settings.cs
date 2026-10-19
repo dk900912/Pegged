@@ -84,6 +84,10 @@ public sealed class Settings
 
     public static Settings Current { get; private set; } = Load();
 
+    /// <summary>Raised whenever the settings were written: the line rehangs
+    /// itself when the card size or the language changes.</summary>
+    public static event EventHandler? Saved;
+
     public static Settings Load()
     {
         try
@@ -114,6 +118,7 @@ public sealed class Settings
         {
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
             File.WriteAllText(FilePath, JsonSerializer.Serialize(this, Options));
+            Saved?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception)
         {

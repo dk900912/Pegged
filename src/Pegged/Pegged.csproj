@@ -34,6 +34,8 @@
     <Using Include="System.Windows.Controls.Canvas" Alias="Canvas" />
     <Using Include="System.Windows.Controls.Image" Alias="Image" />
     <Using Include="System.Windows.Controls.Border" Alias="Border" />
+    <Using Include="System.Windows.Controls.Control" Alias="Control" />
+    <Using Include="System.Windows.Controls.UserControl" Alias="UserControl" />
   </ItemGroup>
 
   <ItemGroup>
