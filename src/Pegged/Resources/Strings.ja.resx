@@ -76,6 +76,12 @@
   <data name="Tray.Sounds" xml:space="preserve">
     <value>サウンド</value>
   </data>
+  <data name="Tray.Empty" xml:space="preserve">
+    <value>Pegged — ラインは空です</value>
+  </data>
+  <data name="Tray.OnLine" xml:space="preserve">
+    <value>Pegged — {0} 件</value>
+  </data>
   <data name="Tray.OpenAtLogin" xml:space="preserve">
     <value>ログイン時に開く</value>
   </data>
@@ -282,6 +288,42 @@
   </data>
   <data name="Settings.RevealDelayDesc" xml:space="preserve">
     <value>ポインターが止まってからラインが下りるまでの時間</value>
+  </data>
+  <data name="Settings.ExtraFolders" xml:space="preserve">
+    <value>追加フォルダー</value>
+  </data>
+  <data name="Settings.ExtraFoldersDesc" xml:space="preserve">
+    <value>最大3つまで追加フォルダーを監視します</value>
+  </data>
+  <data name="Settings.ExtraFoldersNone" xml:space="preserve">
+    <value>なし</value>
+  </data>
+  <data name="Settings.ExtraFoldersFull" xml:space="preserve">
+    <value>追加フォルダーは3つまでです。先に1つ削除してください。</value>
+  </data>
+  <data name="Settings.FolderAdd" xml:space="preserve">
+    <value>フォルダーを追加</value>
+  </data>
+  <data name="Settings.FolderClear" xml:space="preserve">
+    <value>クリア</value>
+  </data>
+  <data name="Settings.Inbox" xml:space="preserve">
+    <value>受信箱モード</value>
+  </data>
+  <data name="Settings.InboxDesc" xml:space="preserve">
+    <value>Windows のキャプチャを Pegged のフォルダーへ直接保存します</value>
+  </data>
+  <data name="Settings.InboxRestore" xml:space="preserve">
+    <value>場所を戻す</value>
+  </data>
+  <data name="Settings.InboxPath" xml:space="preserve">
+    <value>Windows のスクリーンショット保存先: {0}</value>
+  </data>
+  <data name="Settings.InboxFailed" xml:space="preserve">
+    <value>Windows がフォルダー変更を拒否したため、受信箱モードはオフです。</value>
+  </data>
+  <data name="Settings.License" xml:space="preserve">
+    <value>tendedero (MIT) からの移植。Pegged は MIT ライセンスです。</value>
   </data>
   <data name="Settings.TopEdge" xml:space="preserve">
     <value>上端で表示</value>

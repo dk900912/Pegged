@@ -30,11 +30,44 @@ public partial class SettingsWindow : Window
         _initializing = false;
         NavList.SelectedIndex = 0;
         UpdateNavigation();
+
+        // {loc:Str} is a live binding now, so the labels relabel themselves.
+        // The combo boxes hold pre-built strings, so they are rebuilt here.
+        Loc.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        _initializing = true;
+        try
+        {
+            BuildKeepCombo();
+            BuildSizeCombo();
+            BuildThemeCombo();
+            UpdateExtraFoldersText();
+            UpdateInboxText();
+        }
+        finally
+        {
+            _initializing = false;
+        }
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        Loc.LanguageChanged -= OnLanguageChanged;
+        base.OnClosed(e);
     }
 
     // ---- combos ----------------------------------------------------------
 
-    private record LangItem(string Name, string Culture);
+    private record LangItem(string Name, string Culture)
+    {
+        // WPF asks the item for its text when the combo box reports itself to
+        // accessibility tools, and a record's generated ToString() would put
+        // "LangItem { Name = … }" in the dropdown's automation name.
+        public override string ToString() => Name;
+    }
 
     private void BuildLanguageCombo()
     {
@@ -106,6 +139,9 @@ public partial class SettingsWindow : Window
         RevealSlider.Value = s.RevealDelay;
         HotkeyBox.Text = s.Shortcut?.Display ?? "";
         FolderPath.Text = s.ScreenshotFolder;
+        UpdateExtraFoldersText();
+        InboxSwitch.IsOn = s.InboxEnabled;
+        UpdateInboxText();
     }
 
     // ---- nav -------------------------------------------------------------
@@ -282,9 +318,87 @@ public partial class SettingsWindow : Window
         HotkeyBox.Text = shortcut.Display;
     }
 
-    private void OnWebsite(object sender, RoutedEventArgs e) => UpdateChecker.Run();
+    private void UpdateExtraFoldersText()
+    {
+        var folders = Settings.Current.ExtraFolders;
+        ExtraFoldersText.Text = folders.Count == 0
+            ? Loc.Get("Settings.ExtraFoldersNone")
+            : string.Join("\n", folders);
+    }
 
-    private void OnClose(object sender, RoutedEventArgs e) => Close();
+    private void OnAddExtraFolder(object sender, RoutedEventArgs e)
+    {
+        if (_initializing) return;
+        if (Settings.Current.ExtraFolders.Count >= Settings.MaxExtraFolders)
+        {
+            MessageBox.Show(this, Loc.Get("Settings.ExtraFoldersFull"),
+                Loc.Get("Settings.Capture"), MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var dlg = new Microsoft.Win32.OpenFolderDialog
+        {
+            Title = Loc.Get("Settings.FolderAdd"),
+            InitialDirectory = Settings.Current.ScreenshotFolder,
+        };
+        if (dlg.ShowDialog(this) != true) return;
+
+        if (Settings.Current.ExtraFolders.Contains(dlg.FolderName, StringComparer.OrdinalIgnoreCase))
+            return;
+
+        Settings.Current.ExtraFolders.Add(dlg.FolderName);
+        Settings.Current.Save();
+        App.Instance?.Watch?.Restart();
+        UpdateExtraFoldersText();
+    }
+
+    private void OnClearExtraFolders(object sender, RoutedEventArgs e)
+    {
+        if (_initializing) return;
+        Settings.Current.ExtraFolders.Clear();
+        Settings.Current.Save();
+        App.Instance?.Watch?.Restart();
+        UpdateExtraFoldersText();
+    }
+
+    // ---- inbox mode ------------------------------------------------------
+
+    private void UpdateInboxText()
+    {
+        var current = InboxMode.CurrentSystemFolder() ?? Settings.Current.ScreenshotFolder ?? "";
+        InboxText.Text = Loc.Format("Settings.InboxPath", current);
+    }
+
+    private void OnInbox(object sender, RoutedEventArgs e)
+    {
+        if (_initializing) return;
+
+        if (!InboxMode.SetEnabled(InboxSwitch.IsOn))
+        {
+            _initializing = true;
+            InboxSwitch.IsOn = false;
+            _initializing = false;
+            MessageBox.Show(this, Loc.Get("Settings.InboxFailed"),
+                Loc.Get("Settings.Inbox"), MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        UpdateInboxText();
+    }
+
+    private void OnRestoreInbox(object sender, RoutedEventArgs e)
+    {
+        InboxMode.Restore();
+        Settings.Current.InboxEnabled = false;
+        Settings.Current.Save();
+        App.Instance?.Watch?.Restart();
+
+        _initializing = true;
+        InboxSwitch.IsOn = false;
+        _initializing = false;
+        UpdateInboxText();
+    }
+
+    private void OnWebsite(object sender, RoutedEventArgs e) => UpdateChecker.Run();    private void OnClose(object sender, RoutedEventArgs e) => Close();
 
     // ---- option rows -----------------------------------------------------
 
@@ -293,6 +407,7 @@ public partial class SettingsWindow : Window
         public string Label { get; }
         public int? Value { get; }
         public KeepOption(string label, int? value) { Label = label; Value = value; }
+        public override string ToString() => Label;
     }
 
     private sealed class SizeOption
@@ -300,6 +415,7 @@ public partial class SettingsWindow : Window
         public string Label { get; }
         public int Value { get; }
         public SizeOption(string label, int value) { Label = label; Value = value; }
+        public override string ToString() => Label;
     }
 
     private sealed class ThemeOption
@@ -307,5 +423,6 @@ public partial class SettingsWindow : Window
         public string Label { get; }
         public ThemeKind Value { get; }
         public ThemeOption(string label, ThemeKind value) { Label = label; Value = value; }
+        public override string ToString() => Label;
     }
 }

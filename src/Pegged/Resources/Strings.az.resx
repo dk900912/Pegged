@@ -76,6 +76,12 @@
   <data name="Tray.Sounds" xml:space="preserve">
     <value>Səslər</value>
   </data>
+  <data name="Tray.Empty" xml:space="preserve">
+    <value>Pegged — xətt boşdur</value>
+  </data>
+  <data name="Tray.OnLine" xml:space="preserve">
+    <value>Pegged — xətdə {0}</value>
+  </data>
   <data name="Tray.OpenAtLogin" xml:space="preserve">
     <value>Girişdə aç</value>
   </data>
@@ -282,6 +288,42 @@
   </data>
   <data name="Settings.RevealDelayDesc" xml:space="preserve">
     <value>Xəttin enməsi üçün göstəricinin gözləmə müddəti</value>
+  </data>
+  <data name="Settings.ExtraFolders" xml:space="preserve">
+    <value>Əlavə qovluqlar</value>
+  </data>
+  <data name="Settings.ExtraFoldersDesc" xml:space="preserve">
+    <value>Ən çoxu üç əlavə qovluq izlənir</value>
+  </data>
+  <data name="Settings.ExtraFoldersNone" xml:space="preserve">
+    <value>Yoxdur</value>
+  </data>
+  <data name="Settings.ExtraFoldersFull" xml:space="preserve">
+    <value>Ən çoxu üç əlavə qovluq. Əvvəlcə birini silin.</value>
+  </data>
+  <data name="Settings.FolderAdd" xml:space="preserve">
+    <value>Qovluq əlavə et</value>
+  </data>
+  <data name="Settings.FolderClear" xml:space="preserve">
+    <value>Təmizlə</value>
+  </data>
+  <data name="Settings.Inbox" xml:space="preserve">
+    <value>Gələn qutusu rejimi</value>
+  </data>
+  <data name="Settings.InboxDesc" xml:space="preserve">
+    <value>Windows çəkilişləri birbaşa Pegged qovluğuna yazır</value>
+  </data>
+  <data name="Settings.InboxRestore" xml:space="preserve">
+    <value>Yeri bərpa et</value>
+  </data>
+  <data name="Settings.InboxPath" xml:space="preserve">
+    <value>Windows ekran görüntülərini buraya yazır: {0}</value>
+  </data>
+  <data name="Settings.InboxFailed" xml:space="preserve">
+    <value>Windows qovluğu dəyişmədi; gələn qutusu rejimi söndürüldü.</value>
+  </data>
+  <data name="Settings.License" xml:space="preserve">
+    <value>tendedero (MIT) əsasında. Pegged MIT lisenziyalıdır.</value>
   </data>
   <data name="Settings.TopEdge" xml:space="preserve">
     <value>Yuxarı kənarda göstər</value>

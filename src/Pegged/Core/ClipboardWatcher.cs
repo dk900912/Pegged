@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -8,21 +9,31 @@ namespace Pegged.Core;
 /// <summary>
 /// Reads images off the Windows clipboard and hangs them on the line.
 ///
-/// Pegged never sets the clipboard, only reads it, so there is no loop to
-/// break. The privacy filter is also simple: text, files, and everything
-/// that is not a picture is ignored.
+/// Pegged never sets the clipboard, only reads it. Even so, three guards are
+/// kept: the app that put the picture there may have asked every clipboard
+/// monitor to ignore it (passwords managers do this), the same picture copied
+/// twice should not hang twice, and a half-written PNG must never appear on
+/// the line.
 /// </summary>
 public static class ClipboardWatcher
 {
     private const string PngFormat = "PNG";
-    private const string ClipboardTimestampFileName = "clipboard-yyyyMMdd-HHmmss-ffff.png";
+
+    /// <summary>Set by password managers and "exclude from clipboard history"
+    /// style apps: if present, we must not read the picture at all.</summary>
+    private const string ExcludeFromMonitor = "ExcludeClipboardContentFromMonitorProcessing";
+    private const string ClipboardViewerIgnore = "Clipboard Viewer Ignore";
+
+    /// <summary>Above this size the clipboard is not a screenshot any more.</summary>
+    private const long MaxPngBytes = 64L * 1024 * 1024;
+
+    private static string? _lastHash;
 
     public static void OnClipboardChanged()
     {
         if (!Settings.Current.WatchClipboard) return;
 
         // The clipboard is sometimes held by another window for a moment.
-        // One quick retry covers the common case.
         IDataObject? data = null;
         for (var i = 0; i < 3; i++)
         {
@@ -37,7 +48,14 @@ public static class ClipboardWatcher
             }
         }
 
-        if (data is null || !data.GetDataPresent(PngFormat) && !data.GetDataPresent(DataFormats.Bitmap))
+        if (data is null) return;
+
+        // Privacy filter first: an app that opted out must not be screenshotted
+        // into our own folder.
+        if (data.GetDataPresent(ExcludeFromMonitor) || data.GetDataPresent(ClipboardViewerIgnore))
+            return;
+
+        if (!data.GetDataPresent(PngFormat) && !data.GetDataPresent(DataFormats.Bitmap))
             return;
 
         try { DispatchOnUi(SaveAndHang, data); }
@@ -81,7 +99,6 @@ public static class ClipboardWatcher
 
         if (bitmap is null && data.GetDataPresent(DataFormats.Bitmap))
         {
-            // WPF can also pull a Bitmap directly off the clipboard.
             try
             {
                 if (Clipboard.GetImage() is { } bmp) bitmap = bmp;
@@ -90,21 +107,43 @@ public static class ClipboardWatcher
         }
 
         if (bitmap is null) return;
+        if (rawPng is not null && rawPng.LongLength > MaxPngBytes) return;
+
+        // Same picture twice in a row: do not hang a duplicate.
+        if (rawPng is not null)
+        {
+            var hash = Convert.ToHexString(SHA256.HashData(rawPng));
+            if (hash == _lastHash) return;
+            _lastHash = hash;
+        }
 
         AppPaths.EnsureCreated();
         var name = DateTime.Now.ToString("yyyyMMdd-HHmmss-ffff") + ".png";
         var path = Path.Combine(AppPaths.ScreenshotsFolder, "Clipboard " + name);
 
-        if (rawPng is not null)
+        // Write to a temporary name and move it into place: a watcher (ours or
+        // anyone else's) must never see a half-written PNG.
+        var temp = path + ".part";
+        try
         {
-            File.WriteAllBytes(path, rawPng);
+            if (rawPng is not null)
+            {
+                File.WriteAllBytes(temp, rawPng);
+            }
+            else
+            {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                using var stream = File.Create(temp);
+                encoder.Save(stream);
+            }
+
+            File.Move(temp, path, overwrite: true);
         }
-        else
+        catch (Exception)
         {
-            var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(bitmap));
-            using var stream = File.Create(path);
-            encoder.Save(stream);
+            try { if (File.Exists(temp)) File.Delete(temp); } catch (Exception) { }
+            return;
         }
 
         App.CaptureStore.Hang(path, flying: true);

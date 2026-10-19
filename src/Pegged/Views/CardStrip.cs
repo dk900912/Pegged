@@ -132,6 +132,19 @@ public sealed class CardStrip
         }
     }
 
+    /// <summary>Drops the hover look on every card. The line never sees a
+    /// MouseLeave of its own (it is click-through), so the controller clears
+    /// the hover state when the pointer is outside every card.</summary>
+    public void ClearHover()
+    {
+        foreach (var view in _views.Values)
+        {
+            if (!view.Item.Hovering && !view.Item.Pressed) continue;
+            view.Item.Hovering = false;
+            view.Item.Pressed = false;
+        }
+    }
+
     /// <summary>The card under a point in window coordinates, if any.</summary>
     public CardView? CardAt(Point point)
     {

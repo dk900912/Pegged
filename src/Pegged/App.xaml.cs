@@ -54,6 +54,12 @@ public partial class App : System.Windows.Application
 
         base.OnStartup(e);
 
+        // A crash in an overlay app is invisible: the window is gone and the
+        // tray icon with it. Leave a note behind instead of vanishing.
+        DispatcherUnhandledException += (_, args) => Record(args.Exception);
+        AppDomain.CurrentDomain.UnhandledException += (_, args) => Record(args.ExceptionObject as Exception);
+        TaskScheduler.UnobservedTaskException += (_, args) => Record(args.Exception);
+
         // A tiny development hook: put a picture on the clipboard and exit.
         // Used by the automated smoke test for Module 4.
         if (e.Args.Length >= 2 && e.Args[0] == "--put-clip" && File.Exists(e.Args[1]))
@@ -98,6 +104,14 @@ public partial class App : System.Windows.Application
         // fresh captures, and listen to the clipboard.
         Watch = new WatchService();
 
+        // Inbox mode is a system-wide redirect: it only lasts as long as we do,
+        // so it is re-applied on every launch and undone on exit.
+        if (Settings.Current.InboxEnabled && !InboxMode.Apply())
+        {
+            Settings.Current.InboxEnabled = false;
+            Settings.Current.Save();
+        }
+
         // Module 6: the shortcut lives with the app, not with the settings UI.
         HotKey = new HotKeyService(Line.Line);
         HotKey.Apply(Settings.Current.Shortcut);
@@ -112,8 +126,25 @@ public partial class App : System.Windows.Application
         Exit += OnExit;
     }
 
-    private void OnSettingsRequested(object? sender, EventArgs e)
+    /// <summary>Appends a crash to %APPDATA%\Pegged\crash.log and keeps going
+    /// where that is survivable.</summary>
+    private static void Record(Exception? exception)
     {
+        if (exception is null) return;
+
+        try
+        {
+            var path = Path.Combine(AppPaths.DataFolder, "crash.log");
+            File.AppendAllText(path,
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {exception}\r\n\r\n");
+        }
+        catch (Exception)
+        {
+            // Nothing left to do if even the log cannot be written.
+        }
+    }
+
+    private void OnSettingsRequested(object? sender, EventArgs e)    {
         var existing = System.Windows.Application.Current.Windows
             .OfType<Views.SettingsWindow>().FirstOrDefault();
         if (existing is not null) { existing.Activate(); return; }
@@ -134,6 +165,11 @@ public partial class App : System.Windows.Application
     {
         SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
         SettingsRequested -= OnSettingsRequested;
+
+        // Hand the screenshot folder back to Windows before we go, or the
+        // system is left pointing at a folder nobody is watching.
+        if (Settings.Current.InboxEnabled) InboxMode.Restore();
+
         Tray?.Dispose();
         HotKey?.Dispose();
         Watch?.Dispose();

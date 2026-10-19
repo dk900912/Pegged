@@ -19,9 +19,13 @@ public static class LayoutMetrics
     /// <summary>Applied to whatever the user picked.</summary>
     public static double Scale => ScaleFor(Settings.Current.Size);
 
+    /// <summary>The picture itself never grows past 150 x 104 at 100%.</summary>
     public static double PhotoMaxHeight => Math.Round(104 * Scale);
 
-    public static double CardWidth => Math.Round(150 * Scale);
+    public static double PhotoMaxWidth => Math.Round(150 * Scale);
+
+    /// <summary>The polaroid frame: the picture plus its 4px white border.</summary>
+    public static double CardWidth => PhotoMaxWidth + 2 * PhotoInset;
 
     public static double Spacing => CardWidth + 24;
 

@@ -28,8 +28,16 @@
     <Color x:Key="Palette.BandLight">#FFCBD2DC</Color>
     <Color x:Key="Palette.BandDark">#FF79808E</Color>
     <Color x:Key="Palette.Success">#FF6CCB5F</Color>
+    <Color x:Key="Palette.OnSuccess">#FF1A1B1F</Color>
     <Color x:Key="Palette.Mask">#9E000000</Color>
     <Color x:Key="Palette.Shadow">#59000000</Color>
+
+    <!-- Stroke.Card in dark mode: white 16% -> 6%, not the light theme's
+         85% -> 18% gradient. -->
+    <LinearGradientBrush x:Key="Brush.CardEdge" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#29FFFFFF" Offset="0" />
+        <GradientStop Color="#0FFFFFFF" Offset="1" />
+    </LinearGradientBrush>
 
     <SolidColorBrush x:Key="Brush.Window" Color="{DynamicResource Palette.Window}" />
     <SolidColorBrush x:Key="Brush.Sidebar" Color="{DynamicResource Palette.Sidebar}" />

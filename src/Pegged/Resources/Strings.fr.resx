@@ -76,6 +76,12 @@
   <data name="Tray.Sounds" xml:space="preserve">
     <value>Sons</value>
   </data>
+  <data name="Tray.Empty" xml:space="preserve">
+    <value>Pegged — la corde est vide</value>
+  </data>
+  <data name="Tray.OnLine" xml:space="preserve">
+    <value>Pegged — {0} sur la corde</value>
+  </data>
   <data name="Tray.OpenAtLogin" xml:space="preserve">
     <value>Ouvrir à la connexion</value>
   </data>
@@ -282,6 +288,42 @@
   </data>
   <data name="Settings.RevealDelayDesc" xml:space="preserve">
     <value>Temps d'arrêt du pointeur avant que la corde descende</value>
+  </data>
+  <data name="Settings.ExtraFolders" xml:space="preserve">
+    <value>Dossiers supplémentaires</value>
+  </data>
+  <data name="Settings.ExtraFoldersDesc" xml:space="preserve">
+    <value>Jusqu'à trois dossiers de plus sont surveillés</value>
+  </data>
+  <data name="Settings.ExtraFoldersNone" xml:space="preserve">
+    <value>Aucun</value>
+  </data>
+  <data name="Settings.ExtraFoldersFull" xml:space="preserve">
+    <value>Trois dossiers supplémentaires au maximum. Retires-en un.</value>
+  </data>
+  <data name="Settings.FolderAdd" xml:space="preserve">
+    <value>Ajouter un dossier</value>
+  </data>
+  <data name="Settings.FolderClear" xml:space="preserve">
+    <value>Vider</value>
+  </data>
+  <data name="Settings.Inbox" xml:space="preserve">
+    <value>Mode boîte de réception</value>
+  </data>
+  <data name="Settings.InboxDesc" xml:space="preserve">
+    <value>Windows enregistre les captures dans le dossier de Pegged</value>
+  </data>
+  <data name="Settings.InboxRestore" xml:space="preserve">
+    <value>Rétablir l'emplacement</value>
+  </data>
+  <data name="Settings.InboxPath" xml:space="preserve">
+    <value>Windows enregistre les captures dans : {0}</value>
+  </data>
+  <data name="Settings.InboxFailed" xml:space="preserve">
+    <value>Windows a refusé de changer le dossier des captures : le mode est désactivé.</value>
+  </data>
+  <data name="Settings.License" xml:space="preserve">
+    <value>Porté depuis tendedero (MIT). Pegged est sous licence MIT.</value>
   </data>
   <data name="Settings.TopEdge" xml:space="preserve">
     <value>Afficher au bord supérieur</value>

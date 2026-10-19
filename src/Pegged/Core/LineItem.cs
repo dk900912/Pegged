@@ -48,9 +48,21 @@ public sealed class LineItem : INotifyPropertyChanged, IEquatable<LineItem>
     }
 
     /// <summary>Whether the file lives in Pegged's own folder: those go to the
-    /// Recycle Bin when taken down, or the folder would fill up.</summary>
-    public bool IsInPeggedFolder =>
-        Path.StartsWith(AppPaths.ScreenshotsFolder, StringComparison.OrdinalIgnoreCase);
+    /// Recycle Bin when taken down, or the folder would fill up.
+    ///
+    /// Compared with a trailing separator: a bare StartsWith made
+    /// "...\ScreenshotsEvil\x.png" look like one of ours and sent the user's
+    /// file to the Recycle Bin.</summary>
+    public bool IsInPeggedFolder
+    {
+        get
+        {
+            var folder = AppPaths.ScreenshotsFolder
+                .TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar)
+                + System.IO.Path.DirectorySeparatorChar;
+            return Path.StartsWith(folder, StringComparison.OrdinalIgnoreCase);
+        }
+    }
 
     public BitmapSource? Thumb
     {

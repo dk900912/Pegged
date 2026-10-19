@@ -76,6 +76,12 @@
   <data name="Tray.Sounds" xml:space="preserve">
     <value>Sounds</value>
   </data>
+  <data name="Tray.Empty" xml:space="preserve">
+    <value>Pegged — the line is empty</value>
+  </data>
+  <data name="Tray.OnLine" xml:space="preserve">
+    <value>Pegged — {0} on the line</value>
+  </data>
   <data name="Tray.OpenAtLogin" xml:space="preserve">
     <value>Open at login</value>
   </data>
@@ -187,21 +193,6 @@
   <data name="Line.EmptyHint" xml:space="preserve">
     <value>Or copy an image — it hangs too</value>
   </data>
-  <data name="Preview.Title" xml:space="preserve">
-    <value>Preview</value>
-  </data>
-  <data name="Preview.Open" xml:space="preserve">
-    <value>Open in default app</value>
-  </data>
-  <data name="Preview.Crop" xml:space="preserve">
-    <value>Crop</value>
-  </data>
-  <data name="Preview.Close" xml:space="preserve">
-    <value>Close</value>
-  </data>
-  <data name="Preview.CopyError" xml:space="preserve">
-    <value>Could not copy the image to the clipboard.</value>
-  </data>
   <data name="Crop.Title" xml:space="preserve">
     <value>Crop</value>
   </data>
@@ -297,6 +288,42 @@
   </data>
   <data name="Settings.RevealDelayDesc" xml:space="preserve">
     <value>How long the pointer rests before the line comes down</value>
+  </data>
+  <data name="Settings.ExtraFolders" xml:space="preserve">
+    <value>Extra folders</value>
+  </data>
+  <data name="Settings.ExtraFoldersDesc" xml:space="preserve">
+    <value>Up to three more folders are watched for new captures</value>
+  </data>
+  <data name="Settings.ExtraFoldersNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Settings.ExtraFoldersFull" xml:space="preserve">
+    <value>Three extra folders is the maximum. Remove one first.</value>
+  </data>
+  <data name="Settings.FolderAdd" xml:space="preserve">
+    <value>Add folder</value>
+  </data>
+  <data name="Settings.FolderClear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Settings.Inbox" xml:space="preserve">
+    <value>Inbox mode</value>
+  </data>
+  <data name="Settings.InboxDesc" xml:space="preserve">
+    <value>Windows saves captures straight into Pegged's own folder</value>
+  </data>
+  <data name="Settings.InboxRestore" xml:space="preserve">
+    <value>Restore location</value>
+  </data>
+  <data name="Settings.InboxPath" xml:space="preserve">
+    <value>Windows saves screenshots in: {0}</value>
+  </data>
+  <data name="Settings.InboxFailed" xml:space="preserve">
+    <value>Windows would not change the screenshot folder, so inbox mode is off.</value>
+  </data>
+  <data name="Settings.License" xml:space="preserve">
+    <value>Ported from tendedero (MIT). Pegged is MIT licensed.</value>
   </data>
   <data name="Settings.TopEdge" xml:space="preserve">
     <value>Reveal at the top edge</value>

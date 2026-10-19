@@ -25,6 +25,14 @@ internal static class NativeMethods
     public const int MA_NOACTIVATE = 3;
     public const int MA_NOACTIVATEANDEAT = 4;
 
+    // Hit testing: the line answers HTTRANSPARENT everywhere except over the
+    // cards and its own buttons, which is how a top-most window lets clicks
+    // reach the app underneath without a global WS_EX_TRANSPARENT (that would
+    // make its own buttons unclickable too).
+    public const int WM_NCHITTEST = 0x0084;
+    public const int HTTRANSPARENT = -1;
+    public const int HTCLIENT = 1;
+
     public const uint SWP_NOSIZE = 0x0001;
     public const uint SWP_NOMOVE = 0x0002;
     public const uint SWP_NOACTIVATE = 0x0010;

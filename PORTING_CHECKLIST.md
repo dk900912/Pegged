@@ -41,3 +41,19 @@
 - [x] 修复：设置窗口尺寸与导航不符合规范（720×560 / 240px 左栏 / 图标+副标题导航 / 28px 页头）
 - [x] 修复：空状态绳子无微风 + 边缘胶囊无流光（添加 `_breezePhase` 摆动 + 流光 GradientStop 滑动）
 - [x] 重新发布 Release 构建（验证 0 Error 0 Warning）
+
+## Phase 6 — 真实端到端验收与闭环（第三轮）
+- [x] `scripts/e2e/launch_probe.py`：资源管理器真实双击 exe，断言单实例 / 贴顶 / 全宽 / 收起藏于屏幕上方 / 展开 293px / 感应条居中（9/9 PASS）
+- [x] `scripts/e2e/interaction_probe.py`：`WM_NCHITTEST` 逐点穿透、工具栏可点、设置中心打开（720×560）、语言实时刷新（5/5 PASS）
+- [x] 修复：舱体亚克力改为真实"抓屏 + 高斯模糊 + 着色 + 噪点"（`Core/AcrylicBackdrop.cs`）
+- [x] 修复：`WM_NCHITTEST` 逐点点击穿透（取代整窗 `WS_EX_TRANSPARENT`），快捷操作栏恢复可点
+- [x] 修复：卡片白边 4px / 圆角 16-12 同心 / 照片 `Uniform` 等比适配
+- [x] 修复：衣夹 9×26 + 5×1.4 系绳槽 + 13×13 弹簧箍，悬停张开按规范
+- [x] 修复：托盘 ToolTip 播报状态 + 剪贴板图标态 + 补全菜单入口（剪贴板/展开条件/保留数量/尺寸）
+- [x] 新增：设置中心 Inbox 模式（重定向 Screenshots 已知文件夹）+ 还原按钮
+- [x] 修复：`{loc:Str}` 改为活绑定，切换语言时已打开界面即时刷新
+- [x] 修复：`LangItem` 等选项类型 `ToString()` 导致下拉框/UIA 显示 `record` 全字段
+- [x] 新增：未处理异常写 `%APPDATA%\Pegged\crash.log`
+- [x] 剪贴板监听加固：隐私格式跳过、64MB 上限、SHA256 去重、`.part` 原子落盘
+- [x] 外部删除/移动文件后 `CaptureStore.Prune()` 已由 `FileSystemWatcher` 触发
+- [x] 重新发布 Release 构建（0 Error 0 Warning）

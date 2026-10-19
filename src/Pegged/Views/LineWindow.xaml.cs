@@ -27,7 +27,6 @@ public partial class LineWindow : Window
     private IntPtr _handle;
     private bool _revealed;
     private bool _pinned;
-    private bool _transparent = true;
     private double _breezePhase;
     private double _scale = 1.0;
 
@@ -116,9 +115,9 @@ public partial class LineWindow : Window
         if (_handle == IntPtr.Zero) return;
 
         var style = NativeMethods.GetWindowLong(_handle, NativeMethods.GWL_EXSTYLE);
-        style |= NativeMethods.WS_EX_TOOLWINDOW | NativeMethods.WS_EX_NOACTIVATE | NativeMethods.WS_EX_TRANSPARENT;
+        style |= NativeMethods.WS_EX_TOOLWINDOW | NativeMethods.WS_EX_NOACTIVATE;
+        style &= ~NativeMethods.WS_EX_TRANSPARENT;
         NativeMethods.SetWindowLong(_handle, NativeMethods.GWL_EXSTYLE, style);
-        _transparent = true;
 
         // Module 4: the line window is also where the clipboard talks to.
         NativeMethods.AddClipboardFormatListener(_handle);
@@ -139,6 +138,14 @@ public partial class LineWindow : Window
                 handled = true;
                 return (IntPtr)NativeMethods.MA_NOACTIVATE;
 
+            case NativeMethods.WM_NCHITTEST:
+                // Per-pixel click through: only the cards and the line's own
+                // buttons are solid, everything else belongs to the window
+                // underneath. Doing it here instead of with a global
+                // WS_EX_TRANSPARENT keeps our own buttons clickable.
+                handled = true;
+                return (IntPtr)HitTest(lParam);
+
             case NativeMethods.WM_CLIPBOARDUPDATE:
                 ClipboardWatcher.OnClipboardChanged();
                 break;
@@ -147,11 +154,53 @@ public partial class LineWindow : Window
         return IntPtr.Zero;
     }
 
+    /// <summary>WM_NCHITTEST: HTCLIENT over something the user can actually
+    /// touch, HTTRANSPARENT everywhere else.</summary>
+    private int HitTest(IntPtr lParam)
+    {
+        if (!_revealed || _handle == IntPtr.Zero) return NativeMethods.HTTRANSPARENT;
+
+        var packed = lParam.ToInt64();
+        var screen = new Point((short)(packed & 0xFFFF), (short)((packed >> 16) & 0xFFFF));
+
+        Point client;
+        try
+        {
+            client = PointFromScreen(screen);
+        }
+        catch (InvalidOperationException)
+        {
+            // No presentation source yet: nothing is on screen to hit.
+            return NativeMethods.HTTRANSPARENT;
+        }
+
+        if (client.X < 0 || client.Y < 0 || client.X > this.Width || client.Y > this.Height)
+            return NativeMethods.HTTRANSPARENT;
+
+        foreach (var rect in _hitRects)
+        {
+            var grown = rect;
+            grown.Inflate(4, 4);
+            if (grown.Contains(client)) return NativeMethods.HTCLIENT;
+        }
+
+        // The quick action bar is solid only while it is actually showing.
+        if (Toolbar.Opacity > 0.4 && RectOf(Toolbar).Contains(client)) return NativeMethods.HTCLIENT;
+
+        return NativeMethods.HTTRANSPARENT;
+    }
+
+    private Rect RectOf(FrameworkElement element)
+    {
+        var origin = element.TranslatePoint(new Point(0, 0), this);
+        var rect = new Rect(origin, new Size(element.ActualWidth, element.ActualHeight));
+        rect.Inflate(4, 4);
+        return rect;
+    }
+
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         FrameLoop.Subscribe(OnFrame);
-        MouseEnter += (_, _) => ShowToolbar(true);
-        MouseLeave += (_, _) => ShowToolbar(false);
         ApplyThemeBrushes();
         ThemeManager.ThemeChanged += (_, _) => ApplyThemeBrushes();
 
@@ -195,6 +244,38 @@ public partial class LineWindow : Window
 
         MoveTo(left, top - _slide.Value);
         LayoutRope();
+        ApplyAcrylic();
+    }
+
+    /// <summary>
+    /// Rebuilds the frosted material behind the dock. Only ever runs while the
+    /// line is tucked away above the top edge: at that moment the screen the
+    /// dock is about to cover is not covered by us, so the snapshot is of the
+    /// desktop and nothing else. The top 16px are left out of the capture
+    /// because the edge pill lives there, and stretching the rest back over it
+    /// is invisible under a blur this soft.
+    /// </summary>
+    private void ApplyAcrylic()
+    {
+        if (_revealed || _target.Width < 8) return;
+
+        var tint = TryFindResource("Palette.Acrylic") is Color c
+            ? c
+            : Color.FromRgb(0xF4, 0xF6, 0xFB);
+
+        var scale = _scale > 0 ? _scale : 1.0;
+        var region = new Rect(_target.Left, _target.Top + 16,
+            _target.Width, Math.Max(32, _target.Height - 16));
+
+        var frosted = AcrylicBackdrop.Capture(region, scale, tint);
+        if (frosted is not null)
+        {
+            Dock.Background = frosted;
+            return;
+        }
+
+        // No screen to read: keep the plain translucent panel.
+        if (TryFindResource("Brush.Acrylic") is Brush plain) Dock.Background = plain;
     }
 
     /// <summary>Moves the window without activating it, in physical pixels.
@@ -301,6 +382,10 @@ public partial class LineWindow : Window
         _pinned = pinned;
         if (_revealed) return;
 
+        // Take the glass before anything moves: the window is still above the
+        // screen, so what we capture is the desktop the dock is about to cover.
+        ApplyAcrylic();
+
         _revealed = true;
         _slide.Target = 0;
         UpdateHint();
@@ -359,30 +444,31 @@ public partial class LineWindow : Window
         _hitRects.AddRange(rects);
     }
 
-    /// <summary>The window only accepts the mouse while the cursor is over a
-    /// card: everywhere else clicks go to whatever is underneath.</summary>
-    public void UpdateClickThrough(Point cursorInWindow)
+    /// <summary>Called on every poll with the pointer in window units. The line
+    /// is not allowed to steal the mouse, so it never sees a MouseEnter: the
+    /// hover state of the dock and of the cards is driven from here instead.
+    /// The actual click-through happens in <see cref="HitTest"/>.</summary>
+    public void UpdatePointer(Point cursorInWindow)
     {
-        var over = false;
-        foreach (var r in _hitRects)
+        if (!_revealed)
         {
-            var inflated = r;
-            inflated.Inflate(4, 4);
-            if (inflated.Contains(cursorInWindow)) { over = true; break; }
+            ShowToolbar(false);
+            Strip.ClearHover();
+            return;
         }
 
-        SetClickThrough(!over);
-    }
+        var overDock = cursorInWindow.Y >= 0 && cursorInWindow.Y <= _target.Height;
+        ShowToolbar(overDock || RectOf(Toolbar).Contains(cursorInWindow));
 
-    private void SetClickThrough(bool through)
-    {
-        if (through == _transparent || _handle == IntPtr.Zero) return;
+        var overCard = false;
+        foreach (var rect in _hitRects)
+        {
+            var grown = rect;
+            grown.Inflate(4, 4);
+            if (grown.Contains(cursorInWindow)) { overCard = true; break; }
+        }
 
-        var style = NativeMethods.GetWindowLong(_handle, NativeMethods.GWL_EXSTYLE);
-        if (through) style |= NativeMethods.WS_EX_TRANSPARENT;
-        else style &= ~NativeMethods.WS_EX_TRANSPARENT;
-        NativeMethods.SetWindowLong(_handle, NativeMethods.GWL_EXSTYLE, style);
-        _transparent = through;
+        if (!overCard) Strip.ClearHover();
     }
 
     // ---- toolbar ---------------------------------------------------------
